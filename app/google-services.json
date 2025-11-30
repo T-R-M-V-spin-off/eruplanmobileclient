@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "668326935744",
+    "project_id": "eruplan-3f",
+    "storage_bucket": "eruplan-3f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668326935744:android:203bca60e76752f9498125",
+        "android_client_info": {
+          "package_name": "eruplan.unisa.eruplan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPkkXf_jH7X78BP4T6iVa7IsOZ4JzVYsU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
