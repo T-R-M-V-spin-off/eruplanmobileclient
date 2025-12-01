@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 1. PERMESSO OBBLIGATORIO PER ANDROID 13+ (API 33+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
-    <!-- Opzionale ma consigliato, anche se spesso è implicito -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -17,7 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Eruplan">
 
-        <!-- Activity di Login, schermata di avvio dell'app -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -25,14 +21,14 @@
 
         <activity
             android:name=".LoginActivity"
-            android:exported="true"
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+            android:exported="true">
 
-        <!-- 2. DICHIARAZIONE DEL SERVIZIO FIREBASE (FONDAMENTALE) -->
-        <!-- Senza questo, onMessageReceived e onNewToken non partiranno MAI -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
