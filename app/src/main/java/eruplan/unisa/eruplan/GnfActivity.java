@@ -8,7 +8,7 @@ import android.widget.Button;
 
 public class GnfActivity extends AppCompatActivity {
 
-    // Riferimento al pulsante "Logout" nel layout.
+    // Riferimento al pulsante di logout nel layout.
     private Button logoutButton;
 
     // Classe di destinazione (dove reindirizziamo l'utente dopo il logout)
