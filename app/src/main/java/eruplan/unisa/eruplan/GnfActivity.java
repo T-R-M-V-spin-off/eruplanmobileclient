@@ -23,7 +23,7 @@ public class GnfActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gnf);
 
         // Collega il pulsante "Logout" dal layout (dobbiamo decidere l'id).
-        logoutButton = findViewById(R.id.logout_button);
+        logoutButton = findViewById(R.id.btnLogout);
 
         // Gestisci il click del logout
         logoutButton.setOnClickListener(new View.OnClickListener() {
