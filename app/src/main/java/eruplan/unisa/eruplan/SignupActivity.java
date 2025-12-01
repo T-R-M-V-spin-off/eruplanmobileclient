@@ -105,7 +105,7 @@ public class SignupActivity extends AppCompatActivity {
 
         showToast("Registrazione simulata con successo!");
         Intent intent = new Intent(this, MainActivity.class);
-        startActivity(GnfActivity.class);
+        //startActivity(GnfActivity.class);
         finish();
     }
 
