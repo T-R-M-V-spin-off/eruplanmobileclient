@@ -48,7 +48,6 @@ dependencies {
     // Firebase (mantenuto per altri servizi come le notifiche)
     implementation(libs.firebase.messaging)
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-    implementation("com.google.firebase:firebase-auth") // Puoi rimuoverlo se non usi più l'autenticazione
     implementation("com.google.firebase:firebase-analytics")
 
     // Aggiunta libreria per le chiamate di rete
