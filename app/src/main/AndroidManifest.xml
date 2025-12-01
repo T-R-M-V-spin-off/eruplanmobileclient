@@ -17,14 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Eruplan">
 
+        <!-- Activity di Login, schermata di avvio dell'app -->
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
 
         <!-- 2. DICHIARAZIONE DEL SERVIZIO FIREBASE (FONDAMENTALE) -->
         <!-- Senza questo, onMessageReceived e onNewToken non partiranno MAI -->
