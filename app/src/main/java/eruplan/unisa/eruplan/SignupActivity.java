@@ -29,9 +29,7 @@ public class SignupActivity extends AppCompatActivity {
 
         btnSignUp.setOnClickListener(v -> attemptRegistration());
 
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -104,8 +102,8 @@ public class SignupActivity extends AppCompatActivity {
         //Qui andrebbe il codice per salvare nel DB (Room, Firebase, API, ecc.)
 
         showToast("Registrazione simulata con successo!");
-        Intent intent = new Intent(this, MainActivity.class);
-        //startActivity(GnfActivity.class);
+        Intent intent = new Intent(this, GnfActivity.class);
+        startActivity(intent);
         finish();
     }
 
