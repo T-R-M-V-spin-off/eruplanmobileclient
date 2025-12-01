@@ -38,6 +38,9 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:clickable="true"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:background="@drawable/bg_rounded_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
@@ -50,10 +53,13 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:hint="Password"
+        android:textAlignment="center"
         android:inputType="textPassword"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:clickable="true"
+        android:textColor="@color/black"
+        android:background="@drawable/bg_rounded_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codice_fiscale" />
