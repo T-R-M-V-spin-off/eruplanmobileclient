@@ -12,7 +12,7 @@ public class GnfActivity extends AppCompatActivity {
     private Button logoutButton;
 
     // Classe di destinazione (dove reindirizziamo l'utente dopo il logout)
-    // Per ora non esiste una classe per la schermata d'accesso quindi usiamo LoginActivity
+    // Per ora non esiste una classe per la schermata d'accesso per cui reindirizziamo l'utente alla LoginActivity
     private final Class<?> LOGIN_ACTIVITY_CLASS = LoginActivity.class;
 
     @Override
@@ -23,23 +23,16 @@ public class GnfActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gnf);
 
         // Collega il pulsante "Logout" dal layout (dobbiamo decidere l'id).
-        logoutButton = findViewById(R.id.logout_button);
+        logoutButton = findViewById(R.id.btnLogout);
 
         // Gestisci il click del logout
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Avvia il processo di logout.
-                performLogout();
+                navigateToLoginScreen();
             }
         });
-    }
-
-    // Metodo per eseguire il logout
-    private void performLogout() {
-
-        // Navigazione alla schermata di accesso.
-        navigateToLoginScreen();
     }
 
     // Metodo per reindirizzare l'utente alla schermata di accesso
