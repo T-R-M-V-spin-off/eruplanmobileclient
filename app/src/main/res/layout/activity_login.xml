@@ -64,11 +64,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codice_fiscale" />
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:background="@drawable/bg_rounded_gray"
         android:text="Login"
         app:cornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
