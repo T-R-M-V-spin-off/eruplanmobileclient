@@ -14,9 +14,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Eruplan">
 
+        <!-- StartupActivity è il Launcher: deve essere exported="true" -->
         <activity
-            android:name=".MainActivity"
+            android:name=".StartupActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Le altre activity sono interne: exported="false" per sicurezza -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false">
         </activity>
 
         <activity
@@ -31,31 +42,25 @@
 
         <activity
             android:name=".AggiungiMembroActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".CreaNucleoActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
             android:name=".CosaVuoiFareActivity"
-            android:exported="true">
+            android:exported="false">
         </activity>
 
         <activity
-            android:name=".LoginActivity"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".VisualizzaNucleoActivity"
+            android:exported="false"/>
 
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".EruplanMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

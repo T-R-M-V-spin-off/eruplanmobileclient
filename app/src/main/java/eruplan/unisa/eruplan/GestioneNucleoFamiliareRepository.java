@@ -3,11 +3,10 @@ package eruplan.unisa.eruplan;
 import android.content.Context;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+// MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +19,10 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
 
-    private RequestQueue requestQueue;
+    // MODIFICA: Rimosso la RequestQueue locale. 
+    // Ora utilizziamo il contesto per accedere al VolleySingleton.
+    // private RequestQueue requestQueue;
+    private Context context;
 
     public interface RepositoryCallback {
         void onSuccess(String message);
@@ -28,7 +30,12 @@ public class GestioneNucleoFamiliareRepository {
     }
 
     public GestioneNucleoFamiliareRepository(Context context) {
-        this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+        // MODIFICA: Invece di creare una nuova coda separata (che perderebbe la sessione),
+        // salviamo il context per richiamare il Singleton condiviso quando serve.
+        this.context = context;
+        
+        // Vecchio codice rimosso:
+        // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
     public void salvaMembro(Membro membro, final RepositoryCallback callback) {
@@ -70,7 +77,9 @@ public class GestioneNucleoFamiliareRepository {
                     }
                 });
 
-        requestQueue.add(jsonObjectRequest);
+        // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
+        // Questo assicura che vengano inviati i cookie di sessione (JSESSIONID) del login.
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     /**
@@ -114,6 +123,7 @@ public class GestioneNucleoFamiliareRepository {
                     }
                 });
 
-        requestQueue.add(jsonObjectRequest);
+        // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }
