@@ -113,8 +113,8 @@ public class AggiungiMembroActivity extends AppCompatActivity {
                         Toast.makeText(AggiungiMembroActivity.this, message, Toast.LENGTH_LONG).show();
 
                         // Reindirizza l'utente e chiude questa activity.
-                        Intent intent = new Intent(AggiungiMembroActivity.this, VisualizzaMembroBoundary.class);
-                        startActivity(intent);
+                        //Intent intent = new Intent(AggiungiMembroActivity.this, VisualizzaMembroBoundary.class);
+                        //startActivity(intent);
                         finish();
                     }
 
