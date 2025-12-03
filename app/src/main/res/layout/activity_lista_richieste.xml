@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Inviti ricevuti"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@drawable/bg_rounded_light_gray"
+        android:padding="20dp"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/black"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewRichieste"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_above="@id/btn_torna_menu"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:scrollbars="vertical"
+
+        tools:listitem="@layout/item_richiesta" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_torna_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Torna al menu"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+
+        android:background="@drawable/bg_rounded_light_gray"
+        android:textColor="@android:color/black"/>
+
+</RelativeLayout>
