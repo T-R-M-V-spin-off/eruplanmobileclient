@@ -57,4 +57,25 @@ public class GestioneNucleoFamiliareControl {
             }
         });
     }
+
+    /**
+     * Avvia la logica per abbandonare il nucleo familiare corrente.
+     * @param controlCallback L'interfaccia per notificare l'Activity del risultato.
+     */
+    public void abbandonaNucleo(final ControlCallback controlCallback) {
+        service.abbandonaNucleo(new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                // Traduciamo il successo del service in un successo per l'Activity
+                controlCallback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                // Traduciamo l'errore del service in un errore per l'Activity
+                controlCallback.onInserimentoErrore(message);
+            }
+        });
+    }
+
 }
