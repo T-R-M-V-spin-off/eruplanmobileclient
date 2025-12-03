@@ -1,7 +1,7 @@
 package eruplan.unisa.eruplan;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
+import androidx.constraintlayout.helper.widget.Flow;
 
 import android.os.Bundle;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -20,20 +21,21 @@ import java.net.CookieManager;
 public class GnfActivity extends AppCompatActivity {
 
     // Riferimenti ai pulsanti nel layout
-    private AppCompatButton btnLogout;
-    private AppCompatButton btnMembri;
-    private AppCompatButton btnAbbandona;
-    private AppCompatButton btnSi;
-    private AppCompatButton btnNo;
+    private MaterialButton btnLogout;
+    private MaterialButton btnMembri;
+    private MaterialButton btnAbbandona;
+    private MaterialButton btnSi;
+    private MaterialButton btnNo;
     private TextView tvConferma;
     private LinearLayout layoutConfermaAzioni;
+    private Flow buttonFlow;
 
     // Controller per la gestione del nucleo
     private GestioneNucleoFamiliareControl gestioneNucleoControl;
 
     // Classe di destinazione dopo il logout: StartupActivity (Homepage)
     private final Class<?> LOGOUT_TARGET_CLASS = StartupActivity.class;
-    
+
     // TAG per i log delle notifiche
     private static final String TAG_FCM = "FCM_DEBUG";
     // Topic per le notifiche di emergenza
@@ -58,6 +60,7 @@ public class GnfActivity extends AppCompatActivity {
         btnNo = findViewById(R.id.btnNo);
         tvConferma = findViewById(R.id.tvConferma);
         layoutConfermaAzioni = findViewById(R.id.layoutConfermaAzioni);
+        buttonFlow = findViewById(R.id.button_flow);
 
         // Iscrizione al topic per le notifiche di emergenza.
         subscribeToNotificationTopic();
@@ -152,8 +155,11 @@ public class GnfActivity extends AppCompatActivity {
      */
     private void mostraSezioneConferma(boolean mostra) {
         int visibility = mostra ? View.VISIBLE : View.GONE;
+        int gridVisibility = mostra ? View.GONE : View.VISIBLE;
+
         tvConferma.setVisibility(visibility);
         layoutConfermaAzioni.setVisibility(visibility);
+        buttonFlow.setVisibility(gridVisibility);
     }
 
     /**

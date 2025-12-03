@@ -1,163 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".GnfActivity">
 
     <TextView
         android:id="@+id/tvTitle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_rounded_gray"
+        android:background="@color/red"
         android:gravity="center"
         android:padding="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="Gestisci il tuo\nNucleo Familiare"
-        android:textColor="#000000"
+        android:text="Gestisci il tuo Nucleo Familiare"
+        android:textColor="@color/white"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/button_flow"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginTop="24dp"
+        app:constraint_referenced_ids="btnMembri,btnResidenza,btnLuoghi,btnInviti,btnEmergenza,btnAbbandona"
+        app:flow_horizontalGap="16dp"
+        app:flow_verticalGap="16dp"
+        app:flow_horizontalStyle="packed"
+        app:flow_maxElementsWrap="2"
+        app:flow_wrapMode="chain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnMembri"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="I membri\ndel tuo Nucleo"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginEnd="8dp"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnMembri"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="I membri
+del tuo Nucleo"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnResidenza"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="La tua\nResidenza"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnResidenza"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="La tua
+Residenza"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLuoghi"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="I tuoi
+Luoghi Sicuri"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnLuoghi"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="I tuoi\nLuoghi Sicuri"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginEnd="8dp"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnInviti"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="I tuoi inviti"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnInviti"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="I tuoi inviti"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEmergenza"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="Il tuo piano di
+emergenza"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="24dp">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnEmergenza"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="Il tuo piano di\nemergenza"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginEnd="8dp"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnAbbandona"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_rounded_gray"
-            android:text="Abbandona\nNucleo"
-            android:textColor="#000000"
-            android:textAllCaps="false"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAbbandona"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:text="Abbandona
+Nucleo"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/red" />
 
     <TextView
         android:id="@+id/tvConferma"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_rounded_gray"
+        android:layout_marginTop="24dp"
         android:gravity="center"
         android:padding="12dp"
-        android:layout_marginBottom="16dp"
-        android:text="Confermi di voler abbandonare\nil tuo nucleo familiare?"
-        android:textColor="#000000"
+        android:text="Confermi di voler abbandonare il tuo nucleo familiare?"
+        android:background="@drawable/bg_rounded_red"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_flow"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/layoutConfermaAzioni"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvConferma"
+        tools:visibility="visible">
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSi"
             android:layout_width="160dp"
             android:layout_height="80dp"
-            android:background="@drawable/bg_rounded_gray"
+            android:layout_marginEnd="8dp"
             android:text="Si"
-            android:textColor="#000000"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/white"
             android:textAllCaps="false"
             android:textSize="18sp"
-            android:layout_marginEnd="8dp"/>
+            app:backgroundTint="#E0E0E0" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNo"
             android:layout_width="160dp"
             android:layout_height="80dp"
-            android:background="@drawable/bg_rounded_gray"
+            android:layout_marginStart="8dp"
             android:text="No"
-            android:textColor="#000000"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/white"
             android:textAllCaps="false"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp"/>
+            android:textSize="18sp"/>
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_rounded_gray"
         android:text="Logout"
-        android:textColor="#000000"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/red"
         android:textStyle="bold"
         android:textAllCaps="false"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        app:backgroundTint="#E0E0E0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

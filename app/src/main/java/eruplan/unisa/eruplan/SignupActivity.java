@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +26,11 @@ import java.util.Calendar;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private EditText etNome, etCognome, etCodiceFiscale, etDataNascita, etSesso;
+    private EditText etNome, etCognome, etCodiceFiscale, etDataNascita;
+
+    private RadioGroup etSesso;
     private EditText etPassword, etConfirmPassword;
-    private Button btnSignUp, btnBack;
+    private MaterialButton btnSignUp, btnBack;
     private ProgressBar progressBar;
 
     // CORRETTO: URL allineato con il controller del server (URControl)
@@ -85,9 +89,16 @@ public class SignupActivity extends AppCompatActivity {
         String cognome = etCognome.getText().toString().trim();
         String cf = etCodiceFiscale.getText().toString().trim();
         String data = etDataNascita.getText().toString().trim();
-        String sesso = etSesso.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPass = etConfirmPassword.getText().toString().trim();
+
+        int selectedSessoId = etSesso.getCheckedRadioButtonId();
+        String sesso = "";
+        if (selectedSessoId == R.id.radioMaschio) {
+            sesso = "M";
+        } else if (selectedSessoId == R.id.radioFemmina) {
+            sesso = "F";
+        }
 
         // Validazione
         if (TextUtils.isEmpty(nome) || TextUtils.isEmpty(cognome) || TextUtils.isEmpty(cf)) {
@@ -97,6 +108,11 @@ public class SignupActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(data)) {
             showToast("Inserisci la data di nascita.");
+            return;
+        }
+
+        if (TextUtils.isEmpty(sesso)) {
+            showToast("Seleziona il sesso.");
             return;
         }
 
@@ -125,7 +141,7 @@ public class SignupActivity extends AppCompatActivity {
             requestBody.put("cognome", cognome);
             requestBody.put("codiceFiscale", cf.toUpperCase());
             // CORRETTO: La chiave deve essere "dataNascita" come nel server, non "dataDiNascita"
-            requestBody.put("dataNascita", data); 
+            requestBody.put("dataNascita", data);
             requestBody.put("sesso", sesso);
             requestBody.put("password", password);
         } catch (JSONException e) {
@@ -162,12 +178,12 @@ public class SignupActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
                         btnSignUp.setEnabled(true);
-                        
+
                         String errorMsg = "Errore di connessione";
                         if (error.networkResponse != null) {
-                             // Se il server risponde (es. 400 Bad Request), mostriamo il codice
+                            // Se il server risponde (es. 400 Bad Request), mostriamo il codice
                             errorMsg += " (Server: " + error.networkResponse.statusCode + ")";
-                            
+
                             // Tentativo di leggere il messaggio di errore dal server
                             try {
                                 String data = new String(error.networkResponse.data);
