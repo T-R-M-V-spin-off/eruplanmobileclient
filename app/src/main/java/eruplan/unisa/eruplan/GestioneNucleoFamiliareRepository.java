@@ -18,6 +18,7 @@ public class GestioneNucleoFamiliareRepository {
 
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
+    private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
 
     // MODIFICA: Rimosso la RequestQueue locale. 
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
@@ -126,4 +127,42 @@ public class GestioneNucleoFamiliareRepository {
         // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+    /**
+     * Invia la richiesta al server per far sì che l'utente loggato abbandoni il suo nucleo familiare.
+     * L'identificazione dell'utente avviene tramite il cookie di sessione gestito da VolleySingleton.
+     * @param callback L'interfaccia per notificare il successo o l'errore dell'operazione.
+     */
+    public void abbandonaNucleo(final RepositoryCallback callback) {
+        // La richiesta è di tipo POST e non necessita di un corpo (body) JSON,
+        // perché il server identifica l'utente dalla sessione. Passiamo 'null'.
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ABBANDONA_NUCLEO_URL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            // Il server dovrebbe rispondere con un JSON che indica il successo
+                            boolean success = response.getBoolean("success");
+                            String message = response.optString("message", "Operazione completata con successo.");
+                            if (success) {
+                                callback.onSuccess(message);
+                            } else {
+                                callback.onError(message);
+                            }
+                        } catch (JSONException e) {
+                            callback.onError("Errore nella lettura della risposta del server.");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError("Errore di connessione. Impossibile abbandonare il nucleo." + error.getMessage());
+                    }
+                });
+
+        // Aggiunta della richiesta alla coda usando il Singleton per mantenere la sessione
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
 }
