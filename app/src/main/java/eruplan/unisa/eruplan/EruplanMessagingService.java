@@ -11,20 +11,24 @@ import androidx.core.app.NotificationManagerCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+/**
+ * Servizio per la gestione delle notifiche Push di Firebase (FCM).
+ * Rinominato da MyFirebaseMessagingService per coerenza col progetto.
+ */
+public class EruplanMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FCM_Service";
     private static final String CHANNEL_ID = "DefaultChannel"; // ID del canale
 
     /**
      * Chiamato se un nuovo token viene generato.
-     * Questo succede in background, separatamente dalla MainActivity.
+     * Questo succede in background, separatamente dalle Activity.
      */
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         Log.d(TAG, "Token FCM Aggiornato/Nuovo: " + token);
-        // In un'app reale, questo token andrebbe inviato al server
+        // In un'app reale, questo token andrebbe inviato al server per notifiche mirate al singolo utente
     }
 
     /**
@@ -49,8 +53,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    //Costruisce e mostra la notifica (serve per il foreground).
-
+    // Costruisce e mostra la notifica (serve per il foreground).
     private void sendNotification(String title, String messageBody) {
         // 1. Bisogna creare un Canale
         createNotificationChannel();
@@ -67,28 +70,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // 3. Mostra la notifica
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        // Controlla il permesso prima di notificare
-        if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-            // '0' è l'ID della notifica (possiamo usarne uno diverso per gestirne di multiple)
-            notificationManager.notify(0, notificationBuilder.build());
-        } else {
-            Log.w(TAG, "Notifica bloccata. Permesso non concesso.");
+        // Controlla il permesso prima di notificare (necessario su Android 13+)
+        try {
+             notificationManager.notify(0, notificationBuilder.build());
+        } catch (SecurityException e) {
+             Log.w(TAG, "Notifica bloccata. Permesso POST_NOTIFICATIONS non concesso.");
         }
     }
 
-    // Crea il Canale di Notifica. Obbligatorio!!!
+    // Crea il Canale di Notifica. Obbligatorio per Android 8.0+
     private void createNotificationChannel() {
-        CharSequence name = "Notifiche Principali";
-        String description = "Canale di default per le notifiche push";
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "Notifiche Principali";
+            String description = "Canale di default per le notifiche push";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
 
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-        channel.setDescription(description);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
 
-        // Registra il canale con il sistema
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        if (notificationManager != null) {
-            notificationManager.createNotificationChannel(channel);
+            // Registra il canale con il sistema
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 }

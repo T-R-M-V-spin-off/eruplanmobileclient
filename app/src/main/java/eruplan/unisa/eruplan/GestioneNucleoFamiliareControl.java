@@ -1,0 +1,60 @@
+package eruplan.unisa.eruplan;
+
+import android.content.Context;
+import android.content.Intent;
+
+/**
+ * Funge da regista (Controller) per le operazioni relative alla gestione del nucleo familiare.
+ */
+public class GestioneNucleoFamiliareControl {
+
+    private GestioneNucleoFamiliareService service;
+    private Context context;
+
+    public interface ControlCallback {
+        void onInserimentoSuccesso(String message);
+        void onInserimentoErrore(String message);
+    }
+
+    public GestioneNucleoFamiliareControl(Context context) {
+        this.context = context;
+        this.service = new GestioneNucleoFamiliareService(context);
+    }
+
+    public void mostraFormCreaNucleo() {
+        Intent intent = new Intent(context, CreaNucleoActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    public void inserisciMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ControlCallback controlCallback) throws IllegalArgumentException {
+        service.creaMembro(nome, cognome, codiceFiscale, dataDiNascita, sesso, assistenza, minorenne, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                controlCallback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                controlCallback.onInserimentoErrore(message);
+            }
+        });
+    }
+
+    /**
+     * Avvia il processo di creazione di un nuovo nucleo familiare.
+     */
+    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ControlCallback controlCallback) throws IllegalArgumentException {
+        service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                controlCallback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                controlCallback.onInserimentoErrore(message);
+            }
+        });
+    }
+}

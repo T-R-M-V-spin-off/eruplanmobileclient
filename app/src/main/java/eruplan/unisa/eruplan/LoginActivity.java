@@ -13,41 +13,30 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Gestisce il processo di login dell'utente comunicando con un server web per l'autenticazione.
- * <p>
- * L'activity invia le credenziali (codice fiscale e password) a un endpoint del server.
- * In base alla risposta del server, l'utente viene autenticato o riceve un messaggio di errore.
- * </p>
  */
 public class LoginActivity extends Activity {
 
-    // --- PLACEHOLDER: Sostituisci con l'URL reale del tuo endpoint di login ---
-    private static final String LOGIN_URL = "https://your.server.url/api/login";
+    // URL Reale del server
+    private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/autenticazione/login";
 
     private EditText codiceFiscaleEditText;
     private EditText passwordEditText;
     private Button loginButton;
     private ProgressBar loadingProgressBar;
 
-    private RequestQueue requestQueue;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // Inizializza la coda di richieste di Volley
-        requestQueue = Volley.newRequestQueue(this);
 
         // Riferimenti alle view
         codiceFiscaleEditText = findViewById(R.id.codice_fiscale);
@@ -63,9 +52,6 @@ public class LoginActivity extends Activity {
         });
     }
 
-    /**
-     * Tenta di autenticare l'utente inviando le credenziali al server web.
-     */
     private void loginUser() {
         String codiceFiscale = codiceFiscaleEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
@@ -75,7 +61,6 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        // Aggiunto controllo sulla lunghezza del Codice Fiscale
         if (codiceFiscale.length() != 16) {
             Toast.makeText(getApplicationContext(), "Il Codice Fiscale deve essere di 16 caratteri.", Toast.LENGTH_SHORT).show();
             return;
@@ -86,14 +71,12 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        // --- PLACEHOLDER: Struttura JSON della richiesta ---
-        // Assicurati che le chiavi ("codice_fiscale", "password") corrispondano a ciò che il server si aspetta.
+        // Creazione JSON per il server
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("codice_fiscale", codiceFiscale.toUpperCase());
+            requestBody.put("codiceFiscale", codiceFiscale.toUpperCase());
             requestBody.put("password", password);
         } catch (JSONException e) {
-            // Questo errore non dovrebbe accadere in condizioni normali
             Toast.makeText(this, "Errore nella creazione della richiesta", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -108,21 +91,22 @@ public class LoginActivity extends Activity {
                         loadingProgressBar.setVisibility(View.GONE);
                         loginButton.setEnabled(true);
                         try {
-                            // --- PLACEHOLDER: Interpretazione della risposta del server ---
-                            // Questo è un esempio. Adatta la logica alla risposta reale del tuo server.
-                            boolean success = response.getBoolean("success");
+                            // Verifica risposta server
+                            boolean success = response.optBoolean("success", true); 
 
                             if (success) {
-                                Toast.makeText(LoginActivity.this, "Autenticazione riuscita.", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                Toast.makeText(LoginActivity.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
+                                
+                                // Naviga verso il Menu del Nucleo Familiare (GnfActivity)
+                                Intent intent = new Intent(LoginActivity.this, GnfActivity.class);
+                                startActivity(intent);
                                 finish();
                             } else {
-                                String message = response.optString("message", "Credenziali non valide.");
+                                String message = response.optString("message", "Credenziali errate.");
                                 Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                             }
-                        } catch (JSONException e) {
-                            // Errore nel parsing della risposta JSON
-                            Toast.makeText(LoginActivity.this, "Errore nella risposta del server", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(LoginActivity.this, "Errore risposta server", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -131,13 +115,12 @@ public class LoginActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         loadingProgressBar.setVisibility(View.GONE);
                         loginButton.setEnabled(true);
-
-                        // Gestione degli errori di rete (es. server non raggiungibile, timeout)
-                        Toast.makeText(LoginActivity.this, "Errore di connessione: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                        String err = (error.getMessage() != null) ? error.getMessage() : "Errore generico";
+                        Toast.makeText(LoginActivity.this, "Errore login: " + err, Toast.LENGTH_LONG).show();
                     }
                 });
 
-        // Aggiungi la richiesta alla coda
-        requestQueue.add(jsonObjectRequest);
+        // Usa il Singleton per inviare la richiesta
+        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 }
