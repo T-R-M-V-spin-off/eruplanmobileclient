@@ -7,7 +7,11 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.net.CookieHandler;
@@ -18,6 +22,14 @@ public class GnfActivity extends AppCompatActivity {
     // Riferimenti ai pulsanti nel layout
     private AppCompatButton btnLogout;
     private AppCompatButton btnMembri;
+    private AppCompatButton btnAbbandona;
+    private AppCompatButton btnSi;
+    private AppCompatButton btnNo;
+    private TextView tvConferma;
+    private LinearLayout layoutConfermaAzioni;
+
+    // Controller per la gestione del nucleo
+    private GestioneNucleoFamiliareControl gestioneNucleoControl;
 
     // Classe di destinazione dopo il logout: StartupActivity (Homepage)
     private final Class<?> LOGOUT_TARGET_CLASS = StartupActivity.class;
@@ -34,10 +46,19 @@ public class GnfActivity extends AppCompatActivity {
         // Carica il layout del menu GNF
         setContentView(R.layout.activity_gnf);
 
+        // 1. Inizializzazione del Control
+        gestioneNucleoControl = new GestioneNucleoFamiliareControl(getApplicationContext());
+
+
         // Inizializzazione Views
         btnLogout = findViewById(R.id.btnLogout);
         btnMembri = findViewById(R.id.btnMembri);
-        
+        btnAbbandona = findViewById(R.id.btnAbbandona);
+        btnSi = findViewById(R.id.btnSi);
+        btnNo = findViewById(R.id.btnNo);
+        tvConferma = findViewById(R.id.tvConferma);
+        layoutConfermaAzioni = findViewById(R.id.layoutConfermaAzioni);
+
         // Iscrizione al topic per le notifiche di emergenza.
         subscribeToNotificationTopic();
 
@@ -57,6 +78,35 @@ public class GnfActivity extends AppCompatActivity {
                 performLogout();
             }
         });
+
+        // Listener per il pulsante "Abbandona Nucleo"
+        btnAbbandona.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Mostra la sezione di conferma
+                mostraSezioneConferma(true);
+            }
+        });
+
+        // Listener per il pulsante "Sì" (nella sezione di conferma)
+        btnSi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Logica per eseguire l'abbandono del nucleo
+                eseguiAbbandonoNucleo();
+            }
+        });
+
+
+        // Listener per il pulsante "No" (nella sezione di conferma)
+        btnNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Nasconde la sezione di conferma
+                mostraSezioneConferma(false);
+            }
+        });
+
     }
 
     /**
@@ -95,4 +145,44 @@ public class GnfActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    /**
+     * Mostra o nasconde la sezione di conferma per l'abbandono del nucleo.
+     * @param mostra true per mostrare, false per nascondere.
+     */
+    private void mostraSezioneConferma(boolean mostra) {
+        int visibility = mostra ? View.VISIBLE : View.GONE;
+        tvConferma.setVisibility(visibility);
+        layoutConfermaAzioni.setVisibility(visibility);
+    }
+
+    /**
+     * Chiama il control per eseguire l'operazione di abbandono del nucleo
+     * e gestisce la risposta.
+     */
+    private void eseguiAbbandonoNucleo() {
+        // Disabilita i bottoni per prevenire click multipli durante la richiesta
+        btnSi.setEnabled(false);
+        btnNo.setEnabled(false);
+
+        gestioneNucleoControl.abbandonaNucleo(new GestioneNucleoFamiliareControl.ControlCallback() {
+            @Override
+            public void onInserimentoSuccesso(String message) {
+                // Successo: mostra un messaggio e naviga alla schermata di avvio
+                Toast.makeText(GnfActivity.this, message, Toast.LENGTH_LONG).show();
+                navigateToStartupScreen(); // Riutilizziamo il metodo di navigazione
+            }
+
+            @Override
+            public void onInserimentoErrore(String message) {
+                // Errore: nascondi la sezione di conferma, mostra un errore e riabilita i bottoni
+                mostraSezioneConferma(false);
+                Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+                btnSi.setEnabled(true);
+                btnNo.setEnabled(true);
+            }
+        });
+    }
+
+
 }
