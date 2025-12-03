@@ -31,6 +31,7 @@
             android:layout_marginTop="16dp"
             android:hint="Nome"
             android:textColorHint="@color/black"
+            app:cursorColor="@color/black"
             app:boxBackgroundColor="@color/light_gray"
             app:boxCornerRadiusBottomEnd="24dp"
             app:boxCornerRadiusBottomStart="24dp"
@@ -60,6 +61,7 @@
             android:layout_marginTop="8dp"
             android:hint="Cognome"
             android:textColorHint="@color/black"
+            app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
             app:boxBackgroundColor="@color/light_gray"
             app:boxCornerRadiusBottomEnd="24dp"
@@ -88,6 +90,7 @@
             android:layout_marginTop="8dp"
             android:hint="Codice Fiscale"
             android:textColorHint="@color/black"
+            app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
             app:boxBackgroundColor="@color/light_gray"
             app:boxCornerRadiusBottomEnd="24dp"
@@ -117,6 +120,7 @@
             android:layout_marginTop="8dp"
             android:hint="Data di Nascita (gg/mm/aaaa)"
             android:textColorHint="@color/black"
+            app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
             app:boxBackgroundColor="@color/light_gray"
             app:boxCornerRadiusBottomEnd="24dp"
@@ -162,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                app:buttonTint="@color/black"
+                app:buttonTint="@color/red"
                 android:text="Maschio" />
 
             <RadioButton
@@ -170,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                app:buttonTint="@color/black"
+                app:buttonTint="@color/red"
                 android:layout_marginStart="16dp"
                 android:text="Femmina" />
         </RadioGroup>
@@ -182,6 +186,8 @@
             android:layout_marginTop="8dp"
             android:text="Necessita di assistenza"
             android:textColor="@color/black"
+            app:buttonTint="@color/red"
+            app:buttonIconTint="@color/white"
             app:layout_constraintTop_toBottomOf="@id/sessoRadioGroup"
             app:layout_constraintStart_toStartOf="parent" />
         
@@ -191,19 +197,24 @@
             android:layout_height="wrap_content"
             android:text="Minorenne"
             android:textColor="@color/black"
+            app:buttonTint="@color/red"
+            app:buttonIconTint="@color/white"
             app:layout_constraintTop_toBottomOf="@id/assistenzaCheckBox"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/submitButton"
-            android:background="@drawable/bg_rounded_light_gray"
-            android:layout_width="wrap_content"
+            android:shadowColor="@color/black"
+            android:backgroundTint="@color/red"
+            android:elevation="10dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Aggiungi Membro"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@id/minorenneCheckBox"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <ProgressBar
             android:id="@+id/loadingProgressBar"
