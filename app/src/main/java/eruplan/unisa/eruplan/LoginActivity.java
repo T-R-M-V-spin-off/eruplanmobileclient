@@ -25,8 +25,8 @@ import org.json.JSONObject;
  */
 public class LoginActivity extends Activity {
 
-    // URL Reale del server
-    private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/autenticazione/login";
+    // URL Reale del server - CORRETTO: punta a /gestoreUtentiMobile/login
+    private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/login";
 
     private EditText codiceFiscaleEditText;
     private EditText passwordEditText;
@@ -74,6 +74,7 @@ public class LoginActivity extends Activity {
         // Creazione JSON per il server
         JSONObject requestBody = new JSONObject();
         try {
+            // Chiavi confermate dal server: "codiceFiscale" e "password"
             requestBody.put("codiceFiscale", codiceFiscale.toUpperCase());
             requestBody.put("password", password);
         } catch (JSONException e) {
@@ -91,22 +92,19 @@ public class LoginActivity extends Activity {
                         loadingProgressBar.setVisibility(View.GONE);
                         loginButton.setEnabled(true);
                         try {
-                            // Verifica risposta server
-                            boolean success = response.optBoolean("success", true); 
+                            // In base al codice del server, se siamo qui è status 200 OK.
+                            // Il server non restituisce un JSON con "success: true", ma solo status 200 se va bene.
+                            // Tuttavia, Volley chiama onResponse solo per 2xx.
+                            
+                            Toast.makeText(LoginActivity.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
+                            
+                            // Naviga verso il Menu del Nucleo Familiare (GnfActivity)
+                            Intent intent = new Intent(LoginActivity.this, GnfActivity.class);
+                            startActivity(intent);
+                            finish();
 
-                            if (success) {
-                                Toast.makeText(LoginActivity.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
-                                
-                                // Naviga verso il Menu del Nucleo Familiare (GnfActivity)
-                                Intent intent = new Intent(LoginActivity.this, GnfActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                String message = response.optString("message", "Credenziali errate.");
-                                Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
-                            }
                         } catch (Exception e) {
-                            Toast.makeText(LoginActivity.this, "Errore risposta server", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Errore generico dopo login", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -115,8 +113,21 @@ public class LoginActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         loadingProgressBar.setVisibility(View.GONE);
                         loginButton.setEnabled(true);
-                        String err = (error.getMessage() != null) ? error.getMessage() : "Errore generico";
-                        Toast.makeText(LoginActivity.this, "Errore login: " + err, Toast.LENGTH_LONG).show();
+                        
+                        String errorMsg = "Errore login";
+                        if (error.networkResponse != null) {
+                            int statusCode = error.networkResponse.statusCode;
+                            if (statusCode == 404) {
+                                errorMsg = "Utente non trovato (o CF errato)";
+                            } else if (statusCode == 401) {
+                                errorMsg = "Password errata";
+                            } else {
+                                errorMsg += " (" + statusCode + ")";
+                            }
+                        } else {
+                            errorMsg += ": " + error.getMessage();
+                        }
+                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 });
 

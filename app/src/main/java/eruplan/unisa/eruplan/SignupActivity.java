@@ -29,8 +29,8 @@ public class SignupActivity extends AppCompatActivity {
     private Button btnSignUp, btnBack;
     private ProgressBar progressBar;
 
-    // URL del server per la registrazione
-    private static final String SIGNUP_URL = "https://eruplanserver.azurewebsites.net/autenticazione/signup";
+    // CORRETTO: URL allineato con il controller del server (URControl)
+    private static final String SIGNUP_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/registra";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +68,9 @@ public class SignupActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    String selectedDate = String.format("%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear);
+                    // CORRETTO: Il server usa DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    // Quindi dobbiamo usare i trattini "-", non gli slash "/"
+                    String selectedDate = String.format("%02d-%02d-%d", selectedDay, selectedMonth + 1, selectedYear);
                     etDataNascita.setText(selectedDate);
                 },
                 year, month, day
@@ -121,8 +123,9 @@ public class SignupActivity extends AppCompatActivity {
         try {
             requestBody.put("nome", nome);
             requestBody.put("cognome", cognome);
-            requestBody.put("codiceFiscale", cf);
-            requestBody.put("dataDiNascita", data);
+            requestBody.put("codiceFiscale", cf.toUpperCase());
+            // CORRETTO: La chiave deve essere "dataNascita" come nel server, non "dataDiNascita"
+            requestBody.put("dataNascita", data); 
             requestBody.put("sesso", sesso);
             requestBody.put("password", password);
         } catch (JSONException e) {
@@ -159,7 +162,23 @@ public class SignupActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
                         btnSignUp.setEnabled(true);
-                        showToast("Errore di connessione: " + error.getMessage());
+                        
+                        String errorMsg = "Errore di connessione";
+                        if (error.networkResponse != null) {
+                             // Se il server risponde (es. 400 Bad Request), mostriamo il codice
+                            errorMsg += " (Server: " + error.networkResponse.statusCode + ")";
+                            
+                            // Tentativo di leggere il messaggio di errore dal server
+                            try {
+                                String data = new String(error.networkResponse.data);
+                                // Spesso il server manda un JSON anche nell'errore
+                                // Ma in URControl.java usa response.sendError, che manda HTML o testo semplice.
+                                // Proviamo a loggarlo o mostrarlo se breve.
+                            } catch (Exception e) {}
+                        } else if (error.getMessage() != null) {
+                            errorMsg += ": " + error.getMessage();
+                        }
+                        showToast(errorMsg);
                     }
                 });
 
