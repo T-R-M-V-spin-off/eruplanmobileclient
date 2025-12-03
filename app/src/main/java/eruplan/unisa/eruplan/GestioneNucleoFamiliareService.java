@@ -98,4 +98,25 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
+
+    /**
+     * Avvia il processo per abbandonare un nucleo familiare.
+     * @param callback L'interfaccia per notificare il controller del risultato.
+     */
+    public void abbandonaNucleo(final ServiceCallback callback) {
+        repository.abbandonaNucleo(new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                // Mappiamo il callback di successo del repository a quello del servizio
+                callback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                // Mappiamo il callback di errore del repository a quello del servizio
+                callback.onSalvataggioError(message);
+            }
+        });
+    }
+
 }
