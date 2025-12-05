@@ -1,7 +1,7 @@
 package eruplan.unisa.eruplan;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +13,7 @@ import android.widget.Toast;
  * Rappresenta l'interfaccia utente (Boundary) per la compilazione dei dati
  * relativi a un nuovo nucleo familiare.
  */
-public class CreaNucleoActivity extends AppCompatActivity {
+public class CreaNucleoBoundary extends AppCompatActivity {
 
     private EditText viaPiazzaEditText, comuneEditText, regioneEditText, paeseEditText, civicoEditText, capEditText;
     private Button btnSubmitNucleo;
@@ -66,7 +66,7 @@ public class CreaNucleoActivity extends AppCompatActivity {
                 public void onInserimentoSuccesso(String message) {
                     loadingProgressBarNucleo.setVisibility(View.GONE);
                     btnSubmitNucleo.setEnabled(true);
-                    Toast.makeText(CreaNucleoActivity.this, message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
                     
                     // Reindirizza l'utente alla schermata di gestione del nucleo
                     //Intent intent = new Intent(CreaNucleoActivity.this, GestisciNucleoBoundary.class);
@@ -80,7 +80,7 @@ public class CreaNucleoActivity extends AppCompatActivity {
                 public void onInserimentoErrore(String message) {
                     loadingProgressBarNucleo.setVisibility(View.GONE);
                     btnSubmitNucleo.setEnabled(true);
-                    Toast.makeText(CreaNucleoActivity.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
                 }
             });
 

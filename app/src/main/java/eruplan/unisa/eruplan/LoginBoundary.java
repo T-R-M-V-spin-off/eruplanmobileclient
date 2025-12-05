@@ -23,7 +23,7 @@ import org.json.JSONObject;
 /**
  * Gestisce il processo di login dell'utente comunicando con un server web per l'autenticazione.
  */
-public class LoginActivity extends Activity {
+public class LoginBoundary extends Activity {
 
     // URL Reale del server - CORRETTO: punta a /gestoreUtentiMobile/login
     private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/login";
@@ -96,15 +96,15 @@ public class LoginActivity extends Activity {
                             // Il server non restituisce un JSON con "success: true", ma solo status 200 se va bene.
                             // Tuttavia, Volley chiama onResponse solo per 2xx.
                             
-                            Toast.makeText(LoginActivity.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginBoundary.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
                             
                             // Naviga verso il Menu del Nucleo Familiare (GnfActivity)
-                            Intent intent = new Intent(LoginActivity.this, GnfActivity.class);
+                            Intent intent = new Intent(LoginBoundary.this, GestioneNucleoBoundary.class);
                             startActivity(intent);
                             finish();
 
                         } catch (Exception e) {
-                            Toast.makeText(LoginActivity.this, "Errore generico dopo login", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginBoundary.this, "Errore generico dopo login", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -127,7 +127,7 @@ public class LoginActivity extends Activity {
                         } else {
                             errorMsg += ": " + error.getMessage();
                         }
-                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginBoundary.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 });
 

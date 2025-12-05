@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -24,7 +23,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupBoundary extends AppCompatActivity {
 
     private EditText etNome, etCognome, etCodiceFiscale, etDataNascita;
 
@@ -161,7 +160,7 @@ public class SignupActivity extends AppCompatActivity {
 
                             if (success) {
                                 showToast(message);
-                                Intent intent = new Intent(SignupActivity.this, GnfActivity.class);
+                                Intent intent = new Intent(SignupBoundary.this, GestioneNucleoBoundary.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 finish();

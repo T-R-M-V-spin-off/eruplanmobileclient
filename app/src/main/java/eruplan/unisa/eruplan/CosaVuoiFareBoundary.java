@@ -9,7 +9,7 @@ import android.widget.Button;
  * Rappresenta la schermata iniziale (Boundary) da cui l'utente può scegliere
  * di avviare l'operazione di creazione di un nuovo nucleo familiare.
  */
-public class CosaVuoiFareActivity extends AppCompatActivity {
+public class CosaVuoiFareBoundary extends AppCompatActivity {
 
     private Button btnCreaNucleo;
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;

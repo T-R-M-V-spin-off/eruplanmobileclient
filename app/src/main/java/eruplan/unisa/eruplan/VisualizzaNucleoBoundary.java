@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisualizzaNucleoActivity extends AppCompatActivity {
+public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
     private RecyclerView rvMembri;
     private MembroAdapter membroAdapter;
@@ -59,7 +59,7 @@ public class VisualizzaNucleoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Torna al menu GNF (GnfActivity)
-                Intent intent = new Intent(VisualizzaNucleoActivity.this, GnfActivity.class);
+                Intent intent = new Intent(VisualizzaNucleoBoundary.this, GestioneNucleoBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
@@ -96,11 +96,11 @@ public class VisualizzaNucleoActivity extends AppCompatActivity {
                             membroAdapter.notifyDataSetChanged();
                             
                             if (membriList.isEmpty()) {
-                                Toast.makeText(VisualizzaNucleoActivity.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(VisualizzaNucleoBoundary.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
-                            Toast.makeText(VisualizzaNucleoActivity.this, "Errore nel parsing dei dati: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(VisualizzaNucleoBoundary.this, "Errore nel parsing dei dati: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
                 },
@@ -108,7 +108,7 @@ public class VisualizzaNucleoActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                          String errorMsg = "Errore nel caricamento: " + error.getMessage();
-                         Toast.makeText(VisualizzaNucleoActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                         Toast.makeText(VisualizzaNucleoBoundary.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 });
 

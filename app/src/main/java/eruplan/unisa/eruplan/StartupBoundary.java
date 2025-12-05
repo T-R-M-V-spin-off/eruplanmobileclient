@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
  * Activity di avvio dell'applicazione.
  * Permette all'utente di scegliere se effettuare il Login o registrarsi (Sign Up).
  */
-public class StartupActivity extends AppCompatActivity {
+public class StartupBoundary extends AppCompatActivity {
 
     private Button btnGotoLogin;
     private Button btnGotoSignup;
@@ -28,7 +28,7 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Apre la schermata di Login
-                Intent intent = new Intent(StartupActivity.this, LoginActivity.class);
+                Intent intent = new Intent(StartupBoundary.this, LoginBoundary.class);
                 startActivity(intent);
             }
         });
@@ -37,7 +37,7 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Apre la schermata di Registrazione
-                Intent intent = new Intent(StartupActivity.this, SignupActivity.class);
+                Intent intent = new Intent(StartupBoundary.this, SignupBoundary.class);
                 startActivity(intent);
             }
         });

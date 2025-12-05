@@ -22,7 +22,7 @@ public class GestioneNucleoFamiliareControl {
     }
 
     public void mostraFormCreaNucleo() {
-        Intent intent = new Intent(context, CreaNucleoActivity.class);
+        Intent intent = new Intent(context, CreaNucleoBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
