@@ -83,4 +83,42 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
+    
+    public void abbandonaNucleo(final ServiceCallback serviceCallback) {
+        repository.abbandonaNucleo(new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                serviceCallback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                serviceCallback.onSalvataggioError(message);
+            }
+        });
+    }
+
+    public void creaAppoggio(String viaPiazza, String civico, String comune, String cap, String provincia, String regione, String paese, final ServiceCallback serviceCallback) {
+        final String viaPiazzaTrimmed = validateAndTrim(viaPiazza, 1, 45, "Via/Piazza non valido.");
+        final String civicoTrimmed = validateAndTrim(civico, 1, 4, "Numero civico non valido.");
+        final String comuneTrimmed = validateAndTrim(comune, 1, 40, "Comune non valido.");
+        final String capTrimmed = validateAndTrim(cap, 5, 5, "CAP non valido. Deve essere di 5 cifre.");
+        final String provinciaTrimmed = validateAndTrim(provincia, 1, 40, "Provincia non valida.");
+        final String regioneTrimmed = validateAndTrim(regione, 1, 40, "Regione non valida.");
+        final String paeseTrimmed = validateAndTrim(paese, 1, 40, "Paese non valido.");
+
+        AppoggioEntity nuovoAppoggio = new AppoggioEntity(viaPiazzaTrimmed, civicoTrimmed, comuneTrimmed, capTrimmed, provinciaTrimmed, regioneTrimmed, paeseTrimmed);
+
+        repository.salvaAppoggio(nuovoAppoggio, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                serviceCallback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                serviceCallback.onSalvataggioError(message);
+            }
+        });
+    }
 }

@@ -88,6 +88,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             public void onClick(View v) {
                 // Mostra la sezione di conferma
                 mostraSezioneConferma(true);
+
             }
         });
 

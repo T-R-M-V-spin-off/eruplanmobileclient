@@ -19,6 +19,7 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
+    private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
 
     // MODIFICA: Rimosso la RequestQueue locale. 
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
@@ -125,6 +126,48 @@ public class GestioneNucleoFamiliareRepository {
                 });
 
         // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void salvaAppoggio(AppoggioEntity appoggio, final RepositoryCallback callback) {
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("viaPiazza", appoggio.getViaPiazza());
+            requestBody.put("civico", appoggio.getCivico());
+            requestBody.put("comune", appoggio.getComune());
+            requestBody.put("cap", appoggio.getCap());
+            requestBody.put("provincia", appoggio.getProvincia());
+            requestBody.put("regione", appoggio.getRegione());
+            requestBody.put("paese", appoggio.getPaese());
+        } catch (JSONException e) {
+            callback.onError("Errore interno nella creazione della richiesta JSON per l'appoggio.");
+            return;
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ADD_APPOGGIO_URL, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            boolean success = response.getBoolean("success");
+                            String message = response.optString("message", "Appoggio creato con successo.");
+                            if (success) {
+                                callback.onSuccess(message);
+                            } else {
+                                callback.onError(message);
+                            }
+                        } catch (JSONException e) {
+                            callback.onError("Errore nel formato della risposta del server.");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError("Errore di connessione al server: " + error.getMessage());
+                    }
+                });
+
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 

@@ -27,6 +27,12 @@ public class GestioneNucleoFamiliareControl {
         context.startActivity(intent);
     }
 
+     public void mostraFormCreaAppoggio() {
+        Intent intent = new Intent(context, InserisciAppoggioBoundary.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     public void inserisciMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ControlCallback controlCallback) throws IllegalArgumentException {
         service.creaMembro(nome, cognome, codiceFiscale, dataDiNascita, sesso, assistenza, minorenne, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
@@ -46,6 +52,21 @@ public class GestioneNucleoFamiliareControl {
      */
     public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ControlCallback controlCallback) throws IllegalArgumentException {
         service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                controlCallback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                controlCallback.onInserimentoErrore(message);
+            }
+        });
+    }
+
+
+    public void creaAppoggio(String viaPiazza, String civico, String comune, String cap, String provincia, String regione, String paese, final ControlCallback controlCallback) {
+        service.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
             public void onSalvataggioSuccess(String message) {
                 controlCallback.onInserimentoSuccesso(message);
