@@ -57,10 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_rounded_gray"
+            android:background="@drawable/bg_rounded_red"
             android:text="Login"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -69,10 +69,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:background="@drawable/bg_rounded_gray"
+            android:background="@drawable/bg_rounded_red"
             android:text="Sign Up"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="bold" />
 
     </LinearLayout>

@@ -57,7 +57,7 @@
 
         <activity
             android:name=".VisualizzaNucleoActivity"
-            android:exported="false"/>
+            android:exported="true"/>
 
         <service
             android:name=".EruplanMessagingService"
