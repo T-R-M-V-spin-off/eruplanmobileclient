@@ -2,6 +2,8 @@ package eruplan.unisa.eruplan;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 /**
  * Rappresenta l'interfaccia utente (Boundary) per l'inserimento di un nuovo membro del nucleo familiare.
@@ -44,14 +48,11 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
         // Associa le variabili ai componenti definiti nel file XML del layout.
         initViews();
 
+        // Imposta il listener per aprire il DatePicker quando l'utente clicca sul campo data.
+        dataNascitaEditText.setOnClickListener(v -> showDatePicker());
+
         // Imposta il listener per gestire il click sul pulsante di invio.
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Avvia il processo di aggiunta del membro quando il pulsante viene cliccato.
-                aggiungiMembro();
-            }
-        });
+        submitButton.setOnClickListener(v -> aggiungiMembro());
     }
 
     /**
@@ -69,6 +70,34 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
         minorenneCheckBox = findViewById(R.id.minorenneCheckBox);
         submitButton = findViewById(R.id.submitButton);
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
+
+        // Impedisce l'input da tastiera nel campo data, forzando l'uso del picker per una UX migliore.
+        dataNascitaEditText.setFocusable(false);
+    }
+
+    /**
+     * Mostra un DatePickerDialog per permettere all'utente di selezionare la data di nascita.
+     */
+    private void showDatePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // CORRETTO: Il server usa DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                    // Quindi dobbiamo usare i trattini "-", non gli slash "/"
+                    String selectedDate = String.format("%02d-%02d-%d", selectedDay, selectedMonth + 1, selectedYear);
+                    dataNascitaEditText.setText(selectedDate);
+                },
+                year, month, day
+        );
+
+        // Impedisce all'utente di selezionare una data futura.
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialog.show();
     }
 
     /**
@@ -113,7 +142,7 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
                         Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
 
                         // Reindirizza l'utente e chiude questa activity.
-                        //Intent intent = new Intent(AggiungiMembroActivity.this, VisualizzaMembroBoundary.class);
+                        //Intent intent = new Intent(AggiungiMembroBoundary.this, VisualizzaMembroBoundary.class);
                         //startActivity(intent);
                         finish();
                     }

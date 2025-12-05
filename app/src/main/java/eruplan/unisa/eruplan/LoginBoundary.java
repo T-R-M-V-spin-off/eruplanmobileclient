@@ -1,137 +1,84 @@
 package eruplan.unisa.eruplan;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * Gestisce il processo di login dell'utente comunicando con un server web per l'autenticazione.
+ * Gestisce l'interfaccia utente per il login.
  */
-public class LoginBoundary extends Activity {
+public class LoginBoundary extends AppCompatActivity {
 
-    // URL Reale del server - CORRETTO: punta a /gestoreUtentiMobile/login
-    private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/login";
-
-    private EditText codiceFiscaleEditText;
-    private EditText passwordEditText;
-    private Button loginButton;
+    private EditText codiceFiscaleEditText, passwordEditText;
+    private Button loginButton, btnToSignUp;
     private ProgressBar loadingProgressBar;
 
+    private GestioneUtenteControl gestioneUtenteControl;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Riferimenti alle view
-        codiceFiscaleEditText = findViewById(R.id.codice_fiscale);
-        passwordEditText = findViewById(R.id.password);
-        loginButton = findViewById(R.id.login);
-        loadingProgressBar = findViewById(R.id.loading);
+        // Inizializza il Control
+        gestioneUtenteControl = new GestioneUtenteControl(this);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginUser();
-            }
+        initViews();
+
+        loginButton.setOnClickListener(v -> attemptLogin());
+
+        btnToSignUp.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginBoundary.this, SignupBoundary.class);
+            startActivity(intent);
         });
     }
 
-    private void loginUser() {
+    private void initViews() {
+        codiceFiscaleEditText = findViewById(R.id.et_username);
+        passwordEditText = findViewById(R.id.et_password);
+        loginButton = findViewById(R.id.btn_login);
+        btnToSignUp = findViewById(R.id.btn_to_signup);
+        loadingProgressBar = findViewById(R.id.progressBar);
+    }
+
+    private void attemptLogin() {
         String codiceFiscale = codiceFiscaleEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(codiceFiscale)) {
-            Toast.makeText(getApplicationContext(), "Inserisci il Codice Fiscale!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (codiceFiscale.length() != 16) {
-            Toast.makeText(getApplicationContext(), "Il Codice Fiscale deve essere di 16 caratteri.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            Toast.makeText(getApplicationContext(), "Inserisci la password!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Creazione JSON per il server
-        JSONObject requestBody = new JSONObject();
-        try {
-            // Chiavi confermate dal server: "codiceFiscale" e "password"
-            requestBody.put("codiceFiscale", codiceFiscale.toUpperCase());
-            requestBody.put("password", password);
-        } catch (JSONException e) {
-            Toast.makeText(this, "Errore nella creazione della richiesta", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        // Prepara l'UI per l'attesa
         loadingProgressBar.setVisibility(View.VISIBLE);
         loginButton.setEnabled(false);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, LOGIN_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        loadingProgressBar.setVisibility(View.GONE);
-                        loginButton.setEnabled(true);
-                        try {
-                            // In base al codice del server, se siamo qui è status 200 OK.
-                            // Il server non restituisce un JSON con "success: true", ma solo status 200 se va bene.
-                            // Tuttavia, Volley chiama onResponse solo per 2xx.
-                            
-                            Toast.makeText(LoginBoundary.this, "Login effettuato!", Toast.LENGTH_SHORT).show();
-                            
-                            // Naviga verso il Menu del Nucleo Familiare (GnfActivity)
-                            Intent intent = new Intent(LoginBoundary.this, GestioneNucleoBoundary.class);
-                            startActivity(intent);
-                            finish();
+        // Chiama il Control per avviare il processo di login
+        gestioneUtenteControl.login(codiceFiscale, password, new GestioneUtenteControl.ControlCallback() {
+            @Override
+            public void onOperazioneSuccess(String message) {
+                // Operazione riuscita
+                loadingProgressBar.setVisibility(View.GONE);
+                loginButton.setEnabled(true);
 
-                        } catch (Exception e) {
-                            Toast.makeText(LoginBoundary.this, "Errore generico dopo login", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        loadingProgressBar.setVisibility(View.GONE);
-                        loginButton.setEnabled(true);
-                        
-                        String errorMsg = "Errore login";
-                        if (error.networkResponse != null) {
-                            int statusCode = error.networkResponse.statusCode;
-                            if (statusCode == 404) {
-                                errorMsg = "Utente non trovato (o CF errato)";
-                            } else if (statusCode == 401) {
-                                errorMsg = "Password errata";
-                            } else {
-                                errorMsg += " (" + statusCode + ")";
-                            }
-                        } else {
-                            errorMsg += ": " + error.getMessage();
-                        }
-                        Toast.makeText(LoginBoundary.this, errorMsg, Toast.LENGTH_LONG).show();
-                    }
-                });
+                Toast.makeText(LoginBoundary.this, message, Toast.LENGTH_SHORT).show();
 
-        // Usa il Singleton per inviare la richiesta
-        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+                // Reindirizza l'utente alla schermata principale
+                Intent intent = new Intent(LoginBoundary.this, CosaVuoiFareBoundary.class); // o MainActivity, etc.
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onOperazioneError(String message) {
+                // Gestisce l'errore (validazione o rete)
+                loadingProgressBar.setVisibility(View.GONE);
+                loginButton.setEnabled(true);
+                Toast.makeText(LoginBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
