@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".StartupActivity">
+    tools:context=".StartupBoundary">
 
     <!-- Guideline per posizionare il logo coerentemente con il Login -->
     <androidx.constraintlayout.widget.Guideline

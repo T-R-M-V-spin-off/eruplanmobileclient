@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +19,7 @@ import org.json.JSONObject;
  * Activity che si occupa di visualizzare la lista degli inviti ricevuti (Requisito RF-GNF.06).
  * Scarica i dati reali dal server e li mostra in una RecyclerView.
  */
-public class ListaRichiesteActivity extends AppCompatActivity {
+public class ListaRichiesteBoundary extends AppCompatActivity {
 
     // A. URL del server Azure (da sostituire con quello reale fornito dal backend).
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
@@ -90,13 +89,13 @@ public class ListaRichiesteActivity extends AppCompatActivity {
 
                         } catch (JSONException e) {
                             // Errore nel formato del JSON ricevuto (es. chiavi mancanti o errate)
-                            Toast.makeText(ListaRichiesteActivity.this, "Errore parsing dati", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ListaRichiesteBoundary.this, "Errore parsing dati", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
                 error -> {
                     // Se c'è un errrore di rete
-                    Toast.makeText(ListaRichiesteActivity.this, "Errore di connessione", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ListaRichiesteBoundary.this, "Errore di connessione", Toast.LENGTH_SHORT).show();
                 }
         );
 

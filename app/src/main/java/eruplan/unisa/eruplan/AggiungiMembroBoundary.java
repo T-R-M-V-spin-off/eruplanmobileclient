@@ -1,7 +1,7 @@
 package eruplan.unisa.eruplan;
 
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +20,7 @@ import android.widget.Toast;
  * 3. Inoltrare la richiesta di inserimento al livello di Control.
  * 4. Gestire l'esito finale dell'operazione (successo o errore) aggiornando l'UI.
  */
-public class AggiungiMembroActivity extends AppCompatActivity {
+public class AggiungiMembroBoundary extends AppCompatActivity {
 
     // Componenti dell'interfaccia utente
     private EditText nomeEditText, cognomeEditText, codiceFiscaleEditText, dataNascitaEditText;
@@ -110,7 +110,7 @@ public class AggiungiMembroActivity extends AppCompatActivity {
                         //     Aggiorniamo l'UI di conseguenza.
                         loadingProgressBar.setVisibility(View.GONE);
                         submitButton.setEnabled(true);
-                        Toast.makeText(AggiungiMembroActivity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
 
                         // Reindirizza l'utente e chiude questa activity.
                         //Intent intent = new Intent(AggiungiMembroActivity.this, VisualizzaMembroBoundary.class);
@@ -124,7 +124,7 @@ public class AggiungiMembroActivity extends AppCompatActivity {
                         //     Aggiorniamo l'UI mostrando l'errore.
                         loadingProgressBar.setVisibility(View.GONE);
                         submitButton.setEnabled(true);
-                        Toast.makeText(AggiungiMembroActivity.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(AggiungiMembroBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
                     }
                 }
             );

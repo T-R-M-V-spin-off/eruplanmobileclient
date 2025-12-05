@@ -18,7 +18,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 
-public class GnfActivity extends AppCompatActivity {
+public class GestioneNucleoBoundary extends AppCompatActivity {
 
     // Riferimenti ai pulsanti nel layout
     private MaterialButton btnLogout;
@@ -34,7 +34,7 @@ public class GnfActivity extends AppCompatActivity {
     private GestioneNucleoFamiliareControl gestioneNucleoControl;
 
     // Classe di destinazione dopo il logout: StartupActivity (Homepage)
-    private final Class<?> LOGOUT_TARGET_CLASS = StartupActivity.class;
+    private final Class<?> LOGOUT_TARGET_CLASS = StartupBoundary.class;
 
     // TAG per i log delle notifiche
     private static final String TAG_FCM = "FCM_DEBUG";
@@ -69,7 +69,7 @@ public class GnfActivity extends AppCompatActivity {
         btnMembri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GnfActivity.this, VisualizzaNucleoActivity.class);
+                Intent intent = new Intent(GestioneNucleoBoundary.this, VisualizzaNucleoBoundary.class);
                 startActivity(intent);
             }
         });
@@ -142,7 +142,7 @@ public class GnfActivity extends AppCompatActivity {
 
     // Metodo per reindirizzare l'utente alla schermata di avvio
     private void navigateToStartupScreen() {
-        Intent intent = new Intent(GnfActivity.this, LOGOUT_TARGET_CLASS);
+        Intent intent = new Intent(GestioneNucleoBoundary.this, LOGOUT_TARGET_CLASS);
         // I flag servono a pulire lo stack delle activity (non si può tornare indietro al menu loggato)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -175,7 +175,7 @@ public class GnfActivity extends AppCompatActivity {
             @Override
             public void onInserimentoSuccesso(String message) {
                 // Successo: mostra un messaggio e naviga alla schermata di avvio
-                Toast.makeText(GnfActivity.this, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
                 navigateToStartupScreen(); // Riutilizziamo il metodo di navigazione
             }
 
