@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class LoginBoundary extends AppCompatActivity {
 
     private EditText codiceFiscaleEditText, passwordEditText;
-    private Button loginButton, btnToSignUp;
+    private Button loginButton;
     private ProgressBar loadingProgressBar;
 
     private GestioneUtenteControl gestioneUtenteControl;
@@ -33,17 +33,14 @@ public class LoginBoundary extends AppCompatActivity {
 
         loginButton.setOnClickListener(v -> attemptLogin());
 
-        btnToSignUp.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginBoundary.this, SignupBoundary.class);
-            startActivity(intent);
-        });
+
+
     }
 
     private void initViews() {
-        codiceFiscaleEditText = findViewById(R.id.et_username);
+        codiceFiscaleEditText = findViewById(R.id.et_codice_fiscale);
         passwordEditText = findViewById(R.id.et_password);
-        loginButton = findViewById(R.id.btn_login);
-        btnToSignUp = findViewById(R.id.btn_to_signup);
+        loginButton = findViewById(R.id.login);
         loadingProgressBar = findViewById(R.id.progressBar);
     }
 
