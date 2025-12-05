@@ -1,6 +1,7 @@
 package eruplan.unisa.eruplan;
 
 import android.content.Context;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -19,8 +20,41 @@ public class GestioneNucleoFamiliareService {
         void onSalvataggioError(String message);
     }
 
+    public interface AppoggiServiceCallback {
+        void onAppoggiLoaded(List<AppoggioEntity> appoggi);
+        void onServiceError(String message);
+    }
+
     public GestioneNucleoFamiliareService(Context context) {
         this.repository = new GestioneNucleoFamiliareRepository(context);
+    }
+
+    public void getAppoggi(final AppoggiServiceCallback callback) {
+        repository.getAppoggi(new GestioneNucleoFamiliareRepository.AppoggiCallback() {
+            @Override
+            public void onSuccess(List<AppoggioEntity> appoggi) {
+                callback.onAppoggiLoaded(appoggi);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onServiceError(message);
+            }
+        });
+    }
+
+    public void eliminaAppoggio(long appoggioId, final ServiceCallback callback) {
+        repository.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onSalvataggioError(message);
+            }
+        });
     }
 
     private String validateAndTrim(String value, int minLength, int maxLength, String errorMessage) throws IllegalArgumentException {

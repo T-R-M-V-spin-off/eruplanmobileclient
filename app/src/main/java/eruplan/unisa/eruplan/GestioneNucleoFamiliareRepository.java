@@ -5,11 +5,16 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 // MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Gestisce la persistenza dei dati comunicando con il server web.
@@ -31,14 +36,70 @@ public class GestioneNucleoFamiliareRepository {
         void onError(String message);
     }
 
+    public interface AppoggiCallback {
+        void onSuccess(List<AppoggioEntity> appoggi);
+        void onError(String message);
+    }
+
     public GestioneNucleoFamiliareRepository(Context context) {
         // MODIFICA: Invece di creare una nuova coda separata (che perderebbe la sessione),
         // salviamo il context per richiamare il Singleton condiviso quando serve.
         this.context = context;
-        
+
         // Vecchio codice rimosso:
         // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
+
+    public void getAppoggi(final AppoggiCallback callback) {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, ADD_APPOGGIO_URL, null,
+                response -> {
+                    try {
+                        List<AppoggioEntity> appoggi = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject appoggioJson = response.getJSONObject(i);
+                            AppoggioEntity appoggioEntity = new AppoggioEntity(
+                                    appoggioJson.getString("viaPiazza"),
+                                    appoggioJson.getString("civico"),
+                                    appoggioJson.getString("comune"),
+                                    appoggioJson.getString("cap"),
+                                    appoggioJson.getString("provincia"),
+                                    appoggioJson.getString("regione"),
+                                    appoggioJson.getString("paese")
+                            );
+                            appoggioEntity.setId(appoggioJson.getLong("id"));
+                            appoggi.add(appoggioEntity);
+                        }
+                        callback.onSuccess(appoggi);
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel parsing della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+    }
+
+    public void eliminaAppoggio(long appoggioId, final RepositoryCallback callback) {
+        String url = ADD_APPOGGIO_URL + "/" + appoggioId;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
+                response -> {
+                    try {
+                        boolean success = response.getBoolean("success");
+                        String message = response.optString("message", "Appoggio eliminato con successo.");
+                        if (success) {
+                            callback.onSuccess(message);
+                        } else {
+                            callback.onError(message);
+                        }
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel formato della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
 
     public void salvaMembro(Membro membro, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();

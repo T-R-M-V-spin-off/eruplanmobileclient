@@ -2,6 +2,7 @@ package eruplan.unisa.eruplan;
 
 public class AppoggioEntity {
 
+    private long id;
     private String viaPiazza;
     private String civico;
     private String comune;
@@ -18,6 +19,15 @@ public class AppoggioEntity {
         this.provincia = provincia;
         this.regione = regione;
         this.paese = paese;
+    }
+
+    // Getter e Setter
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getViaPiazza() {
