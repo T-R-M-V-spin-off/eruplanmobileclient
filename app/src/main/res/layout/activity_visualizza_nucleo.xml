@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="I membri del tuo nucleo"
+            android:text="I membri del tuo nucleoEntity"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:textStyle="bold"

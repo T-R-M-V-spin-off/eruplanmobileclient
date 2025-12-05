@@ -1,14 +1,14 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.entity;
 
 /**
  * Classe POJO che rappresenta l'invito ad accedere al nucleo familiare.
  */
-public class Richiesta {
+public class RichiestaEntity {
     private String nomeMittente;
     private String dataOra;
 
     // Costruttore utilizzato per creare l'oggetto dai dati del server
-    public Richiesta(String nomeMittente, String dataOra) {
+    public RichiestaEntity(String nomeMittente, String dataOra) {
         this.nomeMittente = nomeMittente;
         this.dataOra = dataOra;
     }

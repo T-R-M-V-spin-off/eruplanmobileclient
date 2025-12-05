@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.entity.RichiestaEntity;
+
 /**
  * Adapter per visualizzare le richieste a schermo usando il layout XML 'item_richiesta.xml'.
  * Utilizza il pattern "ViewHolder" (RichiestaViewHolder), che è obbligatorio per le RecyclerView
@@ -15,10 +18,10 @@ import java.util.List;
 public class RichiestaAdapter extends RecyclerView.Adapter<RichiestaAdapter.RichiestaViewHolder> {
 
     // 1. Lista che contiene gli oggetti Richiesta scaricati dal server
-    private List<Richiesta> richiesteList;
+    private List<RichiestaEntity> richiesteList;
 
     // 2. Quando creo l'Adapter nell'Activity, gli passo le richieste reali con questo costruttore
-    public RichiestaAdapter(List<Richiesta> richiesteList) {
+    public RichiestaAdapter(List<RichiestaEntity> richiesteList) {
         this.richiesteList = richiesteList;
     }
 
@@ -41,12 +44,12 @@ public class RichiestaAdapter extends RecyclerView.Adapter<RichiestaAdapter.Rich
     public void onBindViewHolder(@NonNull RichiestaViewHolder holder, int position) {
 
         // Prendo l'oggetto Richiesta dalla lista Java alla posizione corretta.
-        Richiesta richiesta = richiesteList.get(position);
+        RichiestaEntity richiestaEntity = richiesteList.get(position);
 
         // Uso il ViewHolder per impostare i testi reali nelle TextView bianche della riga.
         // Prende mittente e data usando i Getter definiti nel POJO Richiesta.java.
-        holder.tvNome.setText(richiesta.getNomeMittente());
-        holder.tvData.setText(richiesta.getDataOra());
+        holder.tvNome.setText(richiestaEntity.getNomeMittente());
+        holder.tvData.setText(richiestaEntity.getDataOra());
     }
 
     // Metodo che comunica alla RecyclerView quanti elementi totali ci sono nella lista Java.

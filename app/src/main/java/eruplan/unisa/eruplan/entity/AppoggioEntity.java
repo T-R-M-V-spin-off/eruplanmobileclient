@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.entity;
 
 public class AppoggioEntity {
 

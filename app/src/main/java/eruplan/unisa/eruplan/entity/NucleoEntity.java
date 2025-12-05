@@ -1,10 +1,10 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.entity;
 
 /**
  * Classe POJO (Plain Old Java Object) che rappresenta l'entità Nucleo Familiare.
  * Contiene i dati relativi all'indirizzo del nucleo.
  */
-public class Nucleo {
+public class NucleoEntity {
 
     private String viaPiazza;
     private String comune;
@@ -13,11 +13,11 @@ public class Nucleo {
     private String civico;
     private String cap;
 
-    public Nucleo() {
+    public NucleoEntity() {
         // Costruttore vuoto
     }
 
-    public Nucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap) {
+    public NucleoEntity(String viaPiazza, String comune, String regione, String paese, String civico, String cap) {
         this.viaPiazza = viaPiazza;
         this.comune = comune;
         this.regione = regione;

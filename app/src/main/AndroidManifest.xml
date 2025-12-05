@@ -16,7 +16,7 @@
 
         <!-- StartupActivity è il Launcher: deve essere exported="true" -->
         <activity
-            android:name=".StartupBoundary"
+            android:name=".gestioneUtenteMobile.StartupBoundary"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,37 +26,37 @@
 
         <!-- Le altre activity sono interne: exported="false" per sicurezza -->
         <activity
-            android:name=".LoginBoundary"
+            android:name=".gestioneUtenteMobile.LoginBoundary"
             android:exported="true">
         </activity>
 
         <activity
-            android:name=".GestioneNucleoBoundary"
+            android:name=".gestioneNucleoFamiliare.GestioneNucleoBoundary"
             android:exported="true">a
         </activity>
 
         <activity
-            android:name=".SignupBoundary"
+            android:name=".gestioneUtenteMobile.SignupBoundary"
             android:exported="true">
         </activity>
 
         <activity
-            android:name=".AggiungiMembroBoundary"
+            android:name=".gestioneNucleoFamiliare.AggiungiMembroBoundary"
             android:exported="true">
         </activity>
 
         <activity
-            android:name=".CreaNucleoBoundary"
+            android:name=".gestioneNucleoFamiliare.CreaNucleoBoundary"
             android:exported="false">
         </activity>
 
         <activity
-            android:name=".CosaVuoiFareBoundary"
+            android:name=".gestioneNucleoFamiliare.CosaVuoiFareBoundary"
             android:exported="false">
         </activity>
 
         <activity
-            android:name=".VisualizzaNucleoBoundary"
+            android:name=".gestioneNucleoFamiliare.VisualizzaNucleoBoundary"
             android:exported="false"/>
 
         <service

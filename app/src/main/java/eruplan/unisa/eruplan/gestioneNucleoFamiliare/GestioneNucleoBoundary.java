@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.helper.widget.Flow;
@@ -17,6 +17,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
+
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.gestioneUtenteMobile.StartupBoundary;
 
 public class GestioneNucleoBoundary extends AppCompatActivity {
 

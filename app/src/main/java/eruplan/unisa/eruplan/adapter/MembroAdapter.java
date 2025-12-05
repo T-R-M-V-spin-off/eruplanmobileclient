@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.entity.MembroEntity;
+
 public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroViewHolder> {
 
-    private List<Membro> membriList;
+    private List<MembroEntity> membriList;
 
-    public MembroAdapter(List<Membro> membriList) {
+    public MembroAdapter(List<MembroEntity> membriList) {
         this.membriList = membriList;
     }
 
@@ -27,10 +30,10 @@ public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroView
 
     @Override
     public void onBindViewHolder(@NonNull MembroViewHolder holder, int position) {
-        Membro membro = membriList.get(position);
-        String nomeCompleto = membro.getNome() + " " + membro.getCognome();
+        MembroEntity membroEntity = membriList.get(position);
+        String nomeCompleto = membroEntity.getNome() + " " + membroEntity.getCognome();
         holder.tvNomeCognome.setText(nomeCompleto);
-        holder.tvCodiceFiscale.setText(membro.getCodiceFiscale());
+        holder.tvCodiceFiscale.setText(membroEntity.getCodiceFiscale());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import eruplan.unisa.eruplan.R;
 
 /**
  * Activity di avvio dell'applicazione.

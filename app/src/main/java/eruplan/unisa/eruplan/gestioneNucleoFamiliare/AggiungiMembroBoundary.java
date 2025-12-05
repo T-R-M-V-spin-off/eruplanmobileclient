@@ -1,9 +1,8 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +14,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.util.Calendar;
+
+import eruplan.unisa.eruplan.R;
 
 /**
  * Rappresenta l'interfaccia utente (Boundary) per l'inserimento di un nuovo membro del nucleo familiare.

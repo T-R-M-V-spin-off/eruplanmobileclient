@@ -38,7 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Crea un nuovo nucleo familiare"
+        android:text="Crea un nuovo nucleoEntity familiare"
         android:textColor="@color/white"
         android:backgroundTint="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"

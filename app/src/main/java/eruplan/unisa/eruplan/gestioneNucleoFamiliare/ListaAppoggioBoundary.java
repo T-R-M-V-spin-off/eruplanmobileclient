@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.adapter.AppoggioAdapter;
+import eruplan.unisa.eruplan.control.GestioneNucleoFamiliareControl;
+import eruplan.unisa.eruplan.entity.AppoggioEntity;
 
 public class ListaAppoggioBoundary extends AppCompatActivity {
 

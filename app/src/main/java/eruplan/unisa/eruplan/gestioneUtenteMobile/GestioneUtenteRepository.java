@@ -1,10 +1,12 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import eruplan.unisa.eruplan.VolleySingleton;
 
 /**
  * Gestisce la persistenza e la comunicazione con il server per le operazioni relative all'utente.

@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import eruplan.unisa.eruplan.R;
 
 public class InserisciAppoggioBoundary extends AppCompatActivity {
 

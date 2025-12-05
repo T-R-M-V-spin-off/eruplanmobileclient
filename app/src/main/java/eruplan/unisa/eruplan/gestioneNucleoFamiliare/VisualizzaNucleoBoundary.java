@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,11 +23,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.VolleySingleton;
+import eruplan.unisa.eruplan.adapter.MembroAdapter;
+import eruplan.unisa.eruplan.entity.MembroEntity;
+
 public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
     private RecyclerView rvMembri;
     private MembroAdapter membroAdapter;
-    private List<Membro> membriList;
+    private List<MembroEntity> membriList;
     private Button btnBack;
     private ImageButton btnMenu;
     
@@ -83,7 +88,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
                         try {
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject obj = response.getJSONObject(i);
-                                Membro m = new Membro();
+                                MembroEntity m = new MembroEntity();
                                 m.setNome(obj.optString("nome"));
                                 m.setCognome(obj.optString("cognome"));
                                 m.setCodiceFiscale(obj.optString("codiceFiscale"));

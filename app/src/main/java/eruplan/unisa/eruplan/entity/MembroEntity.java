@@ -1,10 +1,10 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.entity;
 
 /**
  * Classe POJO (Plain Old Java Object) che rappresenta l'entità Membro del nucleo familiare.
  * Contiene i dati anagrafici di un singolo membro.
  */
-public class Membro {
+public class MembroEntity {
 
     private String nome;
     private String cognome;
@@ -15,11 +15,11 @@ public class Membro {
     private boolean minorenne;
 
     // Costruttore vuoto necessario per alcune librerie di serializzazione (es. Gson, Jackson)
-    public Membro() {
+    public MembroEntity() {
     }
 
     // Costruttore con tutti i campi
-    public Membro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne) {
+    public MembroEntity(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne) {
         this.nome = nome;
         this.cognome = cognome;
         this.codiceFiscale = codiceFiscale;

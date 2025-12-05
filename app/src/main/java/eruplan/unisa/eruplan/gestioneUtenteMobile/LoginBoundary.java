@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 
 /**
  * Gestisce l'interfaccia utente per il login.

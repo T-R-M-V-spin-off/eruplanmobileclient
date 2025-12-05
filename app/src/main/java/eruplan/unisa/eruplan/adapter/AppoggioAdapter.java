@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.entity.AppoggioEntity;
 
 public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.AppoggioViewHolder> {
 

@@ -1,9 +1,14 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
 import android.content.Intent;
 
 import java.util.List;
+
+import eruplan.unisa.eruplan.entity.AppoggioEntity;
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CreaNucleoBoundary;
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.InserisciAppoggioBoundary;
+
 
 /**
  * Funge da regista (Controller) per le operazioni relative alla gestione del nucleo familiare.

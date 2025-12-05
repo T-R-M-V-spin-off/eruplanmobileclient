@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.Calendar;
+
+import eruplan.unisa.eruplan.R;
 
 public class SignupBoundary extends AppCompatActivity {
 

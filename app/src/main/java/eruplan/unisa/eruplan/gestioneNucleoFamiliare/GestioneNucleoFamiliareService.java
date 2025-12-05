@@ -1,8 +1,13 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import eruplan.unisa.eruplan.entity.AppoggioEntity;
+import eruplan.unisa.eruplan.entity.MembroEntity;
+import eruplan.unisa.eruplan.entity.NucleoEntity;
+
 
 /**
  * Contiene la logica di business (business logic) per la gestione del nucleo familiare.
@@ -80,9 +85,9 @@ public class GestioneNucleoFamiliareService {
             throw new IllegalArgumentException("Il sesso non è valido.");
         }
 
-        Membro nuovoMembro = new Membro(nomeTrimmed, cognomeTrimmed, cfTrimmed, dataDiNascita, sesso, assistenza, minorenne);
+        MembroEntity nuovoMembroEntity = new MembroEntity(nomeTrimmed, cognomeTrimmed, cfTrimmed, dataDiNascita, sesso, assistenza, minorenne);
 
-        repository.salvaMembro(nuovoMembro, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+        repository.salvaMembro(nuovoMembroEntity, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
                 serviceCallback.onSalvataggioSuccess(message);
@@ -103,9 +108,9 @@ public class GestioneNucleoFamiliareService {
         final String civicoTrimmed = validateAndTrim(civico, 1, 5, "Numero civico non valido.");
         final String capTrimmed = validateAndTrim(cap, 5, 5, "CAP non valido. Deve essere di 5 cifre.");
 
-        Nucleo nuovoNucleo = new Nucleo(viaPiazzaTrimmed, comuneTrimmed, regioneTrimmed, paeseTrimmed, civicoTrimmed, capTrimmed);
+        NucleoEntity nuovoNucleoEntity = new NucleoEntity(viaPiazzaTrimmed, comuneTrimmed, regioneTrimmed, paeseTrimmed, civicoTrimmed, capTrimmed);
 
-        repository.salvaNucleo(nuovoNucleo, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+        repository.salvaNucleo(nuovoNucleoEntity, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
                 serviceCallback.onSalvataggioSuccess(message);

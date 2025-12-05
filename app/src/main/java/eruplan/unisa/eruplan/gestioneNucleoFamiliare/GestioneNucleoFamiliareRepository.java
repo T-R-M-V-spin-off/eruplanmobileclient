@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
 
@@ -9,12 +9,16 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 // MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eruplan.unisa.eruplan.VolleySingleton;
+import eruplan.unisa.eruplan.entity.AppoggioEntity;
+import eruplan.unisa.eruplan.entity.MembroEntity;
+import eruplan.unisa.eruplan.entity.NucleoEntity;
 
 /**
  * Gestisce la persistenza dei dati comunicando con il server web.
@@ -101,16 +105,16 @@ public class GestioneNucleoFamiliareRepository {
     }
 
 
-    public void salvaMembro(Membro membro, final RepositoryCallback callback) {
+    public void salvaMembro(MembroEntity membroEntity, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("nome", membro.getNome());
-            requestBody.put("cognome", membro.getCognome());
-            requestBody.put("codiceFiscale", membro.getCodiceFiscale());
-            requestBody.put("dataDiNascita", membro.getDataDiNascita());
-            requestBody.put("sesso", membro.getSesso());
-            requestBody.put("assistenza", membro.isAssistenza());
-            requestBody.put("minorenne", membro.isMinorenne());
+            requestBody.put("nome", membroEntity.getNome());
+            requestBody.put("cognome", membroEntity.getCognome());
+            requestBody.put("codiceFiscale", membroEntity.getCodiceFiscale());
+            requestBody.put("dataDiNascita", membroEntity.getDataDiNascita());
+            requestBody.put("sesso", membroEntity.getSesso());
+            requestBody.put("assistenza", membroEntity.isAssistenza());
+            requestBody.put("minorenne", membroEntity.isMinorenne());
         } catch (JSONException e) {
             callback.onError("Errore interno nella creazione della richiesta JSON.");
             return;
@@ -148,15 +152,15 @@ public class GestioneNucleoFamiliareRepository {
     /**
      * Invia i dati di un nuovo nucleo al server per il salvataggio.
      */
-    public void salvaNucleo(Nucleo nucleo, final RepositoryCallback callback) {
+    public void salvaNucleo(NucleoEntity nucleoEntity, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("viaPiazza", nucleo.getViaPiazza());
-            requestBody.put("comune", nucleo.getComune());
-            requestBody.put("regione", nucleo.getRegione());
-            requestBody.put("paese", nucleo.getPaese());
-            requestBody.put("civico", nucleo.getCivico());
-            requestBody.put("cap", nucleo.getCap());
+            requestBody.put("viaPiazza", nucleoEntity.getViaPiazza());
+            requestBody.put("comune", nucleoEntity.getComune());
+            requestBody.put("regione", nucleoEntity.getRegione());
+            requestBody.put("paese", nucleoEntity.getPaese());
+            requestBody.put("civico", nucleoEntity.getCivico());
+            requestBody.put("cap", nucleoEntity.getCap());
         } catch (JSONException e) {
             callback.onError("Errore interno nella creazione della richiesta JSON per il nucleo.");
             return;

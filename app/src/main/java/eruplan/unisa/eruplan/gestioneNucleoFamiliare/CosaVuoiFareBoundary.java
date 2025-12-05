@@ -1,9 +1,11 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import eruplan.unisa.eruplan.R;
 
 /**
  * Rappresenta la schermata iniziale (Boundary) da cui l'utente può scegliere

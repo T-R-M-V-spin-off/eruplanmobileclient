@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
 import android.text.TextUtils;

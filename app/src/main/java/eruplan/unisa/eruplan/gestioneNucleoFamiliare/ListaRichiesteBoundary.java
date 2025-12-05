@@ -1,4 +1,4 @@
-package eruplan.unisa.eruplan;
+package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -15,6 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.VolleySingleton;
+import eruplan.unisa.eruplan.adapter.RichiestaAdapter;
+import eruplan.unisa.eruplan.entity.RichiestaEntity;
+
 /**
  * Activity che si occupa di visualizzare la lista degli inviti ricevuti (Requisito RF-GNF.06).
  * Scarica i dati reali dal server e li mostra in una RecyclerView.
@@ -25,7 +30,7 @@ public class ListaRichiesteBoundary extends AppCompatActivity {
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
 
     // B. Variabili per gestire i dati e il ponte tra dati e UI (Adapter).
-    private ArrayList<Richiesta> listaDati;
+    private ArrayList<RichiestaEntity> listaDati;
     private RichiestaAdapter adapter;
 
     @Override
@@ -81,7 +86,7 @@ public class ListaRichiesteBoundary extends AppCompatActivity {
                                 String data = jsonObject.getString("dataOra").trim();
 
                                 // 4. Creiamo l'oggetto Richiesta vero e lo aggiungiamo alla lista Java
-                                listaDati.add(new Richiesta(mittente, data));
+                                listaDati.add(new RichiestaEntity(mittente, data));
                             }
 
                             // 5. Agggiorna la UI usando l'adapter.
