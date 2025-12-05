@@ -32,7 +32,7 @@
 
         <activity
             android:name=".GestioneNucleoBoundary"
-            android:exported="true">a
+            android:exported="true">
         </activity>
 
         <activity
@@ -47,17 +47,29 @@
 
         <activity
             android:name=".CreaNucleoBoundary"
-            android:exported="false">
+            android:exported="true">
         </activity>
 
         <activity
             android:name=".CosaVuoiFareBoundary"
-            android:exported="false">
+            android:exported="true">
         </activity>
 
         <activity
             android:name=".VisualizzaNucleoBoundary"
-            android:exported="false"/>
+            android:exported="true"/>
+
+        <activity
+            android:name=".InserisciAppoggioBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".ListaRichiesteBoundary"
+            android:exported="true"/>
+
+
+
+
 
         <service
             android:name=".EruplanMessagingService"
