@@ -41,7 +41,7 @@
         </activity>
 
         <activity
-            android:name=".AggiungiMembroActivity"
+            android:name=".AggiungiMembroBoundary"
             android:exported="true">
         </activity>
 
@@ -51,7 +51,7 @@
         </activity>
 
         <activity
-            android:name=".CosaVuoiFareActivity"
+            android:name=".CosaVuoiFareBoundary"
             android:exported="false">
         </activity>
 

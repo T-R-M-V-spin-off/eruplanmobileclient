@@ -8,8 +8,9 @@ import java.util.regex.Pattern;
  */
 public class GestioneNucleoFamiliareService {
 
+    // CORREZIONE: Pattern aggiornato per usare i trattini (dd-MM-yyyy) per coerenza.
     private static final Pattern DATE_PATTERN = Pattern.compile(
-        "^((0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)\\d{2}))$");
+        "^((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\\d{2}))$");
 
     private GestioneNucleoFamiliareRepository repository;
 
@@ -22,19 +23,6 @@ public class GestioneNucleoFamiliareService {
         this.repository = new GestioneNucleoFamiliareRepository(context);
     }
 
-    /**
-     * Metodo di utility per validare e "pulire" una stringa.
-     * Controlla che la stringa non sia nulla e che la sua lunghezza (dopo il trim)
-     * rientri in un intervallo specificato. Gestisce anche controlli di lunghezza esatta
-     * passando lo stesso valore a minLength e maxLength.
-     *
-     * @param value La stringa da validare.
-     * @param minLength La lunghezza minima consentita (inclusa).
-     * @param maxLength La lunghezza massima consentita (inclusa).
-     * @param errorMessage Il messaggio da lanciare in caso di errore.
-     * @return La stringa "pulita" (trimmed).
-     * @throws IllegalArgumentException se la validazione fallisce.
-     */
     private String validateAndTrim(String value, int minLength, int maxLength, String errorMessage) throws IllegalArgumentException {
         if (value == null) {
             throw new IllegalArgumentException(errorMessage);
@@ -47,14 +35,12 @@ public class GestioneNucleoFamiliareService {
     }
 
     public void creaMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ServiceCallback serviceCallback) throws IllegalArgumentException {
-        // La validazione delle stringhe è ora delegata al metodo di utility.
         final String nomeTrimmed = validateAndTrim(nome, 2, 30, "Il nome non è valido.");
         final String cognomeTrimmed = validateAndTrim(cognome, 2, 30, "Il cognome non è valido.");
         final String cfTrimmed = validateAndTrim(codiceFiscale, 16, 16, "Il codice fiscale deve essere di 16 caratteri.");
 
-        // Validazioni specifiche che non riguardano la lunghezza della stringa.
         if (dataDiNascita == null || !DATE_PATTERN.matcher(dataDiNascita).matches()) {
-            throw new IllegalArgumentException("La data di nascita non è valida (formato richiesto: gg/mm/aaaa).");
+            throw new IllegalArgumentException("La data di nascita non è valida (formato richiesto: dd-mm-aaaa).");
         }
         if (sesso == null || (!sesso.equals("M") && !sesso.equals("F"))) {
             throw new IllegalArgumentException("Il sesso non è valido.");
@@ -76,7 +62,6 @@ public class GestioneNucleoFamiliareService {
     }
 
     public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ServiceCallback serviceCallback) throws IllegalArgumentException {
-        // La validazione delle stringhe è ora delegata al metodo di utility.
         final String viaPiazzaTrimmed = validateAndTrim(viaPiazza, 1, 40, "Via/Piazza non valido.");
         final String comuneTrimmed = validateAndTrim(comune, 1, 40, "Comune non valido.");
         final String regioneTrimmed = validateAndTrim(regione, 1, 40, "Regione non valida.");
@@ -98,25 +83,4 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
-
-    /**
-     * Avvia il processo per abbandonare un nucleo familiare.
-     * @param callback L'interfaccia per notificare il controller del risultato.
-     */
-    public void abbandonaNucleo(final ServiceCallback callback) {
-        repository.abbandonaNucleo(new GestioneNucleoFamiliareRepository.RepositoryCallback() {
-            @Override
-            public void onSuccess(String message) {
-                // Mappiamo il callback di successo del repository a quello del servizio
-                callback.onSalvataggioSuccess(message);
-            }
-
-            @Override
-            public void onError(String message) {
-                // Mappiamo il callback di errore del repository a quello del servizio
-                callback.onSalvataggioError(message);
-            }
-        });
-    }
-
 }
