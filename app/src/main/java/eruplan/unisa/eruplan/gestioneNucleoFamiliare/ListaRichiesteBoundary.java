@@ -57,6 +57,8 @@ public class ListaRichiesteBoundary extends AppCompatActivity {
         Button btnTornaMenu = findViewById(R.id.btn_torna_menu);
         btnTornaMenu.setOnClickListener(v -> finish());
 
+        //TODO Implementare flusso applicazione
+
         // Scarica i dati reali dal server tramite Volley al posto dei dati finti.
         caricaRichiesteDalServer();
     }

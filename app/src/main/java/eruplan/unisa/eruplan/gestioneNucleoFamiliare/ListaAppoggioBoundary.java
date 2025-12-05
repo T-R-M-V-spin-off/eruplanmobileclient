@@ -13,7 +13,6 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.adapter.AppoggioAdapter;
-import eruplan.unisa.eruplan.control.GestioneNucleoFamiliareControl;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 
 public class ListaAppoggioBoundary extends AppCompatActivity {

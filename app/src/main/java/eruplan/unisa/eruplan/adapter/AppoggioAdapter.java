@@ -31,7 +31,7 @@ public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.Appogg
     @NonNull
     @Override
     public AppoggioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_appoggio, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_appoggio, parent, false);
         return new AppoggioViewHolder(view);
     }
 
@@ -55,8 +55,8 @@ public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.Appogg
 
         public AppoggioViewHolder(@NonNull View itemView) {
             super(itemView);
-            viaPiazzaText = itemView.findViewById(R.id.via_piazza_text);
-            comuneText = itemView.findViewById(R.id.comune_text);
+            viaPiazzaText = itemView.findViewById(R.id.via_piazza_civico);
+            comuneText = itemView.findViewById(R.id.comune_cap_provincia);
             deleteButton = itemView.findViewById(R.id.delete_button);
         }
     }
