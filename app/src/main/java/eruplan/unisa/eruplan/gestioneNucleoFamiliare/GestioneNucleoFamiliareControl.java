@@ -139,4 +139,54 @@ public class GestioneNucleoFamiliareControl {
         });
     }
 
+    // =================================================================================
+    //  NUOVI METODI E INTERFACCE PER L'INVITO (REQUISITO UC-GNF.01)
+    // =================================================================================
+
+    /**
+     * Interfaccia Callback specifica per la ricerca.
+     * Serve per dire all'Activity: "Ho finito di cercare, ecco il Membro trovato (o l'errore)".
+     */
+    public interface RicercaCallback {
+        void onUtenteTrovato(eruplan.unisa.eruplan.entity.MembroEntity membroEntity);
+        void onErrore(String messaggio);
+    }
+
+    /**
+     * Metodo chiamato dal bottone "Cerca" nel Dialog.
+     * Fa da ponte tra Activity e Service.
+     */
+    public void cercaMembroPerInvito(String cf, final RicercaCallback callback) {
+        service.cercaUtentePerInvito(cf, new GestioneNucleoFamiliareRepository.UtenteCallback() {
+            @Override
+            public void onSuccess(eruplan.unisa.eruplan.entity.MembroEntity membroTrovato) {
+                // Il Service ha trovato l'utente, lo passiamo all'Activity
+                callback.onUtenteTrovato(membroTrovato);
+            }
+
+            @Override
+            public void onError(String message) {
+                // Qualcosa è andato storto (non trovato o errore server)
+                callback.onErrore(message);
+            }
+        });
+    }
+
+    /**
+     * Metodo chiamato dal bottone "Invita" nel Dialog.
+     */
+    public void finalizzaInvito(String cf, final ControlCallback callback) {
+        service.inviaInvito(cf, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                callback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                callback.onInserimentoErrore(message);
+            }
+        });
+    }
+
 }

@@ -273,4 +273,113 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
+    // =================================================================================
+    //  NUOVI METODI PER L'INVITO (REQUISITO UC-GNF.01)
+    // =================================================================================
+
+    // URL concordati (ipotetici)
+    private static final String CERCA_UTENTE_URL = "https://eruplanserver.azurewebsites.net/sottosistema/utenti/cerca";
+    private static final String INVITA_UTENTE_URL = "https://eruplanserver.azurewebsites.net/sottosistema/inviti/nuovo";
+
+    /**
+     * Interfaccia specifica per quando cerchiamo un utente.
+     * Ci restituisce un oggetto MembroEntity se lo troviamo.
+     */
+    public interface UtenteCallback {
+        void onSuccess(MembroEntity membroTrovato);
+        void onError(String message);
+    }
+
+    /**
+     * Cerca nel DB se esiste un utente con questo Codice Fiscale.
+     * Serve per l'anteprima prima di invitare.
+     */
+    public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {
+        JSONObject requestBody = new JSONObject();
+        try {
+            // "codiceFiscale" è il nome del campo concordato nel JSON
+            requestBody.put("codiceFiscale", codiceFiscale);
+        } catch (JSONException e) {
+            callback.onError("Errore interno: impossibile creare il JSON.");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, CERCA_UTENTE_URL, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            boolean success = response.getBoolean("success");
+                            if (success) {
+                                // Se success=true, mi aspetto un oggetto "data" con i dettagli
+                                JSONObject data = response.getJSONObject("data");
+
+                                // Creo un oggetto temporaneo per passare i dati
+                                // Uso il costruttore vuoto e i setter per sicurezza
+                                MembroEntity m = new MembroEntity();
+                                m.setNome(data.optString("nome"));
+                                m.setCognome(data.optString("cognome"));
+                                m.setCodiceFiscale(data.optString("codiceFiscale"));
+
+                                callback.onSuccess(m);
+                            } else {
+                                // Il server ha risposto, ma non ha trovato l'utente
+                                String msg = response.optString("message", "Nessun utente trovato.");
+                                callback.onError(msg);
+                            }
+                        } catch (JSONException e) {
+                            callback.onError("Errore nella lettura della risposta del server.");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError("Errore di connessione o utente non trovato.");
+                    }
+                }
+        );
+
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    /**
+     * Invia l'invito effettivo all'utente specificato.
+     */
+    public void inviaRichiestaInvito(String codiceFiscaleDestinatario, final RepositoryCallback callback) {
+        JSONObject requestBody = new JSONObject();
+        try {
+            // "codiceFiscaleDestinatario" è il nome concordato
+            requestBody.put("codiceFiscaleDestinatario", codiceFiscaleDestinatario);
+        } catch (JSONException e) {
+            callback.onError("Errore interno JSON.");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, INVITA_UTENTE_URL, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Leggo la risposta standard { "success": true, "message": "..." }
+                        boolean success = response.optBoolean("success");
+                        String msg = response.optString("message", "Operazione completata.");
+
+                        if (success) {
+                            callback.onSuccess(msg);
+                        } else {
+                            callback.onError(msg);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError("Impossibile inviare l'invito: " + error.getMessage());
+                    }
+                }
+        );
+
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
 }

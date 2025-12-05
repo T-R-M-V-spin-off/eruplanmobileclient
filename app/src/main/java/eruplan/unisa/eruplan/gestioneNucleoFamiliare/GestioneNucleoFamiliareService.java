@@ -160,4 +160,53 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
+
+    // =================================================================================
+    //  NUOVI METODI PER L'INVITO (REQUISITO UC-GNF.01)
+    // =================================================================================
+
+    /**
+     * Logica per la ricerca dell'utente.
+     * 1. Pulisce la stringa del CF e controlla che sia di 16 caratteri.
+     * 2. Se valido, chiama il repository per cercare nel server.
+     */
+    public void cercaUtentePerInvito(String codiceFiscale, final GestioneNucleoFamiliareRepository.UtenteCallback callback) {
+        try {
+            // STEP 1: Validazione locale
+            // Se il CF non è di 16 caratteri, validateAndTrim lancia un'eccezione e blocca tutto subito.
+            String cfTrimmed = validateAndTrim(codiceFiscale, 16, 16, "Il Codice Fiscale deve essere di 16 caratteri esatti.");
+
+            // STEP 2: Se siamo qui, il CF è formalmente valido. Chiamiamo il server.
+            repository.cercaUtenteByCF(cfTrimmed, callback);
+
+        } catch (IllegalArgumentException e) {
+            // Se la validazione fallisce, restituiamo subito l'errore senza chiamare il server
+            callback.onError(e.getMessage());
+        }
+    }
+
+    /**
+     * Logica per l'invio dell'invito.
+     */
+    public void inviaInvito(String codiceFiscale, final ServiceCallback callback) {
+        // Controllo di sicurezza base
+        if (codiceFiscale == null || codiceFiscale.length() != 16) {
+            callback.onSalvataggioError("Codice fiscale non valido per l'invio.");
+            return;
+        }
+
+        // Passo il controllo al repository
+        repository.inviaRichiestaInvito(codiceFiscale, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                // Traduciamo il callback del repository in quello del service
+                callback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onSalvataggioError(message);
+            }
+        });
+    }
 }
