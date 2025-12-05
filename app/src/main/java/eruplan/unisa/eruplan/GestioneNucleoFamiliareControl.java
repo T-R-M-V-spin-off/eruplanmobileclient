@@ -3,6 +3,8 @@ package eruplan.unisa.eruplan;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.List;
+
 /**
  * Funge da regista (Controller) per le operazioni relative alla gestione del nucleo familiare.
  */
@@ -16,9 +18,42 @@ public class GestioneNucleoFamiliareControl {
         void onInserimentoErrore(String message);
     }
 
+    public interface AppoggiControlCallback {
+        void onAppoggiLoaded(List<AppoggioEntity> appoggi);
+        void onControlError(String message);
+    }
+
     public GestioneNucleoFamiliareControl(Context context) {
         this.context = context;
         this.service = new GestioneNucleoFamiliareService(context);
+    }
+
+    public void getAppoggi(final AppoggiControlCallback callback) {
+        service.getAppoggi(new GestioneNucleoFamiliareService.AppoggiServiceCallback() {
+            @Override
+            public void onAppoggiLoaded(List<AppoggioEntity> appoggi) {
+                callback.onAppoggiLoaded(appoggi);
+            }
+
+            @Override
+            public void onServiceError(String message) {
+                callback.onControlError(message);
+            }
+        });
+    }
+
+    public void eliminaAppoggio(long appoggioId, final ControlCallback callback) {
+        service.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                callback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                callback.onInserimentoErrore(message);
+            }
+        });
     }
 
     public void mostraFormCreaNucleo() {
