@@ -33,9 +33,7 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
 
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
-        addAppoggioButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ListaAppoggioBoundary.this, InserisciAppoggioBoundary.class);
-            startActivity(intent);
+        addAppoggioButton.setOnClickListener(v -> { gestioneNucleoFamiliareControl.mostraFormCreaAppoggio();
         });
 
         loadAppoggi();

@@ -254,7 +254,7 @@ public class GestioneNucleoFamiliareControl {
     public void cercaMembroPerInvito(String cf, final RicercaCallback callback) {
         service.cercaUtentePerInvito(cf, new GestioneNucleoFamiliareRepository.UtenteCallback() {
             @Override
-            public void onSuccess(eruplan.unisa.eruplan.entity.MembroEntity membroTrovato) {
+            public void onSuccess(MembroEntity membroTrovato) {
                 // Il Service ha trovato l'utente, lo passiamo all'Activity
                 callback.onUtenteTrovato(membroTrovato);
             }

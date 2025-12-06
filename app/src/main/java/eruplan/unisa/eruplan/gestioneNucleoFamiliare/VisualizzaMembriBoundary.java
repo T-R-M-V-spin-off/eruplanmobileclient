@@ -26,6 +26,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     private ImageButton btnMenu;
     private GestioneNucleoFamiliareControl control;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
