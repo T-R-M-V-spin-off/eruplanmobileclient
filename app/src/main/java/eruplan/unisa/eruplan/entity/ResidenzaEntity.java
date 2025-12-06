@@ -41,4 +41,29 @@ public class ResidenzaEntity {
     public String getCap() {
         return cap;
     }
+
+    // Setters
+    public void setViaPiazza(String viaPiazza) {
+        this.viaPiazza = viaPiazza;
+    }
+
+    public void setComune(String comune) {
+        this.comune = comune;
+    }
+
+    public void setRegione(String regione) {
+        this.regione = regione;
+    }
+
+    public void setPaese(String paese) {
+        this.paese = paese;
+    }
+
+    public void setCivico(String civico) {
+        this.civico = civico;
+    }
+
+    public void setCap(String cap) {
+        this.cap = cap;
+    }
 }
