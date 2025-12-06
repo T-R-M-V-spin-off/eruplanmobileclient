@@ -185,8 +185,8 @@ public class GestioneNucleoFamiliareControl {
     /**
      * Avvia il processo di creazione di un nuovo nucleo familiare.
      */
-    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ControlCallback controlCallback) throws IllegalArgumentException {
-        service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
+    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, boolean hasVeicolo, int postiVeicolo, final ControlCallback controlCallback) throws IllegalArgumentException {
+        service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap,hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
             public void onSalvataggioSuccess(String message) {
                 controlCallback.onInserimentoSuccesso(message);

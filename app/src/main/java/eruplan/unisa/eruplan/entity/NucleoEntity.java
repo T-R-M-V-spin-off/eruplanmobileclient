@@ -12,11 +12,16 @@ public class NucleoEntity {
     private String paese;
     private String civico;
     private String cap;
+    private boolean hasVeicolo;
+    private int postiVeicolo;
+
+    // Costruttori
 
     public NucleoEntity() {
         // Costruttore vuoto
     }
 
+    //Costruttore senza veicolo
     public NucleoEntity(String viaPiazza, String comune, String regione, String paese, String civico, String cap) {
         this.viaPiazza = viaPiazza;
         this.comune = comune;
@@ -24,7 +29,22 @@ public class NucleoEntity {
         this.paese = paese;
         this.civico = civico;
         this.cap = cap;
+        this.hasVeicolo = false;
+        this.postiVeicolo = 0;
     }
+    //Costruttore con veicolo
+
+    public NucleoEntity(String viaPiazza, String comune, String regione, String paese, String civico, String cap, boolean hasVeicolo, int postiVeicolo) {
+        this.viaPiazza = viaPiazza;
+        this.comune = comune;
+        this.regione = regione;
+        this.paese = paese;
+        this.civico = civico;
+        this.cap = cap;
+        this.hasVeicolo = hasVeicolo;
+        this.postiVeicolo = hasVeicolo ? postiVeicolo : 0; // Se non c'è veicolo, i posti sono 0;
+    }
+
 
     // Metodi Getter e Setter
 
@@ -75,4 +95,21 @@ public class NucleoEntity {
     public void setCap(String cap) {
         this.cap = cap;
     }
+
+    public boolean hasVeicolo() {
+        return hasVeicolo;
+    }
+
+    public void setHasVeicolo(boolean hasVeicolo) {
+        this.hasVeicolo = hasVeicolo;
+    }
+
+    public int getPostiVeicolo() {
+        return postiVeicolo;
+    }
+
+    public void setPostiVeicolo(int postiVeicolo) {
+        this.postiVeicolo = postiVeicolo;
+    }
+
 }
