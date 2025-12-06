@@ -20,6 +20,7 @@ import eruplan.unisa.eruplan.VolleySingleton;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
+import eruplan.unisa.eruplan.entity.ResidenzaEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
 /**
@@ -29,6 +30,7 @@ public class GestioneNucleoFamiliareRepository {
 
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
+    private static final String GET_RESIDENZA_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
@@ -41,6 +43,11 @@ public class GestioneNucleoFamiliareRepository {
 
     public interface RepositoryCallback {
         void onSuccess(String message);
+        void onError(String message);
+    }
+
+    public interface ResidenzaCallback {
+        void onSuccess(ResidenzaEntity residenza);
         void onError(String message);
     }
 
@@ -66,6 +73,27 @@ public class GestioneNucleoFamiliareRepository {
 
         // Vecchio codice rimosso:
         // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+    }
+
+    public void getResidenza(final ResidenzaCallback callback) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, GET_RESIDENZA_URL, null,
+                response -> {
+                    try {
+                        ResidenzaEntity residenza = new ResidenzaEntity();
+                        residenza.setViaPiazza(response.getString("viaPiazza"));
+                        residenza.setComune(response.getString("comune"));
+                        residenza.setRegione(response.getString("regione"));
+                        residenza.setPaese(response.getString("paese"));
+                        residenza.setCivico(response.getString("civico"));
+                        residenza.setCap(response.getString("cap"));
+                        callback.onSuccess(residenza);
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel parsing della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     public void getRichieste(final RichiesteCallback callback) {

@@ -26,6 +26,8 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
     // Riferimenti ai pulsanti nel layout
     private MaterialButton btnLogout;
     private MaterialButton btnMembri;
+    private MaterialButton btnLuoghi;
+    private MaterialButton btnResidenza;
     private MaterialButton btnAbbandona;
     private MaterialButton btnSi;
     private MaterialButton btnNo;
@@ -58,6 +60,8 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         // Inizializzazione Views
         btnLogout = findViewById(R.id.btnLogout);
         btnMembri = findViewById(R.id.btnMembri);
+        btnLuoghi = findViewById(R.id.btnLuoghi);
+        btnResidenza = findViewById(R.id.btnResidenza);
         btnAbbandona = findViewById(R.id.btnAbbandona);
         btnSi = findViewById(R.id.btnSi);
         btnNo = findViewById(R.id.btnNo);
@@ -74,6 +78,21 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(GestioneNucleoBoundary.this, VisualizzaNucleoBoundary.class);
                 startActivity(intent);
+            }
+        });
+
+        // Listener per il pulsante "I tuoi Luoghi Sicuri"
+        btnLuoghi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gestioneNucleoControl.apriListaAppoggio();
+            }
+        });
+
+        btnResidenza.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gestioneNucleoControl.mostraVisualizzaResidenza();
             }
         });
 
@@ -99,7 +118,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         btnSi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Logica per eseguire l'abbandono del nucleo
+                // Logica per eseguire l\'abbandono del nucleo
                 eseguiAbbandonoNucleo();
             }
         });
@@ -144,7 +163,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         navigateToStartupScreen();
     }
 
-    // Metodo per reindirizzare l'utente alla schermata di avvio
+    // Metodo per reindirizzare l\'utente alla schermata di avvio
     private void navigateToStartupScreen() {
         Intent intent = new Intent(GestioneNucleoBoundary.this, LOGOUT_TARGET_CLASS);
         // I flag servono a pulire lo stack delle activity (non si può tornare indietro al menu loggato)
@@ -154,7 +173,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
     }
 
     /**
-     * Mostra o nasconde la sezione di conferma per l'abbandono del nucleo.
+     * Mostra o nasconde la sezione di conferma per l\'abbandono del nucleo.
      * @param mostra true per mostrare, false per nascondere.
      */
     private void mostraSezioneConferma(boolean mostra) {
@@ -167,7 +186,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
     }
 
     /**
-     * Chiama il control per eseguire l'operazione di abbandono del nucleo
+     * Chiama il control per eseguire l\'operazione di abbandono del nucleo
      * e gestisce la risposta.
      */
     private void eseguiAbbandonoNucleo() {
