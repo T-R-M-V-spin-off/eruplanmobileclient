@@ -9,6 +9,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 // MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +31,7 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
 
-    // MODIFICA: Rimosso la RequestQueue locale. 
+    // MODIFICA: Rimosso la RequestQueue locale.
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
     // private RequestQueue requestQueue;
     private Context context;
@@ -45,6 +46,11 @@ public class GestioneNucleoFamiliareRepository {
         void onError(String message);
     }
 
+    public interface MembriCallback {
+        void onSuccess(List<MembroEntity> membri);
+        void onError(String message);
+    }
+
     public GestioneNucleoFamiliareRepository(Context context) {
         // MODIFICA: Invece di creare una nuova coda separata (che perderebbe la sessione),
         // salviamo il context per richiamare il Singleton condiviso quando serve.
@@ -52,6 +58,33 @@ public class GestioneNucleoFamiliareRepository {
 
         // Vecchio codice rimosso:
         // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+    }
+
+    public void getMembri(final MembriCallback callback) {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, ADD_MEMBER_URL, null,
+                response -> {
+                    try {
+                        List<MembroEntity> membri = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject obj = response.getJSONObject(i);
+                            MembroEntity m = new MembroEntity();
+                            m.setNome(obj.optString("nome"));
+                            m.setCognome(obj.optString("cognome"));
+                            m.setCodiceFiscale(obj.optString("codiceFiscale"));
+                            m.setDataDiNascita(obj.optString("dataDiNascita"));
+                            m.setSesso(obj.optString("sesso"));
+                            m.setAssistenza(obj.optBoolean("assistenza"));
+                            m.setMinorenne(obj.optBoolean("minorenne"));
+                            membri.add(m);
+                        }
+                        callback.onSuccess(membri);
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel parsing della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
     }
 
     public void getAppoggi(final AppoggiCallback callback) {

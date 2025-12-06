@@ -6,6 +6,7 @@ import android.content.Intent;
 import java.util.List;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
+import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CreaNucleoBoundary;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.InserisciAppoggioBoundary;
 
@@ -28,9 +29,28 @@ public class GestioneNucleoFamiliareControl {
         void onControlError(String message);
     }
 
+    public interface MembriControlCallback {
+        void onMembriLoaded(List<MembroEntity> membri);
+        void onControlError(String message);
+    }
+
     public GestioneNucleoFamiliareControl(Context context) {
         this.context = context;
         this.service = new GestioneNucleoFamiliareService(context);
+    }
+
+    public void getMembri(final MembriControlCallback callback) {
+        service.getMembri(new GestioneNucleoFamiliareService.MembriServiceCallback() {
+            @Override
+            public void onMembriLoaded(List<MembroEntity> membri) {
+                callback.onMembriLoaded(membri);
+            }
+
+            @Override
+            public void onServiceError(String message) {
+                callback.onControlError(message);
+            }
+        });
     }
 
     public void getAppoggi(final AppoggiControlCallback callback) {
@@ -69,6 +89,12 @@ public class GestioneNucleoFamiliareControl {
 
      public void mostraFormCreaAppoggio() {
         Intent intent = new Intent(context, InserisciAppoggioBoundary.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    public void mostraFormAggiungiMembro() {
+        Intent intent = new Intent(context, AggiungiMembroBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

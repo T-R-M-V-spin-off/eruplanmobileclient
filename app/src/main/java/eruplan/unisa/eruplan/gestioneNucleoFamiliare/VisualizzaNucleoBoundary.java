@@ -17,20 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import eruplan.unisa.eruplan.R;
-import eruplan.unisa.eruplan.VolleySingleton;
 import eruplan.unisa.eruplan.adapter.MembroAdapter;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 
@@ -41,9 +31,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
     private List<MembroEntity> membriList;
     private Button btnBack;
     private ImageButton btnMenu;
-
-    // URL per ottenere i membri
-    private static final String GET_MEMBERS_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
+    private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +44,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
         btnMenu = findViewById(R.id.btn_menu);
 
         membriList = new ArrayList<>();
+        gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
         // Configurazione RecyclerView
         rvMembri.setLayoutManager(new LinearLayoutManager(this));
@@ -87,45 +76,23 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
     }
 
     private void loadMembri() {
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, GET_MEMBERS_URL, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        membriList.clear();
-                        try {
-                            for (int i = 0; i < response.length(); i++) {
-                                JSONObject obj = response.getJSONObject(i);
-                                MembroEntity m = new MembroEntity();
-                                m.setNome(obj.optString("nome"));
-                                m.setCognome(obj.optString("cognome"));
-                                m.setCodiceFiscale(obj.optString("codiceFiscale"));
-                                m.setDataDiNascita(obj.optString("dataDiNascita"));
-                                m.setSesso(obj.optString("sesso"));
-                                m.setAssistenza(obj.optBoolean("assistenza"));
-                                m.setMinorenne(obj.optBoolean("minorenne"));
-                                membriList.add(m);
-                            }
-                            membroAdapter.notifyDataSetChanged();
+        gestioneNucleoFamiliareControl.getMembri(new GestioneNucleoFamiliareControl.MembriControlCallback() {
+            @Override
+            public void onMembriLoaded(List<MembroEntity> membri) {
+                membriList.clear();
+                membriList.addAll(membri);
+                membroAdapter.notifyDataSetChanged();
 
-                            if (membriList.isEmpty()) {
-                                Toast.makeText(VisualizzaNucleoBoundary.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
-                            }
+                if (membriList.isEmpty()) {
+                    Toast.makeText(VisualizzaNucleoBoundary.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                        } catch (JSONException e) {
-                            Toast.makeText(VisualizzaNucleoBoundary.this, "Errore nel parsing dei dati: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        String errorMsg = "Errore nel caricamento: " + error.getMessage();
-                        Toast.makeText(VisualizzaNucleoBoundary.this, errorMsg, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-        // Usa il Singleton
-        VolleySingleton.getInstance(this).addToRequestQueue(jsonArrayRequest);
+            @Override
+            public void onControlError(String message) {
+                Toast.makeText(VisualizzaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void mostraMenuOpzioni(View v) {
@@ -138,7 +105,10 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == 3) {
+                if (item.getItemId() == 1) {
+                    gestioneNucleoFamiliareControl.mostraFormAggiungiMembro();
+                    return true;
+                } else if (item.getItemId() == 3) {
                     apriDialogInvito(); // Apre il dialog
                     return true;
                 }

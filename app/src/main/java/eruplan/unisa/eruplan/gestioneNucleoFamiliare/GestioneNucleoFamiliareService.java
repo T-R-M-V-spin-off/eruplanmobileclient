@@ -30,8 +30,27 @@ public class GestioneNucleoFamiliareService {
         void onServiceError(String message);
     }
 
+    public interface MembriServiceCallback {
+        void onMembriLoaded(List<MembroEntity> membri);
+        void onServiceError(String message);
+    }
+
     public GestioneNucleoFamiliareService(Context context) {
         this.repository = new GestioneNucleoFamiliareRepository(context);
+    }
+
+    public void getMembri(final MembriServiceCallback callback) {
+        repository.getMembri(new GestioneNucleoFamiliareRepository.MembriCallback() {
+            @Override
+            public void onSuccess(List<MembroEntity> membri) {
+                callback.onMembriLoaded(membri);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onServiceError(message);
+            }
+        });
     }
 
     public void getAppoggi(final AppoggiServiceCallback callback) {
