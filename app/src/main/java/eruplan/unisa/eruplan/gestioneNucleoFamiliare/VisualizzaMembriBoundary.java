@@ -30,7 +30,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_visualizza_nucleo);
+        setContentView(R.layout.activity_visualizza_membri);
 
         // Inizializza il control
         control = new GestioneNucleoFamiliareControl(this);

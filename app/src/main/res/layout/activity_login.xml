@@ -27,7 +27,7 @@
          />
 
     <EditText
-        android:id="@+id/codice_fiscale"
+        android:id="@+id/et_codice_fiscale"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -47,7 +47,7 @@
         app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/et_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -64,7 +64,7 @@
         android:background="@drawable/bg_rounded_light_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/codice_fiscale" />
+        app:layout_constraintTop_toBottomOf="@+id/et_codice_fiscale" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/login"
@@ -77,10 +77,10 @@
         app:cornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
     <ProgressBar
-        android:id="@+id/loading"
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"

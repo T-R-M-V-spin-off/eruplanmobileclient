@@ -62,9 +62,16 @@
         <activity android:name=".gestioneNucleoFamiliare.ListaRichiesteBoundary"
             android:exported="true"/>
 
+        <activity
+            android:name=".gestioneNucleoFamiliare.VisualizzaMembriBoundary"
+            android:exported="true"/>
 
         <activity
             android:name=".gestioneNucleoFamiliare.VisualizzaNucleoBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.ListaAppoggioBoundary"
             android:exported="true"/>
 
         <service
