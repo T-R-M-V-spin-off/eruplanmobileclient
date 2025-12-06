@@ -1,5 +1,6 @@
 package eruplan.unisa.eruplan.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,21 @@ public class RichiestaAdapter extends RecyclerView.Adapter<RichiestaAdapter.Rich
     // 1. Lista che contiene gli oggetti Richiesta scaricati dal server
     private List<RichiestaEntity> richiesteList;
 
-    // 2. Quando creo l'Adapter nell'Activity, gli passo le richieste reali con questo costruttore
-    public RichiestaAdapter(List<RichiestaEntity> richiesteList) {
+    // NUOVO: Listener per comunicare all'Activity quale riga è stata cliccata
+    private OnItemSelectListener listener;
+
+    // NUOVO: Variabile per ricordare l'indice della riga selezionata (-1 = nessuna)
+    private int selectedPosition = -1;
+
+    // NUOVO: Interfaccia che l'Activity dovrà implementare
+    public interface OnItemSelectListener {
+        void onItemSelected(RichiestaEntity richiesta);
+    }
+
+    // 2. Quando creo l'Adapter nell'Activity, gli passo le richieste reali E il listener per i click
+    public RichiestaAdapter(List<RichiestaEntity> richiesteList, OnItemSelectListener listener) {
         this.richiesteList = richiesteList;
+        this.listener = listener;
     }
 
     // Metodo che crea la struttura grafica della riga, ma ancora senza dati dentro.
@@ -50,6 +63,36 @@ public class RichiestaAdapter extends RecyclerView.Adapter<RichiestaAdapter.Rich
         // Prende mittente e data usando i Getter definiti nel POJO Richiesta.java.
         holder.tvNome.setText(richiestaEntity.getNomeMittente());
         holder.tvData.setText(richiestaEntity.getDataOra());
+
+        // --- NUOVA LOGICA PER LA SELEZIONE VISIVA ---
+
+        // Se questa riga è quella selezionata, le cambio colore (Grigio Chiaro)
+        if (selectedPosition == position) {
+            holder.itemView.setBackgroundColor(Color.LTGRAY);
+        } else {
+            // Altrimenti rimetto il background originale (quello definito nell'XML)
+            holder.itemView.setBackgroundResource(R.drawable.bg_rounded_red);
+        }
+
+        // Gestione del click sull'intera riga
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Salvo la posizione precedente per aggiornarla (toglierle il grigio)
+                int previousItem = selectedPosition;
+                // 2. Salvo la nuova posizione corrente
+                selectedPosition = holder.getAdapterPosition();
+
+                // 3. Notifico l'adapter di ridisegnare le due righe coinvolte
+                notifyItemChanged(previousItem);
+                notifyItemChanged(selectedPosition);
+
+                // 4. Avviso l'Activity che è stato selezionato questo oggetto
+                if (listener != null) {
+                    listener.onItemSelected(richiestaEntity);
+                }
+            }
+        });
     }
 
     // Metodo che comunica alla RecyclerView quanti elementi totali ci sono nella lista Java.

@@ -73,7 +73,12 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
 
         btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
 
-        btnInviti.setOnClickListener(v -> gestioneNucleoControl.mostraListaRichieste());
+        // Listener per il pulsante "I tuoi Inviti"
+        btnInviti.setOnClickListener(v -> {
+            Intent intent = new Intent(GestioneNucleoBoundary.this, ListaRichiesteBoundary.class);
+            intent.putExtra("IS_ACTIONABLE", false); // Passiamo false per rendere visibile solo "Torna al Menu"
+            startActivity(intent);
+        });
 
         // Listener per il pulsante "Logout"
         btnLogout.setOnClickListener(v -> gestioneNucleoControl.performLogout());

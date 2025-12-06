@@ -308,4 +308,33 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
+
+    // =================================================================================
+    //  METODI PER ACCETTARE RICHIESTA (REQUISITO SC-GNF.02)
+    // =================================================================================
+
+    /**
+     * Logica per accettare la richiesta.
+     * Verifica la validità dell'ID e chiama il Repository.
+     */
+    public void accettaRichiesta(long idRichiesta, final ServiceCallback callback) {
+        // Validazione minima: l'ID deve essere positivo
+        if (idRichiesta <= 0) {
+            callback.onSalvataggioError("ID richiesta non valido.");
+            return;
+        }
+
+        // Chiama il metodo del repository
+        repository.accettaRichiestaApi(idRichiesta, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onSalvataggioError(message);
+            }
+        });
+    }
 }

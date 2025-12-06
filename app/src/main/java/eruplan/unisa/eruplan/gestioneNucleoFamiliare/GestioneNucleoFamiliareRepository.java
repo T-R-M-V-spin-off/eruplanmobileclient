@@ -35,6 +35,8 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
 
+    private static final String ACCETTA_INVITO_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti/accetta";
+
 
     // MODIFICA: Rimosso la RequestQueue locale.
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
@@ -104,10 +106,14 @@ public class GestioneNucleoFamiliareRepository {
                         for (int i = 0; i < response.length(); i++) {
                             JSONObject jsonObject = response.getJSONObject(i);
 
+                            // Aggiunto il campo ID per al JSON
+                            long id = jsonObject.optLong("id", -1);
+
                             String mittente = jsonObject.getString("nomeMittente").trim();
                             String data = jsonObject.getString("dataOra").trim();
 
-                            richieste.add(new RichiestaEntity(mittente, data));
+                            // 2. Passiamo 3 parametri al costruttore
+                            richieste.add(new RichiestaEntity(id, mittente, data));
                         }
                         callback.onSuccess(richieste);
                     } catch (JSONException e) {
@@ -529,4 +535,44 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
+
+    // =================================================================================
+    //  METODI PER ACCETTARE RICHIESTA (REQUISITO SC-GNF.02)
+    // =================================================================================
+
+    /**
+     * [AGGIUNTA] Esegue la chiamata POST al server per accettare la richiesta.
+     */
+    public void accettaRichiestaApi(long idRichiesta, final RepositoryCallback callback) {
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("idRichiesta", idRichiesta);
+        } catch (JSONException e) {
+            callback.onError("Errore interno JSON.");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ACCETTA_INVITO_URL, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        boolean success = response.optBoolean("success");
+                        String msg = response.optString("message", "Operazione completata.");
+                        if (success) {
+                            callback.onSuccess(msg);
+                        } else {
+                            callback.onError(msg);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.onError("Errore durante l'accettazione: " + error.getMessage());
+                    }
+                }
+        );
+
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
 }

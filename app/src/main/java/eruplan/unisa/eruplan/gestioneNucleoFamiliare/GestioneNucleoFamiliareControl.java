@@ -318,4 +318,35 @@ public class GestioneNucleoFamiliareControl {
         context.startActivity(intent);
     }
 
+    // =================================================================================
+    //  METODI PER ACCETTARE RICHIESTA (REQUISITO SC-GNF.02)
+    // =================================================================================
+
+    /**
+     * Interfaccia di callback specifica per l'operazione di accettazione.
+     * Permette alla Boundary di sapere se l'utente è entrato nel nucleo o se c'è stato un errore.
+     */
+    public interface AccettaRichiestaCallback {
+        void onSuccess(String message);
+        void onError(String error);
+    }
+
+    /**
+     * Metodo chiamato dalla Boundary quando l'utente preme "Conferma".
+     * Inoltra la chiamata al Service.
+     */
+    public void accettaRichiesta(long idRichiesta, final AccettaRichiestaCallback callback) {
+        service.accettaRichiesta(idRichiesta, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                callback.onSuccess(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                callback.onError(message);
+            }
+        });
+    }
+
 }

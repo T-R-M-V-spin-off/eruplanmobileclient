@@ -1,19 +1,24 @@
 package eruplan.unisa.eruplan.entity;
 
 /**
- * Classe POJO che rappresenta l'invito ad accedere al nucleo familiare.
+ * Rappresenta i dati di un singolo invito.
+ * Aggiornato per includere l'ID univoco necessario per l'accettazione.
  */
 public class RichiestaEntity {
+
+    // COMMENTO: L'ID serve al server per identificare la richiesta nel database.
+    private long id;
     private String nomeMittente;
     private String dataOra;
 
-    // Costruttore utilizzato per creare l'oggetto dai dati del server
-    public RichiestaEntity(String nomeMittente, String dataOra) {
+    // Costruttore completo
+    public RichiestaEntity(long id, String nomeMittente, String dataOra) {
+        this.id = id;
         this.nomeMittente = nomeMittente;
         this.dataOra = dataOra;
     }
 
-    // Getter coerenti con l'uso nell'Adapter
+    public long getId() { return id; }
     public String getNomeMittente() { return nomeMittente; }
     public String getDataOra() { return dataOra; }
 }
