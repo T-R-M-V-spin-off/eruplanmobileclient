@@ -8,6 +8,9 @@ public class ResidenzaEntity {
     private String civico;
     private String cap;
 
+    public ResidenzaEntity() {
+    }
+
     public ResidenzaEntity(String viaPiazza, String comune, String regione, String paese, String civico, String cap) {
         this.viaPiazza = viaPiazza;
         this.comune = comune;
