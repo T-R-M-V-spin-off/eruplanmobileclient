@@ -86,6 +86,8 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 gestioneNucleoControl.apriListaAppoggio();
+                Intent intent = new Intent(GestioneNucleoBoundary.this, ListaAppoggioBoundary.class);
+                startActivity(intent);
             }
         });
 
@@ -93,6 +95,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 gestioneNucleoControl.mostraVisualizzaResidenza();
+
             }
         });
 
