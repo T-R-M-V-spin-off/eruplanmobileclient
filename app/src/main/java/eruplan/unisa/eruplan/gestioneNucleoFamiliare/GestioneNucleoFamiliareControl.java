@@ -7,6 +7,7 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
+import eruplan.unisa.eruplan.entity.RichiestaEntity;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CreaNucleoBoundary;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.InserisciAppoggioBoundary;
 
@@ -34,9 +35,28 @@ public class GestioneNucleoFamiliareControl {
         void onControlError(String message);
     }
 
+    public interface RichiesteControlCallback {
+        void onRichiesteLoaded(List<RichiestaEntity> richieste);
+        void onControlError(String message);
+    }
+
     public GestioneNucleoFamiliareControl(Context context) {
         this.context = context;
         this.service = new GestioneNucleoFamiliareService(context);
+    }
+
+    public void getRichieste(final RichiesteControlCallback callback) {
+        service.getRichieste(new GestioneNucleoFamiliareService.RichiesteServiceCallback() {
+            @Override
+            public void onRichiesteLoaded(List<RichiestaEntity> richieste) {
+                callback.onRichiesteLoaded(richieste);
+            }
+
+            @Override
+            public void onServiceError(String message) {
+                callback.onControlError(message);
+            }
+        });
     }
 
     public void getMembri(final MembriControlCallback callback) {

@@ -20,6 +20,7 @@ import eruplan.unisa.eruplan.VolleySingleton;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
+import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
 /**
  * Gestisce la persistenza dei dati comunicando con il server web.
@@ -30,6 +31,8 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
+    private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
+
 
     // MODIFICA: Rimosso la RequestQueue locale.
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
@@ -51,6 +54,11 @@ public class GestioneNucleoFamiliareRepository {
         void onError(String message);
     }
 
+    public interface RichiesteCallback {
+        void onSuccess(List<RichiestaEntity> richieste);
+        void onError(String message);
+    }
+
     public GestioneNucleoFamiliareRepository(Context context) {
         // MODIFICA: Invece di creare una nuova coda separata (che perderebbe la sessione),
         // salviamo il context per richiamare il Singleton condiviso quando serve.
@@ -58,6 +66,29 @@ public class GestioneNucleoFamiliareRepository {
 
         // Vecchio codice rimosso:
         // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+    }
+
+    public void getRichieste(final RichiesteCallback callback) {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, GET_INVITI_URL, null,
+                response -> {
+                    try {
+                        List<RichiestaEntity> richieste = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject jsonObject = response.getJSONObject(i);
+
+                            String mittente = jsonObject.getString("nomeMittente").trim();
+                            String data = jsonObject.getString("dataOra").trim();
+
+                            richieste.add(new RichiestaEntity(mittente, data));
+                        }
+                        callback.onSuccess(richieste);
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel parsing della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
     }
 
     public void getMembri(final MembriCallback callback) {
