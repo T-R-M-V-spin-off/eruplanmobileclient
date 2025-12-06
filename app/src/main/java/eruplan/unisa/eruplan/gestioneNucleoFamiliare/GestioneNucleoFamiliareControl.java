@@ -150,13 +150,13 @@ public class GestioneNucleoFamiliareControl {
         context.startActivity(intent);
     }
 
-    public void mostraVisualizzaNucleo() {
-        Intent intent = new Intent(context, VisualizzaNucleoBoundary.class);
+    public void mostraVisualizzaMembri() {
+        Intent intent = new Intent(context, VisualizzaMembriBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
-    public void mostraVisualizzaResidenza() {
+    public void mostraVisualizzaNucleo() {
         Intent intent = new Intent(context, VisualizzaNucleoBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);

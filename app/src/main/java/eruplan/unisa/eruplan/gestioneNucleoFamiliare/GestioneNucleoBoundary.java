@@ -65,12 +65,12 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         subscribeToNotificationTopic();
 
         // Listener per il pulsante "I membri del tuo Nucleo"
-        btnMembri.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
+        btnMembri.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaMembri());
 
         // Listener per il pulsante "I tuoi Luoghi Sicuri"
         btnLuoghi.setOnClickListener(v -> gestioneNucleoControl.apriListaAppoggio());
 
-        btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaResidenza());
+        btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
 
         // Listener per il pulsante "Logout"
         btnLogout.setOnClickListener(v -> gestioneNucleoControl.performLogout());
