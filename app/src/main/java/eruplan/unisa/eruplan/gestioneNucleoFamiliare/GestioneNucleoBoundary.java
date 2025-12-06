@@ -55,6 +55,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         MaterialButton btnLuoghi = findViewById(R.id.btnLuoghi);
         MaterialButton btnResidenza = findViewById(R.id.btnResidenza);
         MaterialButton btnAbbandona = findViewById(R.id.btnAbbandona);
+        MaterialButton btnInviti = findViewById(R.id.btnInviti);
         btnSi = findViewById(R.id.btnSi);
         btnNo = findViewById(R.id.btnNo);
         tvConferma = findViewById(R.id.tvConferma);
@@ -71,6 +72,8 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         btnLuoghi.setOnClickListener(v -> gestioneNucleoControl.apriListaAppoggio());
 
         btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
+
+        btnInviti.setOnClickListener(v -> gestioneNucleoControl.mostraListaRichieste());
 
         // Listener per il pulsante "Logout"
         btnLogout.setOnClickListener(v -> gestioneNucleoControl.performLogout());
