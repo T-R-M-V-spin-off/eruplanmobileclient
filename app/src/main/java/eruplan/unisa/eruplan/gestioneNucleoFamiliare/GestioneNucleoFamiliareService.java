@@ -172,7 +172,7 @@ public class GestioneNucleoFamiliareService {
         });
     }
 
-    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ServiceCallback serviceCallback) throws IllegalArgumentException {
+    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, boolean hasVeicolo, int postiVeicolo, final ServiceCallback serviceCallback) throws IllegalArgumentException {
         final String viaPiazzaTrimmed = validateAndTrim(viaPiazza, 1, 40, "Via/Piazza non valido.");
         final String comuneTrimmed = validateAndTrim(comune, 1, 40, "Comune non valido.");
         final String regioneTrimmed = validateAndTrim(regione, 1, 40, "Regione non valida.");
@@ -180,7 +180,11 @@ public class GestioneNucleoFamiliareService {
         final String civicoTrimmed = validateAndTrim(civico, 1, 5, "Numero civico non valido.");
         final String capTrimmed = validateAndTrim(cap, 5, 5, "CAP non valido. Deve essere di 5 cifre.");
 
-        NucleoEntity nuovoNucleoEntity = new NucleoEntity(viaPiazzaTrimmed, comuneTrimmed, regioneTrimmed, paeseTrimmed, civicoTrimmed, capTrimmed);
+        if (hasVeicolo && (postiVeicolo < 2 || postiVeicolo > 9)) {
+            throw new IllegalArgumentException("Il numero di posti del veicolo deve essere compreso tra 2 e 9.");
+        }
+
+        NucleoEntity nuovoNucleoEntity = new NucleoEntity(viaPiazzaTrimmed, comuneTrimmed, regioneTrimmed, paeseTrimmed, civicoTrimmed, capTrimmed, hasVeicolo, postiVeicolo);
 
         repository.salvaNucleo(nuovoNucleoEntity, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override

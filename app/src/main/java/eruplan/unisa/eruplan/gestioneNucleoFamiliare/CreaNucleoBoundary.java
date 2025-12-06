@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -17,9 +18,12 @@ import eruplan.unisa.eruplan.R;
  */
 public class CreaNucleoBoundary extends AppCompatActivity {
 
-    private EditText viaPiazzaEditText, comuneEditText, regioneEditText, paeseEditText, civicoEditText, capEditText;
+    private EditText viaPiazzaEditText, comuneEditText, regioneEditText, paeseEditText, civicoEditText, capEditText, postiVeicoloEditText;
     private Button btnSubmitNucleo;
     private ProgressBar loadingProgressBarNucleo;
+    private CheckBox hasVeicoloCheckBox;
+
+
 
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
 
@@ -32,12 +36,18 @@ public class CreaNucleoBoundary extends AppCompatActivity {
 
         initViews();
 
+        //CheckBox per far comparire e scomparire il campo per i posti del veicolo
+        hasVeicoloCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    postiVeicoloEditText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
         btnSubmitNucleo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 submitNucleo();
             }
         });
+
     }
 
     private void initViews() {
@@ -49,6 +59,8 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         capEditText = findViewById(R.id.capEditText);
         btnSubmitNucleo = findViewById(R.id.btnSubmitNucleo);
         loadingProgressBarNucleo = findViewById(R.id.loadingProgressBarNucleo);
+        hasVeicoloCheckBox = findViewById(R.id.hasVeicoloCheckBox);
+        postiVeicoloEditText = findViewById(R.id.postiVeicoloEditText);
     }
 
     private void submitNucleo() {
@@ -58,12 +70,28 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         String paese = paeseEditText.getText().toString().trim();
         String civico = civicoEditText.getText().toString().trim();
         String cap = capEditText.getText().toString().trim();
+        boolean hasVeicolo = hasVeicoloCheckBox.isChecked();
+        int postiVeicolo = 0;
+
+        if (hasVeicolo) {
+            String postiStr = postiVeicoloEditText.getText().toString().trim();
+            if (postiStr.isEmpty()) {
+                Toast.makeText(this, "Per favore, inserisci il numero di posti.", Toast.LENGTH_SHORT).show();
+                return; // Interrompe l'operazione
+            }
+            try {
+                postiVeicolo = Integer.parseInt(postiStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Il numero di posti non è valido.", Toast.LENGTH_SHORT).show();
+                return; // Interrompe l'operazione
+            }
+        }
 
         try {
             loadingProgressBarNucleo.setVisibility(View.VISIBLE);
             btnSubmitNucleo.setEnabled(false);
 
-            gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareControl.ControlCallback() {
+            gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareControl.ControlCallback() {
                 @Override
                 public void onInserimentoSuccesso(String message) {
                     loadingProgressBarNucleo.setVisibility(View.GONE);

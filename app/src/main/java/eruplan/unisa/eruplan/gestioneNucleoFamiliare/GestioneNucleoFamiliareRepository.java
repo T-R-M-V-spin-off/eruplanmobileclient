@@ -273,6 +273,8 @@ public class GestioneNucleoFamiliareRepository {
             requestBody.put("paese", nucleoEntity.getPaese());
             requestBody.put("civico", nucleoEntity.getCivico());
             requestBody.put("cap", nucleoEntity.getCap());
+            requestBody.put("hasVeicolo", nucleoEntity.hasVeicolo());
+            requestBody.put("postiVeicolo", nucleoEntity.getPostiVeicolo());
         } catch (JSONException e) {
             callback.onError("Errore interno nella creazione della richiesta JSON per il nucleo.");
             return;
