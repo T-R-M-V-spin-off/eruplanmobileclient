@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +15,8 @@ import eruplan.unisa.eruplan.entity.NucleoEntity;
 
 public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
-    private TextView viaPiazzaTextView, comuneTextView, regioneTextView, paeseTextView, civicoTextView, capTextView;
-    private Button btnChiudi;
+    private EditText viaPiazzaEditText, comuneEditText, regioneEditText, paeseEditText, civicoEditText, capEditText;
+    private Button btnSalva, btnChiudi;
     private ProgressBar loadingProgressBar;
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
 
@@ -29,6 +29,8 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
         initViews();
 
+        btnSalva.setOnClickListener(v -> salvaModifiche());
+
         btnChiudi.setOnClickListener(v -> {
             Intent intent = new Intent(VisualizzaNucleoBoundary.this, GestioneNucleoBoundary.class);
             startActivity(intent);
@@ -39,12 +41,13 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
     }
 
     private void initViews() {
-        viaPiazzaTextView = findViewById(R.id.viaPiazzaTextView);
-        comuneTextView = findViewById(R.id.comuneTextView);
-        regioneTextView = findViewById(R.id.regioneTextView);
-        paeseTextView = findViewById(R.id.paeseTextView);
-        civicoTextView = findViewById(R.id.civicoTextView);
-        capTextView = findViewById(R.id.capTextView);
+        viaPiazzaEditText = findViewById(R.id.viaPiazzaEditText);
+        comuneEditText = findViewById(R.id.comuneEditText);
+        regioneEditText = findViewById(R.id.regioneEditText);
+        paeseEditText = findViewById(R.id.paeseEditText);
+        civicoEditText = findViewById(R.id.civicoEditText);
+        capEditText = findViewById(R.id.capEditText);
+        btnSalva = findViewById(R.id.btnSalva);
         btnChiudi = findViewById(R.id.btnChiudi);
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
     }
@@ -56,12 +59,12 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
             public void onNucleoLoaded(NucleoEntity nucleo) {
                 loadingProgressBar.setVisibility(View.GONE);
                 if (nucleo != null) {
-                    viaPiazzaTextView.setText(nucleo.getViaPiazza());
-                    comuneTextView.setText(nucleo.getComune());
-                    regioneTextView.setText(nucleo.getRegione());
-                    paeseTextView.setText(nucleo.getPaese());
-                    civicoTextView.setText(nucleo.getCivico());
-                    capTextView.setText(nucleo.getCap());
+                    viaPiazzaEditText.setText(nucleo.getViaPiazza());
+                    comuneEditText.setText(nucleo.getComune());
+                    regioneEditText.setText(nucleo.getRegione());
+                    paeseEditText.setText(nucleo.getPaese());
+                    civicoEditText.setText(nucleo.getCivico());
+                    capEditText.setText(nucleo.getCap());
                 } else {
                     Toast.makeText(VisualizzaNucleoBoundary.this, "Nessun nucleo trovato.", Toast.LENGTH_LONG).show();
                 }
@@ -71,6 +74,31 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
             public void onControlError(String message) {
                 loadingProgressBar.setVisibility(View.GONE);
                 Toast.makeText(VisualizzaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void salvaModifiche() {
+        String viaPiazza = viaPiazzaEditText.getText().toString();
+        String comune = comuneEditText.getText().toString();
+        String regione = regioneEditText.getText().toString();
+        String paese = paeseEditText.getText().toString();
+        String civico = civicoEditText.getText().toString();
+        String cap = capEditText.getText().toString();
+
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        gestioneNucleoFamiliareControl.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareControl.ControlCallback() {
+            @Override
+            public void onInserimentoSuccesso(String message) {
+                loadingProgressBar.setVisibility(View.GONE);
+                Toast.makeText(VisualizzaNucleoBoundary.this, message, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onInserimentoErrore(String message) {
+                loadingProgressBar.setVisibility(View.GONE);
+                Toast.makeText(VisualizzaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }

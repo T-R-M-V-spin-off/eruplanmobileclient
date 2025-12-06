@@ -30,6 +30,7 @@ public class GestioneNucleoFamiliareRepository {
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
     private static final String GET_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
+    private static final String MODIFY_RESIDENZA_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
@@ -306,6 +307,38 @@ public class GestioneNucleoFamiliareRepository {
 
         // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void modificaResidenza(NucleoEntity nucleo, final RepositoryCallback callback) {
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("viaPiazza", nucleo.getViaPiazza());
+            requestBody.put("comune", nucleo.getComune());
+            requestBody.put("regione", nucleo.getRegione());
+            requestBody.put("paese", nucleo.getPaese());
+            requestBody.put("civico", nucleo.getCivico());
+            requestBody.put("cap", nucleo.getCap());
+
+        } catch (JSONException e) {
+            callback.onError("Errore interno JSON.");
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, MODIFY_RESIDENZA_URL, requestBody,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String msg = response.optString("message", "Operazione completata.");
+
+                    if (success) {
+                        callback.onSuccess(msg);
+                    } else {
+                        callback.onError(msg);
+                    }
+                },
+                error -> callback.onError("Impossibile modificare la residenza: " + error.getMessage())
+        );
+
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
     public void salvaAppoggio(AppoggioEntity appoggio, final RepositoryCallback callback) {

@@ -6,59 +6,75 @@
     android:layout_height="match_parent"
     tools:context=".gestioneNucleoFamiliare.VisualizzaNucleoBoundary">
 
-    <TextView
-        android:id="@+id/viaPiazzaTextView"
+    <EditText
+        android:id="@+id/viaPiazzaEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:hint="Via/Piazza"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/comuneTextView"
+    <EditText
+        android:id="@+id/comuneEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="Comune"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viaPiazzaTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/viaPiazzaEditText" />
 
-    <TextView
-        android:id="@+id/regioneTextView"
+    <EditText
+        android:id="@+id/regioneEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="Regione"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/comuneTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/comuneEditText" />
 
-    <TextView
-        android:id="@+id/paeseTextView"
+    <EditText
+        android:id="@+id/paeseEditText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android_layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="Paese"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/regioneTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/regioneEditText" />
 
-    <TextView
-        android:id="@+id/civicoTextView"
+    <EditText
+        android:id="@+id/civicoEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="Civico"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/paeseTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/paeseEditText" />
 
-    <TextView
-        android:id="@+id/capTextView"
+    <EditText
+        android:id="@+id/capEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:hint="CAP"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/civicoTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/civicoEditText" />
+
+    <Button
+        android:id="@+id/btnSalva"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Salva"
+        app:layout_constraintEnd_toStartOf="@+id/btnChiudi"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/capEditText" />
 
     <Button
         android:id="@+id/btnChiudi"
@@ -67,8 +83,8 @@
         android:layout_marginTop="32dp"
         android:text="Chiudi"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capTextView" />
+        app:layout_constraintStart_toEndOf="@+id/btnSalva"
+        app:layout_constraintTop_toBottomOf="@+id/capEditText" />
 
     <ProgressBar
         android:id="@+id/loadingProgressBar"

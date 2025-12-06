@@ -17,7 +17,7 @@ public class GestioneNucleoFamiliareService {
 
     // CORREZIONE: Pattern aggiornato per usare i trattini (dd-MM-yyyy) per coerenza.
     private static final Pattern DATE_PATTERN = Pattern.compile(
-        "^((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\\d{2}))$");
+        "^((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\\d{2}))S");
 
     private GestioneNucleoFamiliareRepository repository;
 
@@ -198,7 +198,7 @@ public class GestioneNucleoFamiliareService {
             }
         });
     }
-    
+
     public void abbandonaNucleo(final ServiceCallback serviceCallback) {
         repository.abbandonaNucleo(new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
@@ -225,6 +225,29 @@ public class GestioneNucleoFamiliareService {
         AppoggioEntity nuovoAppoggio = new AppoggioEntity(viaPiazzaTrimmed, civicoTrimmed, comuneTrimmed, capTrimmed, provinciaTrimmed, regioneTrimmed, paeseTrimmed);
 
         repository.salvaAppoggio(nuovoAppoggio, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                serviceCallback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                serviceCallback.onSalvataggioError(message);
+            }
+        });
+    }
+
+    public void modificaResidenza(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ServiceCallback serviceCallback) throws IllegalArgumentException {
+        final String viaPiazzaTrimmed = validateAndTrim(viaPiazza, 1, 40, "Via/Piazza non valido.");
+        final String comuneTrimmed = validateAndTrim(comune, 1, 40, "Comune non valido.");
+        final String regioneTrimmed = validateAndTrim(regione, 1, 40, "Regione non valida.");
+        final String paeseTrimmed = validateAndTrim(paese, 1, 40, "Paese non valido.");
+        final String civicoTrimmed = validateAndTrim(civico, 1, 5, "Numero civico non valido.");
+        final String capTrimmed = validateAndTrim(cap, 5, 5, "CAP non valido. Deve essere di 5 cifre.");
+
+        NucleoEntity nucleoModificato = new NucleoEntity(viaPiazzaTrimmed, comuneTrimmed, regioneTrimmed, paeseTrimmed, civicoTrimmed, capTrimmed, false, 0);
+
+        repository.modificaResidenza(nucleoModificato, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
                 serviceCallback.onSalvataggioSuccess(message);

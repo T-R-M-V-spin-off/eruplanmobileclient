@@ -220,6 +220,20 @@ public class GestioneNucleoFamiliareControl {
         });
     }
 
+    public void modificaResidenza(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ControlCallback controlCallback) {
+        service.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                controlCallback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                controlCallback.onInserimentoErrore(message);
+            }
+        });
+    }
+
     /**
      * Avvia la logica per abbandonare il nucleo familiare corrente.
      * @param controlCallback L'interfaccia per notificare l'Activity del risultato.
