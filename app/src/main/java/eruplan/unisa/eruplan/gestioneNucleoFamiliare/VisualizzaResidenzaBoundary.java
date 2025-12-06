@@ -11,9 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import eruplan.unisa.eruplan.R;
-import eruplan.unisa.eruplan.entity.ResidenzaEntity;
+import eruplan.unisa.eruplan.entity.NucleoEntity;
 
-public class VisualizzaResidenzaBoundary extends AppCompatActivity {
+public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
     private TextView viaPiazzaTextView, comuneTextView, regioneTextView, paeseTextView, civicoTextView, capTextView;
     private Button btnChiudi;
@@ -23,19 +23,19 @@ public class VisualizzaResidenzaBoundary extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_visualizza_residenza);
+        setContentView(R.layout.activity_visualizza_nucleo);
 
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
         initViews();
 
         btnChiudi.setOnClickListener(v -> {
-            Intent intent = new Intent(VisualizzaResidenzaBoundary.this, GestioneNucleoBoundary.class);
+            Intent intent = new Intent(VisualizzaNucleoBoundary.this, GestioneNucleoBoundary.class);
             startActivity(intent);
             finish();
         });
 
-        caricaDatiResidenza();
+        caricaDatiNucleo();
     }
 
     private void initViews() {
@@ -49,28 +49,28 @@ public class VisualizzaResidenzaBoundary extends AppCompatActivity {
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
     }
 
-    private void caricaDatiResidenza() {
+    private void caricaDatiNucleo() {
         loadingProgressBar.setVisibility(View.VISIBLE);
-        gestioneNucleoFamiliareControl.getResidenza(new GestioneNucleoFamiliareControl.ResidenzaControlCallback() {
+        gestioneNucleoFamiliareControl.getNucleo(new GestioneNucleoFamiliareControl.NucleoControlCallback() {
             @Override
-            public void onResidenzaLoaded(ResidenzaEntity residenza) {
+            public void onNucleoLoaded(NucleoEntity nucleo) {
                 loadingProgressBar.setVisibility(View.GONE);
-                if (residenza != null) {
-                    viaPiazzaTextView.setText(residenza.getViaPiazza());
-                    comuneTextView.setText(residenza.getComune());
-                    regioneTextView.setText(residenza.getRegione());
-                    paeseTextView.setText(residenza.getPaese());
-                    civicoTextView.setText(residenza.getCivico());
-                    capTextView.setText(residenza.getCap());
+                if (nucleo != null) {
+                    viaPiazzaTextView.setText(nucleo.getViaPiazza());
+                    comuneTextView.setText(nucleo.getComune());
+                    regioneTextView.setText(nucleo.getRegione());
+                    paeseTextView.setText(nucleo.getPaese());
+                    civicoTextView.setText(nucleo.getCivico());
+                    capTextView.setText(nucleo.getCap());
                 } else {
-                    Toast.makeText(VisualizzaResidenzaBoundary.this, "Nessuna residenza trovata.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(VisualizzaNucleoBoundary.this, "Nessun nucleo trovato.", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onControlError(String message) {
                 loadingProgressBar.setVisibility(View.GONE);
-                Toast.makeText(VisualizzaResidenzaBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(VisualizzaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
             }
         });
     }

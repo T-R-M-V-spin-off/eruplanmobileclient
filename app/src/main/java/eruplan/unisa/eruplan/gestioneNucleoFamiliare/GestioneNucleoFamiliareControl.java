@@ -7,7 +7,7 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
-import eruplan.unisa.eruplan.entity.ResidenzaEntity;
+import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
 public class GestioneNucleoFamiliareControl {
@@ -20,8 +20,8 @@ public class GestioneNucleoFamiliareControl {
         void onInserimentoErrore(String message);
     }
 
-    public interface ResidenzaControlCallback {
-        void onResidenzaLoaded(ResidenzaEntity residenza);
+    public interface NucleoControlCallback {
+        void onNucleoLoaded(NucleoEntity nucleo);
         void onControlError(String message);
     }
 
@@ -45,11 +45,11 @@ public class GestioneNucleoFamiliareControl {
         this.service = new GestioneNucleoFamiliareService(context);
     }
 
-    public void getResidenza(final ResidenzaControlCallback callback) {
-        service.getResidenza(new GestioneNucleoFamiliareService.ResidenzaServiceCallback() {
+    public void getNucleo(final NucleoControlCallback callback) {
+        service.getNucleo(new GestioneNucleoFamiliareService.NucleoServiceCallback() {
             @Override
-            public void onResidenzaLoaded(ResidenzaEntity residenza) {
-                callback.onResidenzaLoaded(residenza);
+            public void onNucleoLoaded(NucleoEntity nucleo) {
+                callback.onNucleoLoaded(nucleo);
             }
 
             @Override
@@ -147,8 +147,8 @@ public class GestioneNucleoFamiliareControl {
         context.startActivity(intent);
     }
 
-    public void mostraVisualizzaResidenza() {
-        Intent intent = new Intent(context, VisualizzaResidenzaBoundary.class);
+    public void mostraVisualizzaNucleo() {
+        Intent intent = new Intent(context, VisualizzaNucleoBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

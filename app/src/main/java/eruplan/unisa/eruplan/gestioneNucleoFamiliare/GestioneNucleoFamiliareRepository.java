@@ -20,7 +20,6 @@ import eruplan.unisa.eruplan.VolleySingleton;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
-import eruplan.unisa.eruplan.entity.ResidenzaEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
 /**
@@ -30,7 +29,7 @@ public class GestioneNucleoFamiliareRepository {
 
     private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
     private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
-    private static final String GET_RESIDENZA_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
+    private static final String GET_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
     private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
     private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
     private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
@@ -46,8 +45,8 @@ public class GestioneNucleoFamiliareRepository {
         void onError(String message);
     }
 
-    public interface ResidenzaCallback {
-        void onSuccess(ResidenzaEntity residenza);
+    public interface NucleoCallback {
+        void onSuccess(NucleoEntity nucleo);
         void onError(String message);
     }
 
@@ -75,18 +74,18 @@ public class GestioneNucleoFamiliareRepository {
         // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
-    public void getResidenza(final ResidenzaCallback callback) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, GET_RESIDENZA_URL, null,
+    public void getNucleo(final NucleoCallback callback) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, GET_NUCLEO_URL, null,
                 response -> {
                     try {
-                        ResidenzaEntity residenza = new ResidenzaEntity();
-                        residenza.setViaPiazza(response.getString("viaPiazza"));
-                        residenza.setComune(response.getString("comune"));
-                        residenza.setRegione(response.getString("regione"));
-                        residenza.setPaese(response.getString("paese"));
-                        residenza.setCivico(response.getString("civico"));
-                        residenza.setCap(response.getString("cap"));
-                        callback.onSuccess(residenza);
+                        NucleoEntity nucleo = new NucleoEntity();
+                        nucleo.setViaPiazza(response.getString("viaPiazza"));
+                        nucleo.setComune(response.getString("comune"));
+                        nucleo.setRegione(response.getString("regione"));
+                        nucleo.setPaese(response.getString("paese"));
+                        nucleo.setCivico(response.getString("civico"));
+                        nucleo.setCap(response.getString("cap"));
+                        callback.onSuccess(nucleo);
                     } catch (JSONException e) {
                         callback.onError("Errore nel parsing della risposta del server.");
                     }

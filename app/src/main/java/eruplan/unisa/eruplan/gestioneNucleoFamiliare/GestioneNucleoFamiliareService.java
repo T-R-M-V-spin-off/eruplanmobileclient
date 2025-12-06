@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
-import eruplan.unisa.eruplan.entity.ResidenzaEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
 
@@ -27,8 +26,8 @@ public class GestioneNucleoFamiliareService {
         void onSalvataggioError(String message);
     }
 
-    public interface ResidenzaServiceCallback {
-        void onResidenzaLoaded(ResidenzaEntity residenza);
+    public interface NucleoServiceCallback {
+        void onNucleoLoaded(NucleoEntity nucleo);
         void onServiceError(String message);
     }
 
@@ -51,11 +50,11 @@ public class GestioneNucleoFamiliareService {
         this.repository = new GestioneNucleoFamiliareRepository(context);
     }
 
-    public void getResidenza(final ResidenzaServiceCallback callback) {
-        repository.getResidenza(new GestioneNucleoFamiliareRepository.ResidenzaCallback() {
+    public void getNucleo(final NucleoServiceCallback callback) {
+        repository.getNucleo(new GestioneNucleoFamiliareRepository.NucleoCallback() {
             @Override
-            public void onSuccess(ResidenzaEntity residenza) {
-                callback.onResidenzaLoaded(residenza);
+            public void onSuccess(NucleoEntity nucleo) {
+                callback.onNucleoLoaded(nucleo);
             }
 
             @Override

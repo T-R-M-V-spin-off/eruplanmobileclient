@@ -1,5 +1,6 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -46,7 +47,10 @@ public class ListaRichiesteBoundary extends AppCompatActivity {
 
         // Trova il pulsante "Torna al Menu" e al click chiude l'activity e torna indietro
         Button btnTornaMenu = findViewById(R.id.btn_torna_menu);
-        btnTornaMenu.setOnClickListener(v -> finish());
+        btnTornaMenu.setOnClickListener(v -> {
+            Intent intent = new Intent(ListaRichiesteBoundary.this, GestioneNucleoBoundary.class);
+            startActivity(intent);
+        });
 
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
