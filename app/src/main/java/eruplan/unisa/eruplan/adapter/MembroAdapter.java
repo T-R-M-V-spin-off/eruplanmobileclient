@@ -1,8 +1,12 @@
 package eruplan.unisa.eruplan.adapter;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,9 +20,21 @@ import eruplan.unisa.eruplan.entity.MembroEntity;
 public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroViewHolder> {
 
     private List<MembroEntity> membriList;
+    private boolean showDeleteIcon = false;
+    private OnItemDeleteListener deleteListener;
 
-    public MembroAdapter(List<MembroEntity> membriList) {
+    public interface OnItemDeleteListener {
+        void onItemDelete(int position);
+    }
+
+    public MembroAdapter(List<MembroEntity> membriList, OnItemDeleteListener deleteListener) {
         this.membriList = membriList;
+        this.deleteListener = deleteListener;
+    }
+
+    public void setShowDeleteIcon(boolean show) {
+        this.showDeleteIcon = show;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -34,6 +50,21 @@ public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroView
         String nomeCompleto = membroEntity.getNome() + " " + membroEntity.getCognome();
         holder.tvNomeCognome.setText(nomeCompleto);
         holder.tvCodiceFiscale.setText(membroEntity.getCodiceFiscale());
+
+        holder.ivDeleteMembro.setVisibility(showDeleteIcon ? View.VISIBLE : View.GONE);
+
+        holder.ivDeleteMembro.setOnClickListener(v -> {
+            new AlertDialog.Builder(v.getContext())
+                    .setTitle("Conferma eliminazione")
+                    .setMessage("Vuoi eliminare questo membro del tuo nucleo?")
+                    .setPositiveButton("Sì", (dialog, which) -> {
+                        if (deleteListener != null) {
+                            deleteListener.onItemDelete(position);
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
     }
 
     @Override
@@ -44,11 +75,13 @@ public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroView
     public static class MembroViewHolder extends RecyclerView.ViewHolder {
         TextView tvNomeCognome;
         TextView tvCodiceFiscale;
+        ImageView ivDeleteMembro;
 
         public MembroViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNomeCognome = itemView.findViewById(R.id.tv_nome_cognome);
             tvCodiceFiscale = itemView.findViewById(R.id.tv_codice_fiscale);
+            ivDeleteMembro = itemView.findViewById(R.id.iv_delete_membro);
         }
     }
 }

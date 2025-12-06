@@ -1,15 +1,18 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +27,7 @@ import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.adapter.MembroAdapter;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 
-public class VisualizzaNucleoBoundary extends AppCompatActivity {
+public class VisualizzaNucleoBoundary extends AppCompatActivity implements MembroAdapter.OnItemDeleteListener {
 
     private RecyclerView rvMembri;
     private MembroAdapter membroAdapter;
@@ -32,13 +35,13 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
     private Button btnBack;
     private ImageButton btnMenu;
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
+    private PopupWindow popupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualizza_nucleo);
 
-        // Inizializzazione View
         rvMembri = findViewById(R.id.rv_membri);
         btnBack = findViewById(R.id.btn_back);
         btnMenu = findViewById(R.id.btn_menu);
@@ -46,33 +49,20 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
         membriList = new ArrayList<>();
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
-        // Configurazione RecyclerView
         rvMembri.setLayoutManager(new LinearLayoutManager(this));
-        membroAdapter = new MembroAdapter(membriList);
+        membroAdapter = new MembroAdapter(membriList, this);
         rvMembri.setAdapter(membroAdapter);
 
-        // Caricamento dati dal server
         loadMembri();
 
-        // Listener Pulsanti
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Torna al menu GNF (GnfActivity)
-                Intent intent = new Intent(VisualizzaNucleoBoundary.this, GestioneNucleoBoundary.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-            }
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(VisualizzaNucleoBoundary.this, GestioneNucleoBoundary.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
         });
 
-        // MODIFICA: Ora apre il menu opzioni
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mostraMenuOpzioni(v);
-            }
-        });
+        btnMenu.setOnClickListener(this::mostraMenuOpzioni);
     }
 
     private void loadMembri() {
@@ -95,104 +85,124 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
         });
     }
 
-    private void mostraMenuOpzioni(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        // Aggiungiamo le opzioni: Aggiungi, Rimuovi, Invita
-        popup.getMenu().add(0, 1, 0, "Aggiungi membro");
-        popup.getMenu().add(0, 2, 0, "Rimuovi membro");
-        popup.getMenu().add(0, 3, 0, "Invita membro");
+    private void mostraMenuOpzioni(View anchor) {
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.dismiss();
+            return;
+        }
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == 1) {
-                    gestioneNucleoFamiliareControl.mostraFormAggiungiMembro();
-                    return true;
-                } else if (item.getItemId() == 3) {
-                    apriDialogInvito(); // Apre il dialog
-                    return true;
-                }
-                // Gestione future delle altre voci (aggiungi e rimuovi membro)
-                return false;
-            }
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, null);
+
+        popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
+        Button btnAggiungi = popupView.findViewById(R.id.btn_aggiungi_membro_menu);
+        Button btnRimuovi = popupView.findViewById(R.id.btn_rimuovi_membro_menu);
+        Button btnInvita = popupView.findViewById(R.id.btn_invita_membro_menu);
+
+        btnAggiungi.setOnClickListener(v -> {
+            gestioneNucleoFamiliareControl.mostraFormAggiungiMembro();
+            popupWindow.dismiss();
         });
-        popup.show();
+
+        btnRimuovi.setOnClickListener(v -> {
+            membroAdapter.setShowDeleteIcon(true);
+            popupWindow.dismiss();
+        });
+
+        btnInvita.setOnClickListener(v -> {
+            apriDialogInvito();
+            popupWindow.dismiss();
+        });
+
+        popupWindow.showAsDropDown(anchor);
     }
 
 
     private void apriDialogInvito() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-
-        // ROSSA finché Alfonso non crea il layout XML
         View dialogView = inflater.inflate(R.layout.dialog_invita_membro, null);
 
         builder.setView(dialogView);
         final AlertDialog dialog = builder.create();
 
-        // Binding View (Rossi finché Alfonso non inserisce gli ID nell'XML)
         final EditText etCF = dialogView.findViewById(R.id.et_codice_fiscale_ricerca);
-        Button btnCerca = dialogView.findViewById(R.id.btn_cerca_membro);
         final View layoutRisultato = dialogView.findViewById(R.id.layout_risultato);
         final TextView tvNome = dialogView.findViewById(R.id.tv_nome_trovato);
         final TextView tvCognome = dialogView.findViewById(R.id.tv_cognome_trovato);
         final TextView tvCF = dialogView.findViewById(R.id.tv_cf_trovato);
         Button btnInvita = dialogView.findViewById(R.id.btn_conferma_invito);
 
-
-        // Istanza del Controller
         final GestioneNucleoFamiliareControl controller = new GestioneNucleoFamiliareControl(this);
 
-        // Click su CERCA
-        btnCerca.setOnClickListener(new View.OnClickListener() {
+        etCF.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                String cfDigitato = etCF.getText().toString();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-                controller.cercaMembroPerInvito(cfDigitato, new GestioneNucleoFamiliareControl.RicercaCallback() {
-                    @Override
-                    public void onUtenteTrovato(MembroEntity m) {
-                        // Mostra i dati trovati
-                        layoutRisultato.setVisibility(View.VISIBLE);
-                        tvNome.setText("Nome: " + m.getNome());
-                        tvCognome.setText("Cognome: " + m.getCognome());
-                        tvCF.setText("CF: " + m.getCodiceFiscale());
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
-                        // Blocchiamo l'input per evitare modifiche durante l'invito
-                        etCF.setEnabled(false);
-                    }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 16) {
+                    controller.cercaMembroPerInvito(s.toString(), new GestioneNucleoFamiliareControl.RicercaCallback() {
+                        @Override
+                        public void onUtenteTrovato(MembroEntity m) {
+                            layoutRisultato.setVisibility(View.VISIBLE);
+                            tvNome.setText("Nome: " + m.getNome());
+                            tvCognome.setText("Cognome: " + m.getCognome());
+                            tvCF.setText("CF: " + m.getCodiceFiscale());
+                            etCF.setEnabled(false);
+                        }
 
-                    @Override
-                    public void onErrore(String msg) {
-                        // Nascondi risultato se c'è errore
-                        layoutRisultato.setVisibility(View.GONE);
-                        Toast.makeText(VisualizzaNucleoBoundary.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onErrore(String msg) {
+                            layoutRisultato.setVisibility(View.GONE);
+                            Toast.makeText(VisualizzaNucleoBoundary.this, msg, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    layoutRisultato.setVisibility(View.GONE);
+                }
             }
         });
 
-        // Click su INVITA
-        btnInvita.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String cfDaInvitare = etCF.getText().toString();
+        btnInvita.setOnClickListener(v -> {
+            String cfDaInvitare = etCF.getText().toString();
+            controller.finalizzaInvito(cfDaInvitare, new GestioneNucleoFamiliareControl.ControlCallback() {
+                @Override
+                public void onInserimentoSuccesso(String message) {
+                    dialog.dismiss();
+                    Toast.makeText(VisualizzaNucleoBoundary.this, "Invito inviato con successo!", Toast.LENGTH_LONG).show();
+                }
 
-                controller.finalizzaInvito(cfDaInvitare, new GestioneNucleoFamiliareControl.ControlCallback() {
-                    @Override
-                    public void onInserimentoSuccesso(String message) {
-                        dialog.dismiss();
-                        Toast.makeText(VisualizzaNucleoBoundary.this, "Invito inviato con successo!", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onInserimentoErrore(String message) {
-                        Toast.makeText(VisualizzaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+                @Override
+                public void onInserimentoErrore(String message) {
+                    Toast.makeText(VisualizzaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                }
+            });
         });
 
         dialog.show();
+    }
+
+    @Override
+    public void onItemDelete(int position) {
+        MembroEntity membro = membriList.get(position);
+        gestioneNucleoFamiliareControl.rimuoviMembro(membro.getCodiceFiscale(), new GestioneNucleoFamiliareControl.ControlCallback() {
+            @Override
+            public void onInserimentoSuccesso(String message) {
+                Toast.makeText(VisualizzaNucleoBoundary.this, message, Toast.LENGTH_SHORT).show();
+                membriList.remove(position);
+                membroAdapter.notifyItemRemoved(position);
+                membroAdapter.setShowDeleteIcon(false);
+            }
+
+            @Override
+            public void onInserimentoErrore(String message) {
+                Toast.makeText(VisualizzaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

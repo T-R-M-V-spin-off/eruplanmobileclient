@@ -121,6 +121,20 @@ public class GestioneNucleoFamiliareService {
         });
     }
 
+    public void rimuoviMembro(String codiceFiscale, final ServiceCallback callback) {
+        repository.rimuoviMembro(codiceFiscale, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSalvataggioSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onSalvataggioError(message);
+            }
+        });
+    }
+
     private String validateAndTrim(String value, int minLength, int maxLength, String errorMessage) throws IllegalArgumentException {
         if (value == null) {
             throw new IllegalArgumentException(errorMessage);

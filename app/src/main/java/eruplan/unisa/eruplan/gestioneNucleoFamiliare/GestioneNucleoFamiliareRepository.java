@@ -196,6 +196,27 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
+    public void rimuoviMembro(String codiceFiscale, final RepositoryCallback callback) {
+        String url = ADD_MEMBER_URL + "/" + codiceFiscale;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
+                response -> {
+                    try {
+                        boolean success = response.getBoolean("success");
+                        String message = response.optString("message", "Membro rimosso con successo.");
+                        if (success) {
+                            callback.onSuccess(message);
+                        } else {
+                            callback.onError(message);
+                        }
+                    } catch (JSONException e) {
+                        callback.onError("Errore nel formato della risposta del server.");
+                    }
+                },
+                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
 
     public void salvaMembro(MembroEntity membroEntity, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();

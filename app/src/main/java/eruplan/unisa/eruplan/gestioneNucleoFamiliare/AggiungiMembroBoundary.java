@@ -3,6 +3,7 @@ package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -116,8 +117,8 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
                         submitButton.setEnabled(true);
                         Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
 
-                        //Intent intent = new Intent(AggiungiMembroBoundary.this, VisualizzaMembroBoundary.class);
-                        //startActivity(intent);
+                        Intent intent = new Intent(AggiungiMembroBoundary.this, VisualizzaNucleoBoundary.class);
+                        startActivity(intent);
                         finish();
                     }
 

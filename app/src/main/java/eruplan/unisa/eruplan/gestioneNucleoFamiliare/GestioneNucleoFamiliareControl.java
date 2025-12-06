@@ -7,9 +7,11 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
-import eruplan.unisa.eruplan.entity.ResidenzaEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
 
+/**
+ * Funge da regista (Controller) per le operazioni relative alla gestione del nucleo familiare.
+ */
 public class GestioneNucleoFamiliareControl {
 
     private GestioneNucleoFamiliareService service;
@@ -18,11 +20,6 @@ public class GestioneNucleoFamiliareControl {
     public interface ControlCallback {
         void onInserimentoSuccesso(String message);
         void onInserimentoErrore(String message);
-    }
-
-    public interface ResidenzaControlCallback {
-        void onResidenzaLoaded(ResidenzaEntity residenza);
-        void onControlError(String message);
     }
 
     public interface AppoggiControlCallback {
@@ -43,20 +40,6 @@ public class GestioneNucleoFamiliareControl {
     public GestioneNucleoFamiliareControl(Context context) {
         this.context = context;
         this.service = new GestioneNucleoFamiliareService(context);
-    }
-
-    public void getResidenza(final ResidenzaControlCallback callback) {
-        service.getResidenza(new GestioneNucleoFamiliareService.ResidenzaServiceCallback() {
-            @Override
-            public void onResidenzaLoaded(ResidenzaEntity residenza) {
-                callback.onResidenzaLoaded(residenza);
-            }
-
-            @Override
-            public void onServiceError(String message) {
-                callback.onControlError(message);
-            }
-        });
     }
 
     public void getRichieste(final RichiesteControlCallback callback) {
@@ -115,6 +98,20 @@ public class GestioneNucleoFamiliareControl {
         });
     }
 
+    public void rimuoviMembro(String codiceFiscale, final ControlCallback callback) {
+        service.rimuoviMembro(codiceFiscale, new GestioneNucleoFamiliareService.ServiceCallback() {
+            @Override
+            public void onSalvataggioSuccess(String message) {
+                callback.onInserimentoSuccesso(message);
+            }
+
+            @Override
+            public void onSalvataggioError(String message) {
+                callback.onInserimentoErrore(message);
+            }
+        });
+    }
+
     public void mostraFormCreaNucleo() {
         Intent intent = new Intent(context, CreaNucleoBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -123,18 +120,6 @@ public class GestioneNucleoFamiliareControl {
 
      public void mostraFormCreaAppoggio() {
         Intent intent = new Intent(context, InserisciAppoggioBoundary.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
-    public void apriListaAppoggio(){
-        Intent intent = new Intent(context, ListaAppoggioBoundary.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
-    public void mostraVisualizzaResidenza() {
-        Intent intent = new Intent(context, VisualizzaResidenzaBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -193,31 +178,31 @@ public class GestioneNucleoFamiliareControl {
 
     /**
      * Avvia la logica per abbandonare il nucleo familiare corrente.
-     * @param controlCallback L\'interfaccia per notificare l\'Activity del risultato.
+     * @param controlCallback L'interfaccia per notificare l'Activity del risultato.
      */
     public void abbandonaNucleo(final ControlCallback controlCallback) {
         service.abbandonaNucleo(new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
             public void onSalvataggioSuccess(String message) {
-                // Traduciamo il successo del service in un successo per l\'Activity
+                // Traduciamo il successo del service in un successo per l'Activity
                 controlCallback.onInserimentoSuccesso(message);
             }
 
             @Override
             public void onSalvataggioError(String message) {
-                // Traduciamo l\'errore del service in un errore per l\'Activity
+                // Traduciamo l'errore del service in un errore per l'Activity
                 controlCallback.onInserimentoErrore(message);
             }
         });
     }
 
     // =================================================================================
-    //  NUOVI METODI E INTERFACCE PER L\'INVITO (REQUISITO UC-GNF.01)
+    //  NUOVI METODI E INTERFACCE PER L'INVITO (REQUISITO UC-GNF.01)
     // =================================================================================
 
     /**
      * Interfaccia Callback specifica per la ricerca.
-     * Serve per dire all\'Activity: "Ho finito di cercare, ecco il Membro trovato (o l\'errore)".
+     * Serve per dire all'Activity: "Ho finito di cercare, ecco il Membro trovato (o l'errore)".
      */
     public interface RicercaCallback {
         void onUtenteTrovato(eruplan.unisa.eruplan.entity.MembroEntity membroEntity);
@@ -232,7 +217,7 @@ public class GestioneNucleoFamiliareControl {
         service.cercaUtentePerInvito(cf, new GestioneNucleoFamiliareRepository.UtenteCallback() {
             @Override
             public void onSuccess(eruplan.unisa.eruplan.entity.MembroEntity membroTrovato) {
-                // Il Service ha trovato l\'utente, lo passiamo all\'Activity
+                // Il Service ha trovato l'utente, lo passiamo all'Activity
                 callback.onUtenteTrovato(membroTrovato);
             }
 
