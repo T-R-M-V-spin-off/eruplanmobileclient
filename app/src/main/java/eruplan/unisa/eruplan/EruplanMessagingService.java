@@ -80,19 +80,17 @@ public class EruplanMessagingService extends FirebaseMessagingService {
 
     // Crea il Canale di Notifica. Obbligatorio per Android 8.0+
     private void createNotificationChannel() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "Notifiche Principali";
-            String description = "Canale di default per le notifiche push";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        CharSequence name = "Notifiche Principali";
+        String description = "Canale di default per le notifiche push";
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
 
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        channel.setDescription(description);
 
-            // Registra il canale con il sistema
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
+        // Registra il canale con il sistema
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(channel);
         }
     }
 }
