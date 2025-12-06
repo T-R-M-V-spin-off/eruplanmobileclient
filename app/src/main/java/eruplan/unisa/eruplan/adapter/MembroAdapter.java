@@ -1,8 +1,6 @@
 package eruplan.unisa.eruplan.adapter;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +25,12 @@ public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroView
         void onItemDelete(int position);
     }
 
-    public MembroAdapter(List<MembroEntity> membriList, OnItemDeleteListener deleteListener) {
+    public MembroAdapter(List<MembroEntity> membriList) {
         this.membriList = membriList;
-        this.deleteListener = deleteListener;
+    }
+
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) {
+        this.deleteListener = listener;
     }
 
     public void setShowDeleteIcon(boolean show) {
@@ -59,7 +60,11 @@ public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroView
                     .setMessage("Vuoi eliminare questo membro del tuo nucleo?")
                     .setPositiveButton("Sì", (dialog, which) -> {
                         if (deleteListener != null) {
-                            deleteListener.onItemDelete(position);
+                            // Usa getAdapterPosition() per evitare problemi se la lista è cambiata
+                            int currentPos = holder.getAdapterPosition();
+                            if (currentPos != RecyclerView.NO_POSITION) {
+                                deleteListener.onItemDelete(currentPos);
+                            }
                         }
                     })
                     .setNegativeButton("No", null)
