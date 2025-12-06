@@ -3,12 +3,15 @@ package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 import android.content.Context;
 import android.content.Intent;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.util.List;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
+import eruplan.unisa.eruplan.gestioneUtenteMobile.StartupBoundary;
 
 public class GestioneNucleoFamiliareControl {
 
@@ -279,6 +282,20 @@ public class GestioneNucleoFamiliareControl {
                 callback.onInserimentoErrore(message);
             }
         });
+    }
+
+    public void performLogout() {
+        // 1. Cancella i cookie di sessione (JSESSIONID) memorizzati localmente
+        CookieHandler cookieHandler = CookieHandler.getDefault();
+        if (cookieHandler instanceof CookieManager) {
+            ((CookieManager) cookieHandler).getCookieStore().removeAll();
+        }
+
+        // 2. Navigazione alla schermata di avvio (StartupActivity)
+        Intent intent = new Intent(context, StartupBoundary.class);
+        // I flag servono a pulire lo stack delle activity (non si può tornare indietro al menu loggato)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
     }
 
 }
