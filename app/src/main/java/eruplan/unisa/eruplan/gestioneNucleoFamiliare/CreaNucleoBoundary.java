@@ -87,37 +87,26 @@ public class CreaNucleoBoundary extends AppCompatActivity {
             }
         }
 
-        try {
-            loadingProgressBarNucleo.setVisibility(View.VISIBLE);
-            btnSubmitNucleo.setEnabled(false);
+        loadingProgressBarNucleo.setVisibility(View.VISIBLE);
+        btnSubmitNucleo.setEnabled(false);
 
-            gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareControl.ControlCallback() {
-                @Override
-                public void onInserimentoSuccesso(String message) {
-                    loadingProgressBarNucleo.setVisibility(View.GONE);
-                    btnSubmitNucleo.setEnabled(true);
-                    Toast.makeText(CreaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
-                    
-                    // Reindirizza l'utente alla schermata di gestione del nucleo
-                    //Intent intent = new Intent(CreaNucleoActivity.this, GestisciNucleoBoundary.class);
-                    //startActivity(intent);
+        gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareControl.ControlCallback() {
+            @Override
+            public void onSuccess(String message) {
+                loadingProgressBarNucleo.setVisibility(View.GONE);
+                btnSubmitNucleo.setEnabled(true);
+                Toast.makeText(CreaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
 
-                    // Chiude l'activity corrente
-                    finish();
-                }
+                // Chiude l'activity corrente
+                finish();
+            }
 
-                @Override
-                public void onInserimentoErrore(String message) {
-                    loadingProgressBarNucleo.setVisibility(View.GONE);
-                    btnSubmitNucleo.setEnabled(true);
-                    Toast.makeText(CreaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
-                }
-            });
-
-        } catch (IllegalArgumentException e) {
-            loadingProgressBarNucleo.setVisibility(View.GONE);
-            btnSubmitNucleo.setEnabled(true);
-            Toast.makeText(this, "Errore di validazione: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+            @Override
+            public void onError(String message) {
+                loadingProgressBarNucleo.setVisibility(View.GONE);
+                btnSubmitNucleo.setEnabled(true);
+                Toast.makeText(CreaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
