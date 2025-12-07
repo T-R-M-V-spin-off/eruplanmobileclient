@@ -76,7 +76,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
     private void showPopupMenu(View anchor) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, (ViewGroup) rvMembri, false);
+        View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, rvMembri, false);
 
         final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
 

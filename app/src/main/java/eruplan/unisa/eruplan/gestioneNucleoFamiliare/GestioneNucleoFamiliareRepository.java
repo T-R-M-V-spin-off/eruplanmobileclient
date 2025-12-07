@@ -40,7 +40,7 @@ public class GestioneNucleoFamiliareRepository {
     // MODIFICA: Rimosso la RequestQueue locale.
     // Ora utilizziamo il contesto per accedere al VolleySingleton.
     // private RequestQueue requestQueue;
-    private Context context;
+    private final Context context;
 
     public interface RepositoryCallback {
         void onSuccess(String message);

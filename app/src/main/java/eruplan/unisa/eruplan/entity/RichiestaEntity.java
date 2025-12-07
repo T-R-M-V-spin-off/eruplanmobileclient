@@ -7,9 +7,9 @@ package eruplan.unisa.eruplan.entity;
 public class RichiestaEntity {
 
     // COMMENTO: L'ID serve al server per identificare la richiesta nel database.
-    private long id;
-    private String nomeMittente;
-    private String dataOra;
+    private final long id;
+    private final String nomeMittente;
+    private final String dataOra;
 
     // Costruttore completo
     public RichiestaEntity(long id, String nomeMittente, String dataOra) {

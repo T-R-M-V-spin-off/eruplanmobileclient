@@ -19,10 +19,10 @@ import eruplan.unisa.eruplan.entity.RichiestaEntity;
 public class RichiestaAdapter extends RecyclerView.Adapter<RichiestaAdapter.RichiestaViewHolder> {
 
     // 1. Lista che contiene gli oggetti Richiesta scaricati dal server
-    private List<RichiestaEntity> richiesteList;
+    private final List<RichiestaEntity> richiesteList;
 
     // NUOVO: Listener per comunicare all'Activity quale riga è stata cliccata
-    private OnItemSelectListener listener;
+    private final OnItemSelectListener listener;
 
     // NUOVO: Variabile per ricordare l'indice della riga selezionata (-1 = nessuna)
     private int selectedPosition = -1;

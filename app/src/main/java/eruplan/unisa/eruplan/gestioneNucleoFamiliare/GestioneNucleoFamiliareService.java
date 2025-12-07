@@ -19,7 +19,7 @@ import eruplan.unisa.eruplan.utility.Validator;
  */
 public class GestioneNucleoFamiliareService {
 
-    private GestioneNucleoFamiliareRepository repository;
+    private final GestioneNucleoFamiliareRepository repository;
 
     public interface ServiceCallback {
         void onSuccess(String message);

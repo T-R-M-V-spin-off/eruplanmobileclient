@@ -1,9 +1,10 @@
 package eruplan.unisa.eruplan.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,8 +17,8 @@ import eruplan.unisa.eruplan.entity.AppoggioEntity;
 
 public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.AppoggioViewHolder> {
 
-    private List<AppoggioEntity> appoggi;
-    private OnDeleteClickListener listener;
+    private final List<AppoggioEntity> appoggi;
+    private final OnDeleteClickListener listener;
 
     public interface OnDeleteClickListener {
         void onDeleteClick(AppoggioEntity appoggio);
@@ -38,8 +39,9 @@ public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.Appogg
     @Override
     public void onBindViewHolder(@NonNull AppoggioViewHolder holder, int position) {
         AppoggioEntity appoggio = appoggi.get(position);
-        holder.viaPiazzaText.setText(appoggio.getViaPiazza() + ", " + appoggio.getCivico());
-        holder.comuneText.setText(appoggio.getComune() + " (" + appoggio.getProvincia() + ")");
+        Context context = holder.itemView.getContext();
+        holder.viaPiazzaText.setText(context.getString(R.string.address_format, appoggio.getViaPiazza(), appoggio.getCivico()));
+        holder.comuneText.setText(context.getString(R.string.municipality_format, appoggio.getComune(), appoggio.getProvincia()));
 
         holder.deleteButton.setOnClickListener(v -> listener.onDeleteClick(appoggio));
     }
@@ -49,9 +51,9 @@ public class AppoggioAdapter extends RecyclerView.Adapter<AppoggioAdapter.Appogg
         return appoggi.size();
     }
 
-    static class AppoggioViewHolder extends RecyclerView.ViewHolder {
+    public static class AppoggioViewHolder extends RecyclerView.ViewHolder {
         TextView viaPiazzaText, comuneText;
-        Button deleteButton;
+        ImageButton deleteButton;
 
         public AppoggioViewHolder(@NonNull View itemView) {
             super(itemView);

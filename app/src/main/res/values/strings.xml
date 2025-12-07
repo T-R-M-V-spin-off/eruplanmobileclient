@@ -21,4 +21,6 @@
     <string name="member_remove_error">Errore eliminazione: %1$s</string>
     <string name="invitation_sent_success">Invito inviato con successo!</string>
     <string name="generic_error">Errore: %1$s</string>
+    <string name="address_format">%1$s, %2$s</string>
+    <string name="municipality_format">%1$s (%2$s)</string>
 </resources>

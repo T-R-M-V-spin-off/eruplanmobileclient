@@ -17,7 +17,7 @@ import eruplan.unisa.eruplan.entity.MembroEntity;
 
 public class MembroAdapter extends RecyclerView.Adapter<MembroAdapter.MembroViewHolder> {
 
-    private List<MembroEntity> membriList;
+    private final List<MembroEntity> membriList;
     private boolean showDeleteIcon = false;
     private OnItemDeleteListener deleteListener;
 
