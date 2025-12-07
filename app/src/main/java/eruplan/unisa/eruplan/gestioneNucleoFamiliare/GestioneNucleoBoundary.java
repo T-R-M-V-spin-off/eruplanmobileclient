@@ -72,6 +72,8 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         MaterialButton btnResidenza = findViewById(R.id.btnResidenza);
         MaterialButton btnAbbandona = findViewById(R.id.btnAbbandona);
         MaterialButton btnInviti = findViewById(R.id.btnInviti);
+        MaterialButton btnGestioneEmergenza = findViewById(R.id.btnEmergenza);
+
         btnSi = findViewById(R.id.btnSi);
         btnNo = findViewById(R.id.btnNo);
         tvConferma = findViewById(R.id.tvConferma);
@@ -86,6 +88,9 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
 
         // Listener per il pulsante "I tuoi Luoghi Sicuri"
         btnLuoghi.setOnClickListener(v -> gestioneNucleoControl.apriListaAppoggio());
+
+        //Listneer per il pulsante "Il tuo Piano di Emergenza"
+        btnGestioneEmergenza.setOnClickListener(v -> gestioneNucleoControl.mostraGestioneEmergenza());
 
         btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
 

@@ -9,6 +9,7 @@ import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
+import eruplan.unisa.eruplan.gestioneEmergenza.GestioneEmergenzaBoundary;
 import eruplan.unisa.eruplan.utility.VolleySingleton;
 
 public class GestioneNucleoFamiliareControl {
@@ -189,7 +190,11 @@ public class GestioneNucleoFamiliareControl {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
-
+    public void mostraGestioneEmergenza(){
+        Intent intent = new Intent(context, GestioneEmergenzaBoundary.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
     public void mostraAggiungiMembro() {
         Intent intent = new Intent(context, AggiungiMembroBoundary.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
