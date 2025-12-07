@@ -54,7 +54,7 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
             }
 
             @Override
-            public void onControlError(String message) {
+            public void onError(String message) {
                 Toast.makeText(ListaAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -63,13 +63,13 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
     private void eliminaAppoggio(long appoggioId) {
         gestioneNucleoFamiliareControl.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareControl.ControlCallback() {
             @Override
-            public void onInserimentoSuccesso(String message) {
+            public void onSuccess(String message) {
                 Toast.makeText(ListaAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
                 loadAppoggi(); // Ricarica la lista dopo l'eliminazione
             }
 
             @Override
-            public void onInserimentoErrore(String message) {
+            public void onError(String message) {
                 Toast.makeText(ListaAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
             }
         });

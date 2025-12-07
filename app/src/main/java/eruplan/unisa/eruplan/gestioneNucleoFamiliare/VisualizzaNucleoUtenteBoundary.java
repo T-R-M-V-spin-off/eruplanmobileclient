@@ -68,7 +68,7 @@ public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
             }
 
             @Override
-            public void onControlError(String message) {
+            public void onError(String message) {
                 loadingProgressBar.setVisibility(View.GONE);
                 Toast.makeText(VisualizzaNucleoUtenteBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
             }

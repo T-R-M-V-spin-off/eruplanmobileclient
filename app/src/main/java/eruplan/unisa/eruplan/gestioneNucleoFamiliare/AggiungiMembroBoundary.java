@@ -112,7 +112,7 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
                 nome, cognome, codiceFiscale, dataNascita, sesso, assistenza, minorenne,
                 new GestioneNucleoFamiliareControl.ControlCallback() {
                     @Override
-                    public void onInserimentoSuccesso(String message) {
+                    public void onSuccess(String message) {
                         loadingProgressBar.setVisibility(View.GONE);
                         submitButton.setEnabled(true);
                         Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
@@ -123,7 +123,7 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onInserimentoErrore(String message) {
+                    public void onError(String message) {
                         loadingProgressBar.setVisibility(View.GONE);
                         submitButton.setEnabled(true);
                         Toast.makeText(AggiungiMembroBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();

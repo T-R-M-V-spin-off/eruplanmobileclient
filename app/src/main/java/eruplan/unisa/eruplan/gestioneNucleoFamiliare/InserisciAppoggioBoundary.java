@@ -45,13 +45,13 @@ public class InserisciAppoggioBoundary extends AppCompatActivity {
 
                 gestioneNucleoFamiliareControl.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GestioneNucleoFamiliareControl.ControlCallback() {
                     @Override
-                    public void onInserimentoSuccesso(String message) {
+                    public void onSuccess(String message) {
                         Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
                         finish();
                     }
 
                     @Override
-                    public void onInserimentoErrore(String message) {
+                    public void onError(String message) {
                         Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
