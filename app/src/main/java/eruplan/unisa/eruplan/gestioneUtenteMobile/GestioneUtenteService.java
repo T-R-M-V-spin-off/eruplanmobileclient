@@ -1,8 +1,10 @@
 package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
-import android.text.TextUtils;
-import java.util.regex.Pattern;
+import eruplan.unisa.eruplan.utility.Validator;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Contiene la logica di business per la gestione dell'utente.
@@ -10,11 +12,7 @@ import java.util.regex.Pattern;
  */
 public class GestioneUtenteService {
 
-    private GestioneUtenteRepository repository;
-    
-    // Regex per validare la data nel formato dd-mm-yyyy
-    private static final Pattern DATE_PATTERN = Pattern.compile(
-        "^((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\\d{2}))$");
+    private final GestioneUtenteRepository repository;
 
     public interface ServiceCallback {
         void onSuccess(String message);
@@ -26,94 +24,141 @@ public class GestioneUtenteService {
     }
 
     /**
-     * Metodo di utilità per validare e trimmare stringhe.
-     */
-    private String validateAndTrim(String value, int minLength, int maxLength, String errorMessage) throws IllegalArgumentException {
-        if (value == null) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-        String trimmedValue = value.trim();
-        if (trimmedValue.length() < minLength || trimmedValue.length() > maxLength) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-        return trimmedValue;
-    }
-
-    /**
      * Esegue la validazione e avvia il processo di login.
      */
     public void login(String codiceFiscale, String password, final ServiceCallback callback) {
-        try {
-            // Validazione
-            String cfTrimmed = validateAndTrim(codiceFiscale, 16, 16, "Il codice fiscale deve essere di 16 caratteri.");
-            // Normalizziamo il CF in maiuscolo per evitare problemi di case-sensitivity
-            cfTrimmed = cfTrimmed.toUpperCase();
-            
-            // Per la password non facciamo trim o uppercase, la passiamo com'è (solo check vuoto)
-            if (TextUtils.isEmpty(password)) {
-                throw new IllegalArgumentException("La password non può essere vuota.");
+        if (codiceFiscale == null || codiceFiscale.trim().isEmpty()) {
+            callback.onError("Il codice fiscale è obbligatorio.");
+            return;
+        }
+        if (!Validator.isCodiceFiscaleValid(codiceFiscale)) {
+            callback.onError("Formato codice fiscale non valido.");
+            return;
+        }
+
+        if (password == null || password.isEmpty()) {
+            callback.onError("La password è obbligatoria.");
+            return;
+        }
+        if (!Validator.isPasswordValid(password)) {
+            callback.onError("Password non valida. La password deve contenere almeno 8 caratteri, di cui una lettera maiuscola, una minuscola e un numero.");
+            return;
+        }
+
+        // Normalizziamo il CF in maiuscolo per evitare problemi di case-sensitivity
+        String cfUpper = codiceFiscale.toUpperCase();
+
+        repository.login(cfUpper, password, new GestioneUtenteRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
             }
 
-            repository.login(cfTrimmed, password, new GestioneUtenteRepository.RepositoryCallback() {
-                @Override
-                public void onSuccess(String message) {
-                    callback.onSuccess(message);
-                }
-
-                @Override
-                public void onError(String message) {
-                    callback.onError(message);
-                }
-            });
-
-        } catch (IllegalArgumentException e) {
-            callback.onError(e.getMessage());
-        }
+            @Override
+            public void onError(String message) {
+                callback.onError(message);
+            }
+        });
     }
+
+    /**
+     * Avvia il processo di logout.
+     */
+    public void logout(final ServiceCallback callback) {
+        repository.logout(new GestioneUtenteRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onError(message);
+            }
+        });
+    }
+
 
     /**
      * Esegue la validazione e avvia il processo di registrazione.
      */
     public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass, final ServiceCallback callback) {
-        try {
-            // Validazione campi stringa
-            String nomeTrimmed = validateAndTrim(nome, 2, 30, "Nome troppo breve o mancante.");
-            String cognomeTrimmed = validateAndTrim(cognome, 2, 30, "Cognome troppo breve o mancante.");
-            String cfTrimmed = validateAndTrim(cf, 16, 16, "Il codice fiscale deve essere di 16 caratteri.");
-            cfTrimmed = cfTrimmed.toUpperCase();
-
-            // Validazione data
-            if (TextUtils.isEmpty(data) || !DATE_PATTERN.matcher(data).matches()) {
-                throw new IllegalArgumentException("La data di nascita non è valida (formato richiesto: dd-mm-aaaa).");
-            }
-
-            // Validazione sesso
-            if (TextUtils.isEmpty(sesso) || (!sesso.equals("M") && !sesso.equals("F"))) {
-                throw new IllegalArgumentException("Il sesso deve essere 'M' o 'F'.");
-            }
-
-            // Validazione password
-            if (TextUtils.isEmpty(password) || password.length() < 8) {
-                throw new IllegalArgumentException("La password deve essere di almeno 8 caratteri.");
-            }
-            if (!password.equals(confirmPass)) {
-                throw new IllegalArgumentException("Le password non coincidono.");
-            }
-
-            repository.registra(nomeTrimmed, cognomeTrimmed, cfTrimmed, data, sesso, password, new GestioneUtenteRepository.RepositoryCallback() {
-                @Override
-                public void onSuccess(String message) {
-                    callback.onSuccess(message);
-                }
-
-                @Override
-                public void onError(String message) {
-                    callback.onError(message);
-                }
-            });
-
-        } catch (IllegalArgumentException e) {
-            callback.onError(e.getMessage());
+        if (nome == null || nome.trim().isEmpty()) {
+            callback.onError("Il nome è obbligatorio.");
+            return;
         }
+        if (!Validator.isNomeValid(nome)) {
+            callback.onError("Formato nome non valido.");
+            return;
+        }
+
+        if (cognome == null || cognome.trim().isEmpty()) {
+            callback.onError("Il cognome è obbligatorio.");
+            return;
+        }
+        if (!Validator.isCognomeValid(cognome)) {
+            callback.onError("Formato cognome non valido.");
+            return;
+        }
+
+        if (cf == null || cf.trim().isEmpty()) {
+            callback.onError("Il codice fiscale è obbligatorio.");
+            return;
+        }
+        if (!Validator.isCodiceFiscaleValid(cf)) {
+            callback.onError("Formato codice fiscale non valido.");
+            return;
+        }
+
+        if (data == null || data.trim().isEmpty()) {
+            callback.onError("La data di nascita è obbligatoria.");
+            return;
+        }
+        LocalDate localDate;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            localDate = LocalDate.parse(data, formatter);
+        } catch (DateTimeParseException e) {
+            callback.onError("Formato data non valido. Usa dd-MM-yyyy.");
+            return;
+        }
+
+        if (!Validator.isDataNascitaValid(localDate)) {
+            callback.onError("Data di nascita non valida (deve essere nel passato).");
+            return;
+        }
+
+        if (sesso == null || sesso.isEmpty() || !Validator.isSessoValid(sesso)) {
+            callback.onError("È obbligatorio specificare il sesso.");
+            return;
+        }
+
+        if (password == null || password.isEmpty()) {
+            callback.onError("La password è obbligatoria.");
+            return;
+        }
+        if (!Validator.isPasswordValid(password)) {
+            callback.onError("La password deve contenere almeno 8 caratteri, di cui una lettera maiuscola, una minuscola e un numero.");
+            return;
+        }
+        if (!password.equals(confirmPass)) {
+            callback.onError("Le password non coincidono.");
+            return;
+        }
+
+        // Normalizziamo il CF in maiuscolo
+        String cfUpper = cf.toUpperCase();
+
+        repository.registra(nome, cognome, cfUpper, data, sesso, password, new GestioneUtenteRepository.RepositoryCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onError(message);
+            }
+        });
     }
 }

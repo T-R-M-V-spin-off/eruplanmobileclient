@@ -9,14 +9,13 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 // MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eruplan.unisa.eruplan.VolleySingleton;
+import eruplan.unisa.eruplan.utility.VolleySingleton;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;

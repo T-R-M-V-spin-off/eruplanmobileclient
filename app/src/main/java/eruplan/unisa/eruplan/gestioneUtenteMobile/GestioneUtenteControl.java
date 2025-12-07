@@ -1,35 +1,46 @@
 package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
+import android.content.Intent;
+
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 
 /**
- * Funge da regista (Controller) per le operazioni relative alla gestione dell'utente.
- * Disaccoppia l'interfaccia utente (Boundary) dalla logica di business (Service).
+ * Gestisce le interazioni tra la UI (Boundary) e la logica di business (Service).
+ * Inoltra le richieste dalla UI al Service e restituisce i risultati alla UI tramite callback.
  */
 public class GestioneUtenteControl {
 
-    private GestioneUtenteService service;
+    private final GestioneUtenteService service;
+    private final ControlCallback callback;
+    private final Context context;
 
-    /**
-     * Interfaccia di callback per notificare all'Activity (Boundary) l'esito finale dell'operazione.
-     */
+    // Interfaccia per la comunicazione verso la Boundary
     public interface ControlCallback {
         void onOperazioneSuccess(String message);
         void onOperazioneError(String message);
+        void onLoginRedirect();
+        void onSignupRedirect();
     }
 
-    public GestioneUtenteControl(Context context) {
+    public GestioneUtenteControl(Context context, ControlCallback callback) {
         this.service = new GestioneUtenteService(context);
+        this.callback = callback;
+        this.context = context;
     }
 
     /**
-     * Avvia il processo di login.
+     * Inoltra la richiesta di login al Service.
      */
-    public void login(String codiceFiscale, String password, final ControlCallback callback) {
+    public void login(String codiceFiscale, String password) {
         service.login(codiceFiscale, password, new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
                 callback.onOperazioneSuccess(message);
+                Intent intent = new Intent(context, CosaVuoiFareBoundary.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+                callback.onLoginRedirect();
             }
 
             @Override
@@ -40,10 +51,31 @@ public class GestioneUtenteControl {
     }
 
     /**
-     * Avvia il processo di registrazione.
+     * Inoltra la richiesta di registrazione al Service.
      */
-    public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass, final ControlCallback callback) {
+    public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass) {
         service.registra(nome, cognome, cf, data, sesso, password, confirmPass, new GestioneUtenteService.ServiceCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onOperazioneSuccess(message);
+                Intent intent = new Intent(context, LoginBoundary.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+                callback.onSignupRedirect();
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onOperazioneError(message);
+            }
+        });
+    }
+
+    /**
+     * Inoltra la richiesta di logout al Service.
+     */
+    public void logout() {
+        service.logout(new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
                 callback.onOperazioneSuccess(message);

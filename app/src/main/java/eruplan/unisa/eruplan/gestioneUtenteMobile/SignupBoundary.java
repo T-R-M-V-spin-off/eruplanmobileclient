@@ -1,7 +1,6 @@
 package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -17,7 +16,7 @@ import java.util.Calendar;
 
 import eruplan.unisa.eruplan.R;
 
-public class SignupBoundary extends AppCompatActivity {
+public class SignupBoundary extends AppCompatActivity implements GestioneUtenteControl.ControlCallback {
 
     private EditText etNome, etCognome, etCodiceFiscale, etDataNascita;
     private RadioGroup etSesso;
@@ -32,8 +31,8 @@ public class SignupBoundary extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        // Inizializza il Control
-        gestioneUtenteControl = new GestioneUtenteControl(this);
+        // Inizializza il Control passando il callback
+        gestioneUtenteControl = new GestioneUtenteControl(this, this);
 
         initViews();
 
@@ -89,26 +88,30 @@ public class SignupBoundary extends AppCompatActivity {
         btnSignUp.setEnabled(false);
 
         // Chiama il Control per avviare il processo di registrazione
-        gestioneUtenteControl.registra(nome, cognome, cf, data, sesso, password, confirmPass, new GestioneUtenteControl.ControlCallback() {
-            @Override
-            public void onOperazioneSuccess(String message) {
-                progressBar.setVisibility(View.GONE);
-                btnSignUp.setEnabled(true);
-                Toast.makeText(SignupBoundary.this, message, Toast.LENGTH_SHORT).show();
+        gestioneUtenteControl.registra(nome, cognome, cf, data, sesso, password, confirmPass);
+    }
 
-                // Reindirizza alla schermata di login dopo la registrazione
-                Intent intent = new Intent(SignupBoundary.this, LoginBoundary.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
+    @Override
+    public void onOperazioneSuccess(String message) {
+        progressBar.setVisibility(View.GONE);
+        btnSignUp.setEnabled(true);
+        Toast.makeText(SignupBoundary.this, message, Toast.LENGTH_SHORT).show();
+    }
 
-            @Override
-            public void onOperazioneError(String message) {
-                progressBar.setVisibility(View.GONE);
-                btnSignUp.setEnabled(true);
-                Toast.makeText(SignupBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
-            }
-        });
+    @Override
+    public void onOperazioneError(String message) {
+        progressBar.setVisibility(View.GONE);
+        btnSignUp.setEnabled(true);
+        Toast.makeText(SignupBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onLoginRedirect() {
+        // Non implementato in questa boundary
+    }
+
+    @Override
+    public void onSignupRedirect() {
+        finish();
     }
 }
