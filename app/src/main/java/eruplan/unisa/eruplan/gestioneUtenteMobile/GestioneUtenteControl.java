@@ -23,6 +23,23 @@ public class GestioneUtenteControl {
         void onSignupRedirect();
     }
 
+    /**
+     * Implementazione vuota di {@link ControlCallback}.
+     * Permette alle classi di estenderla e implementare solo i metodi necessari,
+     * evitando di dover fornire implementazioni vuote per i metodi non utilizzati.
+     */
+    public static class ControlCallbackAdapter implements ControlCallback {
+        @Override
+        public void onOperazioneSuccess(String message) {}
+        @Override
+        public void onOperazioneError(String message) {}
+        @Override
+        public void onLoginRedirect() {}
+        @Override
+        public void onSignupRedirect() {}
+    }
+
+
     public GestioneUtenteControl(Context context, ControlCallback callback) {
         this.service = new GestioneUtenteService(context);
         this.callback = callback;

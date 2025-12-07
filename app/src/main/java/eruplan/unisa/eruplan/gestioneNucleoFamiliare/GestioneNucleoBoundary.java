@@ -18,6 +18,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import eruplan.unisa.eruplan.gestioneUtenteMobile.GestioneUtenteControl;
 
 import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.gestioneUtenteMobile.LoginBoundary;
 
 
 public class GestioneNucleoBoundary extends AppCompatActivity {
@@ -45,8 +46,23 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         // Carica il layout del menu GNF
         setContentView(R.layout.activity_gnf);
 
-        // 1. Inizializzazione del Control
+        // 1. Inizializzazione dei Control
         gestioneNucleoControl = new GestioneNucleoFamiliareControl(getApplicationContext());
+        gestioneUtenteControl = new GestioneUtenteControl(this, new GestioneUtenteControl.ControlCallbackAdapter() {
+            @Override
+            public void onOperazioneSuccess(String message) {
+                Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GestioneNucleoBoundary.this, LoginBoundary.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onOperazioneError(String message) {
+                Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+            }
+        }); // Correzione: Inizializzazione del control
 
 
         // Inizializzazione Views
@@ -74,11 +90,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
 
         // Listener per il pulsante "I tuoi Inviti"
-        btnInviti.setOnClickListener(v -> {
-            Intent intent = new Intent(GestioneNucleoBoundary.this, ListaRichiesteBoundary.class);
-            intent.putExtra("IS_ACTIONABLE", false); // Passiamo false per rendere visibile solo "Torna al Menu"
-            startActivity(intent);
-        });
+        btnInviti.setOnClickListener(v -> gestioneNucleoControl.mostraListaRichieste());
 
         // Listener per il pulsante "Logout"
         btnLogout.setOnClickListener(v -> gestioneUtenteControl.logout());
@@ -145,14 +157,14 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
 
         gestioneNucleoControl.abbandonaNucleo(new GestioneNucleoFamiliareControl.ControlCallback() {
             @Override
-            public void onInserimentoSuccesso(String message) {
+            public void onSuccess(String message) { // Correzione: nome metodo
                 // Successo: mostra un messaggio e naviga alla schermata di avvio
                 Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
                 gestioneUtenteControl.logout();
             }
 
             @Override
-            public void onInserimentoErrore(String message) {
+            public void onError(String message) { // Correzione: nome metodo
                 // Errore: nascondi la sezione di conferma, mostra un errore e riabilita i bottoni
                 mostraSezioneConferma(false);
                 Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
@@ -161,6 +173,4 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             }
         });
     }
-
-
 }
