@@ -411,5 +411,17 @@ public class GestioneNucleoFamiliareControl {
             }
         });
     }
+    
+    public void tornaAlMenuNucleo() {
+        Intent intent = new Intent(context, GestioneNucleoBoundary.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        context.startActivity(intent);
+    }
+
+    public void mostraMenuNucleoDopoAccettazione() {
+        Intent intent = new Intent(context, GestioneNucleoBoundary.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
 
 }
