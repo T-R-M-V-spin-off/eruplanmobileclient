@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.content.Intent;
 
 import eruplan.unisa.eruplan.R;
 
@@ -42,13 +41,10 @@ public class CosaVuoiFareBoundary extends AppCompatActivity {
         });
 
         // Listener per il bottone "Inviti Ricevuti"
-        // Qui passiamo TRUE, in modo da rendere visibili "Conferma" e "Indietro"
         btnInvitiRicevuti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CosaVuoiFareBoundary.this, ListaRichiesteBoundary.class);
-                intent.putExtra("IS_ACTIONABLE", true); // Passiamo true: voglio i tasti "Conferma/Indietro"
-                startActivity(intent);
+                gestioneNucleoFamiliareControl.mostraInvitiRicevuti();
             }
         });
     }

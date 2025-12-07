@@ -195,6 +195,13 @@ public class GestioneNucleoFamiliareControl {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
+    
+    public void mostraInvitiRicevuti() {
+        Intent intent = new Intent(context, ListaRichiesteBoundary.class);
+        intent.putExtra("IS_ACTIONABLE", true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     public void inserisciMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
