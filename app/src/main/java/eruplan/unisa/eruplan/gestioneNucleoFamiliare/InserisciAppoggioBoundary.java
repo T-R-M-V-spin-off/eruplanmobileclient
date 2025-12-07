@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.GenericCallback;
 
 public class InserisciAppoggioBoundary extends AppCompatActivity {
 
@@ -32,30 +33,27 @@ public class InserisciAppoggioBoundary extends AppCompatActivity {
 
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String viaPiazza = viaPiazzaEditText.getText().toString();
-                String civico = civicoEditText.getText().toString();
-                String comune = comuneEditText.getText().toString();
-                String cap = capEditText.getText().toString();
-                String provincia = provinciaEditText.getText().toString();
-                String regione = regioneEditText.getText().toString();
-                String paese = paeseEditText.getText().toString();
+        submitButton.setOnClickListener(v -> {
+            String viaPiazza = viaPiazzaEditText.getText().toString();
+            String civico = civicoEditText.getText().toString();
+            String comune = comuneEditText.getText().toString();
+            String cap = capEditText.getText().toString();
+            String provincia = provinciaEditText.getText().toString();
+            String regione = regioneEditText.getText().toString();
+            String paese = paeseEditText.getText().toString();
 
-                gestioneNucleoFamiliareControl.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GestioneNucleoFamiliareControl.ControlCallback() {
-                    @Override
-                    public void onSuccess(String message) {
-                        Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
+            gestioneNucleoFamiliareControl.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GenericCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
 
-                    @Override
-                    public void onError(String message) {
-                        Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+                @Override
+                public void onError(String message) {
+                    Toast.makeText(InserisciAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 }

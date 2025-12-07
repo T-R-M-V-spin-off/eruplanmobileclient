@@ -13,6 +13,8 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.adapter.AppoggioAdapter;
+import eruplan.unisa.eruplan.callback.AppoggiCallback;
+import eruplan.unisa.eruplan.callback.GenericCallback;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 
 public class ListaAppoggioBoundary extends AppCompatActivity {
@@ -29,13 +31,11 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
         recyclerView = findViewById(R.id.appoggi_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //TODO AGGIUNGI BOTTONE INDIETRO CHE RIPORTA A GNBUONDARY
         Button addAppoggioButton = findViewById(R.id.add_appoggio_button);
 
         gestioneNucleoFamiliareControl = new GestioneNucleoFamiliareControl(this);
 
-        addAppoggioButton.setOnClickListener(v -> { gestioneNucleoFamiliareControl.mostraFormCreaAppoggio();
-        });
+        addAppoggioButton.setOnClickListener(v -> startActivity(new Intent(this, InserisciAppoggioBoundary.class)));
 
         loadAppoggi();
     }
@@ -47,7 +47,7 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
     }
 
     private void loadAppoggi() {
-        gestioneNucleoFamiliareControl.getAppoggi(new GestioneNucleoFamiliareControl.AppoggiControlCallback() {
+        gestioneNucleoFamiliareControl.getAppoggi(new AppoggiCallback() {
             @Override
             public void onAppoggiLoaded(List<AppoggioEntity> appoggi) {
                 adapter = new AppoggioAdapter(appoggi, appoggioToDelete -> eliminaAppoggio(appoggioToDelete.getId()));
@@ -62,7 +62,7 @@ public class ListaAppoggioBoundary extends AppCompatActivity {
     }
 
     private void eliminaAppoggio(long appoggioId) {
-        gestioneNucleoFamiliareControl.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareControl.ControlCallback() {
+        gestioneNucleoFamiliareControl.eliminaAppoggio(appoggioId, new GenericCallback() {
             @Override
             public void onSuccess(String message) {
                 Toast.makeText(ListaAppoggioBoundary.this, message, Toast.LENGTH_SHORT).show();

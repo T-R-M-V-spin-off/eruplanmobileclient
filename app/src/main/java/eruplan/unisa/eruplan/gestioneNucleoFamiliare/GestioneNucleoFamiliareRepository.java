@@ -2,82 +2,77 @@ package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-// MODIFICA: Rimosso import di RequestQueue e Volley standard perché usiamo il Singleton
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import eruplan.unisa.eruplan.utility.VolleySingleton;
+import eruplan.unisa.eruplan.BuildConfig;
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.AppoggiCallback;
+import eruplan.unisa.eruplan.callback.GenericCallback;
+import eruplan.unisa.eruplan.callback.MembriCallback;
+import eruplan.unisa.eruplan.callback.NucleoCallback;
+import eruplan.unisa.eruplan.callback.RichiesteCallback;
+import eruplan.unisa.eruplan.callback.UtenteCallback;
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
+import eruplan.unisa.eruplan.utility.VolleySingleton;
 
-/**
- * Gestisce la persistenza dei dati comunicando con il server web.
- */
 public class GestioneNucleoFamiliareRepository {
 
-    private static final String ADD_MEMBER_URL = "https://eruplanserver.azurewebsites.net/sottosistema/membri";
-    private static final String ADD_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei";
-    private static final String GET_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
-    private static final String MODIFY_RESIDENZA_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/residenza";
-    private static final String ABBANDONA_NUCLEO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/nuclei/abbandona";
-    private static final String ADD_APPOGGIO_URL = "https://eruplanserver.azurewebsites.net/sottosistema/appoggi";
-    private static final String GET_INVITI_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti";
+    // Endpoints
+    private static final String SOTTOSISTEMA_NUCLEO_URL = BuildConfig.BASE_URL + "/sottosistema";
+    private static final String NUCLEO_URL = BuildConfig.BASE_URL + "/nucleo";
 
-    private static final String ACCETTA_INVITO_URL = "https://eruplanserver.azurewebsites.net/nucleo/inviti/accetta";
+    private static final String MEMBERS_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/membri";
+    private static final String NUCLEI_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/nuclei";
+    private static final String RESIDENZA_ENDPOINT = NUCLEI_ENDPOINT + "/residenza";
+    private static final String ABBANDONA_ENDPOINT = NUCLEI_ENDPOINT + "/abbandona";
+    private static final String APPOGGI_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/appoggi";
+    private static final String INVITI_ENDPOINT = NUCLEO_URL + "/inviti";
+    private static final String ACCETTA_INVITO_ENDPOINT = INVITI_ENDPOINT + "/accetta";
+    private static final String CERCA_UTENTE_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/utenti/cerca";
+    private static final String INVITA_UTENTE_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/inviti/nuovo";
 
-
-    // MODIFICA: Rimosso la RequestQueue locale.
-    // Ora utilizziamo il contesto per accedere al VolleySingleton.
-    // private RequestQueue requestQueue;
     private final Context context;
 
-    public interface RepositoryCallback {
-        void onSuccess(String message);
-        void onError(String message);
-    }
-
-    public interface NucleoCallback {
-        void onSuccess(NucleoEntity nucleo);
-        void onError(String message);
-    }
-
-    public interface AppoggiCallback {
-        void onSuccess(List<AppoggioEntity> appoggi);
-        void onError(String message);
-    }
-
-    public interface MembriCallback {
-        void onSuccess(List<MembroEntity> membri);
-        void onError(String message);
-    }
-
-    public interface RichiesteCallback {
-        void onSuccess(List<RichiestaEntity> richieste);
-        void onError(String message);
-    }
-
     public GestioneNucleoFamiliareRepository(Context context) {
-        // MODIFICA: Invece di creare una nuova coda separata (che perderebbe la sessione),
-        // salviamo il context per richiamare il Singleton condiviso quando serve.
         this.context = context;
+    }
 
-        // Vecchio codice rimosso:
-        // this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+    private String parseError(com.android.volley.VolleyError error) {
+        NetworkResponse response = error.networkResponse;
+        if (response != null && response.data != null) {
+            try {
+                String responseBody = new String(response.data, StandardCharsets.UTF_8);
+                JSONObject data = new JSONObject(responseBody);
+                if (data.has("message")) {
+                    return data.getString("message");
+                } else if (data.has("error")) {
+                    return data.getString("error");
+                }
+            } catch (Exception e) {
+                // Ignora, usa messaggio generico
+            }
+        }
+        if (response != null) {
+            return context.getString(R.string.repo_server_communication_error_with_code, response.statusCode);
+        }
+        return context.getString(R.string.repo_server_communication_error);
     }
 
     public void getNucleo(final NucleoCallback callback) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, GET_NUCLEO_URL, null,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, RESIDENZA_ENDPOINT, null,
                 response -> {
                     try {
                         NucleoEntity nucleo = new NucleoEntity();
@@ -87,45 +82,35 @@ public class GestioneNucleoFamiliareRepository {
                         nucleo.setPaese(response.getString("paese"));
                         nucleo.setCivico(response.getString("civico"));
                         nucleo.setCap(response.getString("cap"));
-                        callback.onSuccess(nucleo);
+                        callback.onNucleoLoaded(nucleo);
                     } catch (JSONException e) {
-                        callback.onError("Errore nel parsing della risposta del server.");
+                        callback.onError(context.getString(R.string.repo_parsing_error));
                     }
                 },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
     public void getRichieste(final RichiesteCallback callback) {
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, GET_INVITI_URL, null,
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, INVITI_ENDPOINT, null,
                 response -> {
                     try {
                         List<RichiestaEntity> richieste = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
-
-                            // Aggiunto il campo ID per al JSON
-                            long id = jsonObject.optLong("id", -1);
-
-                            String mittente = jsonObject.getString("nomeMittente").trim();
-                            String data = jsonObject.getString("dataOra").trim();
-
-                            // 2. Passiamo 3 parametri al costruttore
-                            richieste.add(new RichiestaEntity(id, mittente, data));
+                            JSONObject obj = response.getJSONObject(i);
+                            richieste.add(new RichiestaEntity(obj.getLong("id"), obj.getString("nomeMittente"), obj.getString("dataOra")));
                         }
-                        callback.onSuccess(richieste);
+                        callback.onRichiesteLoaded(richieste);
                     } catch (JSONException e) {
-                        callback.onError("Errore nel parsing della risposta del server.");
+                        callback.onError(context.getString(R.string.repo_parsing_error));
                     }
                 },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
     public void getMembri(final MembriCallback callback) {
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, ADD_MEMBER_URL, null,
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBERS_ENDPOINT, null,
                 response -> {
                     try {
                         List<MembroEntity> membri = new ArrayList<>();
@@ -141,437 +126,240 @@ public class GestioneNucleoFamiliareRepository {
                             m.setMinorenne(obj.optBoolean("minorenne"));
                             membri.add(m);
                         }
-                        callback.onSuccess(membri);
+                        callback.onMembriLoaded(membri);
                     } catch (JSONException e) {
-                        callback.onError("Errore nel parsing della risposta del server.");
+                        callback.onError(context.getString(R.string.repo_parsing_error));
                     }
                 },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
     public void getAppoggi(final AppoggiCallback callback) {
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, ADD_APPOGGIO_URL, null,
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, APPOGGI_ENDPOINT, null,
                 response -> {
                     try {
                         List<AppoggioEntity> appoggi = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
-                            JSONObject appoggioJson = response.getJSONObject(i);
-                            AppoggioEntity appoggioEntity = new AppoggioEntity(
-                                    appoggioJson.getString("viaPiazza"),
-                                    appoggioJson.getString("civico"),
-                                    appoggioJson.getString("comune"),
-                                    appoggioJson.getString("cap"),
-                                    appoggioJson.getString("provincia"),
-                                    appoggioJson.getString("regione"),
-                                    appoggioJson.getString("paese")
+                            JSONObject json = response.getJSONObject(i);
+                            AppoggioEntity appoggio = new AppoggioEntity(
+                                    json.getString("viaPiazza"), json.getString("civico"), json.getString("comune"),
+                                    json.getString("cap"), json.getString("provincia"), json.getString("regione"),
+                                    json.getString("paese")
                             );
-                            appoggioEntity.setId(appoggioJson.getLong("id"));
-                            appoggi.add(appoggioEntity);
+                            appoggio.setId(json.getLong("id"));
+                            appoggi.add(appoggio);
                         }
-                        callback.onSuccess(appoggi);
+                        callback.onAppoggiLoaded(appoggi);
                     } catch (JSONException e) {
-                        callback.onError("Errore nel parsing della risposta del server.");
+                        callback.onError(context.getString(R.string.repo_parsing_error));
                     }
                 },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    public void eliminaAppoggio(long appoggioId, final RepositoryCallback callback) {
-        String url = ADD_APPOGGIO_URL + "/" + appoggioId;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
-                response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.optString("message", "Appoggio eliminato con successo.");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Errore nel formato della risposta del server.");
-                    }
-                },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-    public void rimuoviMembro(String codiceFiscale, final RepositoryCallback callback) {
-        String url = ADD_MEMBER_URL + "/" + codiceFiscale;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
-                response -> {
-                    try {
-                        boolean success = response.getBoolean("success");
-                        String message = response.optString("message", "Membro rimosso con successo.");
-                        if (success) {
-                            callback.onSuccess(message);
-                        } else {
-                            callback.onError(message);
-                        }
-                    } catch (JSONException e) {
-                        callback.onError("Errore nel formato della risposta del server.");
-                    }
-                },
-                error -> callback.onError("Errore di connessione al server: " + error.getMessage()));
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-
-    public void salvaMembro(MembroEntity membroEntity, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("nome", membroEntity.getNome());
-            requestBody.put("cognome", membroEntity.getCognome());
-            requestBody.put("codiceFiscale", membroEntity.getCodiceFiscale());
-            requestBody.put("dataDiNascita", membroEntity.getDataDiNascita());
-            requestBody.put("sesso", membroEntity.getSesso());
-            requestBody.put("assistenza", membroEntity.isAssistenza());
-            requestBody.put("minorenne", membroEntity.isMinorenne());
-        } catch (JSONException e) {
-            callback.onError("Errore interno nella creazione della richiesta JSON.");
-            return;
-        }
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ADD_MEMBER_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            boolean success = response.getBoolean("success");
-                            String message = response.optString("message", "Operazione completata.");
-                            if (success) {
-                                callback.onSuccess(message);
-                            } else {
-                                callback.onError(message);
-                            }
-                        } catch (JSONException e) {
-                            callback.onError("Errore nel formato della risposta del server.");
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore di connessione al server: " + error.getMessage());
-                    }
-                });
-
-        // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
-        // Questo assicura che vengano inviati i cookie di sessione (JSESSIONID) del login.
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-    /**
-     * Invia i dati di un nuovo nucleo al server per il salvataggio.
-     */
-    public void salvaNucleo(NucleoEntity nucleoEntity, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("viaPiazza", nucleoEntity.getViaPiazza());
-            requestBody.put("comune", nucleoEntity.getComune());
-            requestBody.put("regione", nucleoEntity.getRegione());
-            requestBody.put("paese", nucleoEntity.getPaese());
-            requestBody.put("civico", nucleoEntity.getCivico());
-            requestBody.put("cap", nucleoEntity.getCap());
-            requestBody.put("hasVeicolo", nucleoEntity.hasVeicolo());
-            requestBody.put("postiVeicolo", nucleoEntity.getPostiVeicolo());
-        } catch (JSONException e) {
-            callback.onError("Errore interno nella creazione della richiesta JSON per il nucleo.");
-            return;
-        }
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ADD_NUCLEO_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            boolean success = response.getBoolean("success");
-                            String message = response.optString("message", "Nucleo creato con successo.");
-                            if (success) {
-                                callback.onSuccess(message);
-                            } else {
-                                callback.onError(message);
-                            }
-                        } catch (JSONException e) {
-                            callback.onError("Errore nel formato della risposta del server.");
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore di connessione al server: " + error.getMessage());
-                    }
-                });
-
-        // MODIFICA: Aggiungiamo la richiesta alla coda centralizzata tramite il Singleton.
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-    public void modificaResidenza(NucleoEntity nucleo, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("viaPiazza", nucleo.getViaPiazza());
-            requestBody.put("comune", nucleo.getComune());
-            requestBody.put("regione", nucleo.getRegione());
-            requestBody.put("paese", nucleo.getPaese());
-            requestBody.put("civico", nucleo.getCivico());
-            requestBody.put("cap", nucleo.getCap());
-
-        } catch (JSONException e) {
-            callback.onError("Errore interno JSON.");
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, MODIFY_RESIDENZA_URL, requestBody,
+    public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {
+        String url = APPOGGI_ENDPOINT + "/" + appoggioId;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 response -> {
                     boolean success = response.optBoolean("success");
-                    String msg = response.optString("message", "Operazione completata.");
-
-                    if (success) {
-                        callback.onSuccess(msg);
-                    } else {
-                        callback.onError(msg);
-                    }
+                    String message = response.optString("message", context.getString(R.string.repo_delete_success_default));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
                 },
-                error -> callback.onError("Impossibile modificare la residenza: " + error.getMessage())
-        );
-
+                error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    public void salvaAppoggio(AppoggioEntity appoggio, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
+    public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {
+        String url = MEMBERS_ENDPOINT + "/" + codiceFiscale;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String message = response.optString("message", context.getString(R.string.repo_remove_member_success_default));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
+                },
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void salvaMembro(MembroEntity membro, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
         try {
-            requestBody.put("viaPiazza", appoggio.getViaPiazza());
-            requestBody.put("civico", appoggio.getCivico());
-            requestBody.put("comune", appoggio.getComune());
-            requestBody.put("cap", appoggio.getCap());
-            requestBody.put("provincia", appoggio.getProvincia());
-            requestBody.put("regione", appoggio.getRegione());
-            requestBody.put("paese", appoggio.getPaese());
+            body.put("nome", membro.getNome());
+            body.put("cognome", membro.getCognome());
+            body.put("codiceFiscale", membro.getCodiceFiscale());
+            body.put("dataDiNascita", membro.getDataDiNascita());
+            body.put("sesso", membro.getSesso());
+            body.put("assistenza", membro.isAssistenza());
+            body.put("minorenne", membro.isMinorenne());
         } catch (JSONException e) {
-            callback.onError("Errore interno nella creazione della richiesta JSON per l'appoggio.");
+            callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ADD_APPOGGIO_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            boolean success = response.getBoolean("success");
-                            String message = response.optString("message", "Appoggio creato con successo.");
-                            if (success) {
-                                callback.onSuccess(message);
-                            } else {
-                                callback.onError(message);
-                            }
-                        } catch (JSONException e) {
-                            callback.onError("Errore nel formato della risposta del server.");
-                        }
-                    }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, MEMBERS_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String message = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore di connessione al server: " + error.getMessage());
-                    }
-                });
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    /**
-     * Invia la richiesta al server per far sì che l'utente loggato abbandoni il suo nucleo familiare.
-     * L'identificazione dell'utente avviene tramite il cookie di sessione gestito da VolleySingleton.
-     * @param callback L'interfaccia per notificare il successo o l'errore dell'operazione.
-     */
-    public void abbandonaNucleo(final RepositoryCallback callback) {
-        // La richiesta è di tipo POST e non necessita di un corpo (body) JSON,
-        // perché il server identifica l'utente dalla sessione. Passiamo 'null'.
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, ABBANDONA_NUCLEO_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            // Il server dovrebbe rispondere con un JSON che indica il successo
-                            boolean success = response.getBoolean("success");
-                            String message = response.optString("message", "Operazione completata con successo.");
-                            if (success) {
-                                callback.onSuccess(message);
-                            } else {
-                                callback.onError(message);
-                            }
-                        } catch (JSONException e) {
-                            callback.onError("Errore nella lettura della risposta del server.");
-                        }
-                    }
+    public void salvaNucleo(NucleoEntity nucleo, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("viaPiazza", nucleo.getViaPiazza());
+            body.put("comune", nucleo.getComune());
+            body.put("regione", nucleo.getRegione());
+            body.put("paese", nucleo.getPaese());
+            body.put("civico", nucleo.getCivico());
+            body.put("cap", nucleo.getCap());
+            body.put("hasVeicolo", nucleo.hasVeicolo());
+            body.put("postiVeicolo", nucleo.getPostiVeicolo());
+        } catch (JSONException e) {
+            callback.onError(context.getString(R.string.repo_internal_request_error));
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, NUCLEI_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String message = response.optString("message", context.getString(R.string.repo_create_nucleus_success_default));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore di connessione. Impossibile abbandonare il nucleo." + error.getMessage());
-                    }
-                });
-
-        // Aggiunta della richiesta alla coda usando il Singleton per mantenere la sessione
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    // =================================================================================
-    //  NUOVI METODI PER L'INVITO (REQUISITO UC-GNF.01)
-    // =================================================================================
+    public void modificaResidenza(NucleoEntity nucleo, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("viaPiazza", nucleo.getViaPiazza());
+            body.put("comune", nucleo.getComune());
+            body.put("regione", nucleo.getRegione());
+            body.put("paese", nucleo.getPaese());
+            body.put("civico", nucleo.getCivico());
+            body.put("cap", nucleo.getCap());
+        } catch (JSONException e) {
+            callback.onError(context.getString(R.string.repo_internal_request_error));
+            return;
+        }
 
-    // URL concordati (ipotetici)
-    private static final String CERCA_UTENTE_URL = "https://eruplanserver.azurewebsites.net/sottosistema/utenti/cerca";
-    private static final String INVITA_UTENTE_URL = "https://eruplanserver.azurewebsites.net/sottosistema/inviti/nuovo";
-
-    /**
-     * Interfaccia specifica per quando cerchiamo un utente.
-     * Ci restituisce un oggetto MembroEntity se lo troviamo.
-     */
-    public interface UtenteCallback {
-        void onSuccess(MembroEntity membroTrovato);
-        void onError(String message);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, RESIDENZA_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
+                    if (success) callback.onSuccess(msg); else callback.onError(msg);
+                },
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    /**
-     * Cerca nel DB se esiste un utente con questo Codice Fiscale.
-     * Serve per l'anteprima prima di invitare.
-     */
+    public void salvaAppoggio(AppoggioEntity appoggio, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("viaPiazza", appoggio.getViaPiazza());
+            body.put("civico", appoggio.getCivico());
+            body.put("comune", appoggio.getComune());
+            body.put("cap", appoggio.getCap());
+            body.put("provincia", appoggio.getProvincia());
+            body.put("regione", appoggio.getRegione());
+            body.put("paese", appoggio.getPaese());
+        } catch (JSONException e) {
+            callback.onError(context.getString(R.string.repo_internal_request_error));
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, APPOGGI_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String message = response.optString("message", context.getString(R.string.repo_create_support_success_default));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
+                },
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void abbandonaNucleo(final GenericCallback callback) {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ABBANDONA_ENDPOINT, null,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String message = response.optString("message", context.getString(R.string.repo_leave_nucleus_success_default));
+                    if (success) callback.onSuccess(message); else callback.onError(message);
+                },
+                error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
     public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {
-        JSONObject requestBody = new JSONObject();
+        JSONObject body = new JSONObject();
         try {
-            // "codiceFiscale" è il nome del campo concordato nel JSON
-            requestBody.put("codiceFiscale", codiceFiscale);
+            body.put("codiceFiscale", codiceFiscale);
         } catch (JSONException e) {
-            callback.onError("Errore interno: impossibile creare il JSON.");
+            callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, CERCA_UTENTE_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            boolean success = response.getBoolean("success");
-                            if (success) {
-                                // Se success=true, mi aspetto un oggetto "data" con i dettagli
-                                JSONObject data = response.getJSONObject("data");
-
-                                // Creo un oggetto temporaneo per passare i dati
-                                // Uso il costruttore vuoto e i setter per sicurezza
-                                MembroEntity m = new MembroEntity();
-                                m.setNome(data.optString("nome"));
-                                m.setCognome(data.optString("cognome"));
-                                m.setCodiceFiscale(data.optString("codiceFiscale"));
-
-                                callback.onSuccess(m);
-                            } else {
-                                // Il server ha risposto, ma non ha trovato l'utente
-                                String msg = response.optString("message", "Nessun utente trovato.");
-                                callback.onError(msg);
-                            }
-                        } catch (JSONException e) {
-                            callback.onError("Errore nella lettura della risposta del server.");
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, CERCA_UTENTE_ENDPOINT, body,
+                response -> {
+                    try {
+                        boolean success = response.getBoolean("success");
+                        if (success) {
+                            JSONObject data = response.getJSONObject("data");
+                            MembroEntity m = new MembroEntity();
+                            m.setNome(data.optString("nome"));
+                            m.setCognome(data.optString("cognome"));
+                            m.setCodiceFiscale(data.optString("codiceFiscale"));
+                            callback.onSuccess(m);
+                        } else {
+                            callback.onError(response.optString("message", context.getString(R.string.repo_user_not_found)));
                         }
+                    } catch (JSONException e) {
+                        callback.onError(context.getString(R.string.repo_parsing_error));
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore di connessione o utente non trovato.");
-                    }
-                }
-        );
-
+                error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    /**
-     * Invia l'invito effettivo all'utente specificato.
-     */
-    public void inviaRichiestaInvito(String codiceFiscaleDestinatario, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
+    public void inviaRichiestaInvito(String codiceFiscaleDestinatario, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
         try {
-            // "codiceFiscaleDestinatario" è il nome concordato
-            requestBody.put("codiceFiscaleDestinatario", codiceFiscaleDestinatario);
+            body.put("codiceFiscaleDestinatario", codiceFiscaleDestinatario);
         } catch (JSONException e) {
-            callback.onError("Errore interno JSON.");
+            callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, INVITA_UTENTE_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // Leggo la risposta standard { "success": true, "message": "..." }
-                        boolean success = response.optBoolean("success");
-                        String msg = response.optString("message", "Operazione completata.");
-
-                        if (success) {
-                            callback.onSuccess(msg);
-                        } else {
-                            callback.onError(msg);
-                        }
-                    }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, INVITA_UTENTE_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
+                    if (success) callback.onSuccess(msg); else callback.onError(msg);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Impossibile inviare l'invito: " + error.getMessage());
-                    }
-                }
-        );
-
+                error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-
-    // =================================================================================
-    //  METODI PER ACCETTARE RICHIESTA (REQUISITO SC-GNF.02)
-    // =================================================================================
-
-    /**
-     * [AGGIUNTA] Esegue la chiamata POST al server per accettare la richiesta.
-     */
-    public void accettaRichiestaApi(long idRichiesta, final RepositoryCallback callback) {
-        JSONObject requestBody = new JSONObject();
+    public void accettaRichiestaApi(long idRichiesta, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
         try {
-            requestBody.put("idRichiesta", idRichiesta);
+            body.put("idRichiesta", idRichiesta);
         } catch (JSONException e) {
-            callback.onError("Errore interno JSON.");
+            callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ACCETTA_INVITO_URL, requestBody,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        boolean success = response.optBoolean("success");
-                        String msg = response.optString("message", "Operazione completata.");
-                        if (success) {
-                            callback.onSuccess(msg);
-                        } else {
-                            callback.onError(msg);
-                        }
-                    }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ACCETTA_INVITO_ENDPOINT, body,
+                response -> {
+                    boolean success = response.optBoolean("success");
+                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
+                    if (success) callback.onSuccess(msg); else callback.onError(msg);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        callback.onError("Errore durante l'accettazione: " + error.getMessage());
-                    }
-                }
-        );
-
+                error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 }

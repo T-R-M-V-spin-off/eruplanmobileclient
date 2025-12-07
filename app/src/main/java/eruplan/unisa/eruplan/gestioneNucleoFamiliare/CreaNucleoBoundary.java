@@ -1,7 +1,5 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,20 +8,17 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import eruplan.unisa.eruplan.R;
+import androidx.appcompat.app.AppCompatActivity;
 
-/**
- * Rappresenta l'interfaccia utente (Boundary) per la compilazione dei dati
- * relativi a un nuovo nucleo familiare.
- */
+import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.GenericCallback;
+
 public class CreaNucleoBoundary extends AppCompatActivity {
 
     private EditText viaPiazzaEditText, comuneEditText, regioneEditText, paeseEditText, civicoEditText, capEditText, postiVeicoloEditText;
     private Button btnSubmitNucleo;
     private ProgressBar loadingProgressBarNucleo;
     private CheckBox hasVeicoloCheckBox;
-
-
 
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
 
@@ -36,18 +31,11 @@ public class CreaNucleoBoundary extends AppCompatActivity {
 
         initViews();
 
-        //CheckBox per far comparire e scomparire il campo per i posti del veicolo
         hasVeicoloCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    postiVeicoloEditText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            postiVeicoloEditText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        btnSubmitNucleo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitNucleo();
-            }
-        });
-
+        btnSubmitNucleo.setOnClickListener(v -> submitNucleo());
     }
 
     private void initViews() {
@@ -77,27 +65,25 @@ public class CreaNucleoBoundary extends AppCompatActivity {
             String postiStr = postiVeicoloEditText.getText().toString().trim();
             if (postiStr.isEmpty()) {
                 Toast.makeText(this, "Per favore, inserisci il numero di posti.", Toast.LENGTH_SHORT).show();
-                return; // Interrompe l'operazione
+                return;
             }
             try {
                 postiVeicolo = Integer.parseInt(postiStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Il numero di posti non è valido.", Toast.LENGTH_SHORT).show();
-                return; // Interrompe l'operazione
+                return;
             }
         }
 
         loadingProgressBarNucleo.setVisibility(View.VISIBLE);
         btnSubmitNucleo.setEnabled(false);
 
-        gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareControl.ControlCallback() {
+        gestioneNucleoFamiliareControl.creaNucleo(viaPiazza, comune, regione, paese, civico, cap, hasVeicolo, postiVeicolo, new GenericCallback() {
             @Override
             public void onSuccess(String message) {
                 loadingProgressBarNucleo.setVisibility(View.GONE);
                 btnSubmitNucleo.setEnabled(true);
                 Toast.makeText(CreaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
-
-                // Chiude l'activity corrente
                 finish();
             }
 
@@ -105,7 +91,7 @@ public class CreaNucleoBoundary extends AppCompatActivity {
             public void onError(String message) {
                 loadingProgressBarNucleo.setVisibility(View.GONE);
                 btnSubmitNucleo.setEnabled(true);
-                Toast.makeText(CreaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(CreaNucleoBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
             }
         });
     }

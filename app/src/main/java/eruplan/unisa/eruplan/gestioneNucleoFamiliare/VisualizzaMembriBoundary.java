@@ -1,6 +1,7 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +24,9 @@ import java.util.List;
 
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.adapter.MembroAdapter;
+import eruplan.unisa.eruplan.callback.GenericCallback;
+import eruplan.unisa.eruplan.callback.MembriCallback;
+import eruplan.unisa.eruplan.callback.UtenteCallback;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 
 public class VisualizzaMembriBoundary extends AppCompatActivity {
@@ -67,7 +71,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> control.tornaAllaGestioneNucleo());
+        btnBack.setOnClickListener(v -> finish());
 
         if (btnMenu != null) {
             btnMenu.setOnClickListener(this::showPopupMenu);
@@ -83,7 +87,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
         popupWindow.showAsDropDown(anchor);
 
         popupView.findViewById(R.id.btn_aggiungi_membro_menu).setOnClickListener(v -> {
-            control.mostraAggiungiMembro();
+            startActivity(new Intent(this, AggiungiMembroBoundary.class));
             popupWindow.dismiss();
         });
 
@@ -100,7 +104,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     }
 
     private void caricaMembri() {
-        control.getMembri(new GestioneNucleoFamiliareControl.MembriControlCallback() {
+        control.getMembri(new MembriCallback() {
             @Override
             public void onMembriLoaded(List<MembroEntity> membri) {
                 membriList.clear();
@@ -122,7 +126,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     }
 
     private void rimuoviMembro(MembroEntity membro, int position) {
-        control.rimuoviMembro(membro.getCodiceFiscale(), new GestioneNucleoFamiliareControl.ControlCallback() {
+        control.rimuoviMembro(membro.getCodiceFiscale(), new GenericCallback() {
             @Override
             public void onSuccess(String message) {
                 Toast.makeText(VisualizzaMembriBoundary.this, message, Toast.LENGTH_SHORT).show();
@@ -162,9 +166,9 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 16) {
-                    control.cercaUtentePerInvito(s.toString(), new GestioneNucleoFamiliareControl.RicercaCallback() {
+                    control.cercaUtentePerInvito(s.toString(), new UtenteCallback() {
                         @Override
-                        public void onUtenteTrovato(MembroEntity m) {
+                        public void onSuccess(MembroEntity m) {
                             layoutRisultato.setVisibility(View.VISIBLE);
                             tvNome.setText(getString(R.string.label_nome, m.getNome()));
                             tvCognome.setText(getString(R.string.label_cognome, m.getCognome()));
@@ -186,7 +190,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
         btnInvita.setOnClickListener(v -> {
             String cfDaInvitare = etCF.getText().toString();
-            control.finalizzaInvito(cfDaInvitare, new GestioneNucleoFamiliareControl.ControlCallback() {
+            control.finalizzaInvito(cfDaInvitare, new GenericCallback() {
                 @Override
                 public void onSuccess(String message) {
                     dialog.dismiss();

@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 
 import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.GenericCallback;
+import eruplan.unisa.eruplan.callback.NucleoCallback;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 
 public class VisualizzaNucleoBoundary extends AppCompatActivity {
@@ -55,7 +57,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
 
     private void caricaDatiNucleo() {
         loadingProgressBar.setVisibility(View.VISIBLE);
-        gestioneNucleoFamiliareControl.getNucleo(new GestioneNucleoFamiliareControl.NucleoControlCallback() {
+        gestioneNucleoFamiliareControl.getNucleo(new NucleoCallback() {
             @Override
             public void onNucleoLoaded(NucleoEntity nucleo) {
                 loadingProgressBar.setVisibility(View.GONE);
@@ -74,7 +76,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 loadingProgressBar.setVisibility(View.GONE);
-                Toast.makeText(VisualizzaNucleoBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(VisualizzaNucleoBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -88,7 +90,7 @@ public class VisualizzaNucleoBoundary extends AppCompatActivity {
         String cap = capEditText.getText().toString();
 
         loadingProgressBar.setVisibility(View.VISIBLE);
-        gestioneNucleoFamiliareControl.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareControl.ControlCallback() {
+        gestioneNucleoFamiliareControl.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GenericCallback() {
             @Override
             public void onSuccess(String message) {
                 loadingProgressBar.setVisibility(View.GONE);

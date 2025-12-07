@@ -1,23 +1,24 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.helper.widget.Flow;
-
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.helper.widget.Flow;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import eruplan.unisa.eruplan.gestioneUtenteMobile.GestioneUtenteControl;
-
 import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.GenericCallback;
+import eruplan.unisa.eruplan.gestioneEmergenza.GestioneEmergenzaBoundary;
+import eruplan.unisa.eruplan.gestioneUtenteMobile.GestioneUtenteControl;
 import eruplan.unisa.eruplan.gestioneUtenteMobile.LoginBoundary;
 
 
@@ -63,21 +64,15 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
 
         subscribeToNotificationTopic();
 
-        btnMembri.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaMembri());
-        btnLuoghi.setOnClickListener(v -> gestioneNucleoControl.apriListaAppoggio());
-
-        //Listneer per il pulsante "Il tuo Piano di Emergenza"
-        btnGestioneEmergenza.setOnClickListener(v -> gestioneNucleoControl.mostraGestioneEmergenza());
-
-        btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
-        btnInviti.setOnClickListener(v -> gestioneNucleoControl.mostraListaRichieste());
+        btnMembri.setOnClickListener(v -> startActivity(new Intent(this, VisualizzaMembriBoundary.class)));
+        btnLuoghi.setOnClickListener(v -> startActivity(new Intent(this, ListaAppoggioBoundary.class)));
+        btnGestioneEmergenza.setOnClickListener(v -> startActivity(new Intent(this, GestioneEmergenzaBoundary.class)));
+        btnResidenza.setOnClickListener(v -> startActivity(new Intent(this, VisualizzaNucleoBoundary.class)));
+        btnInviti.setOnClickListener(v -> startActivity(new Intent(this, ListaRichiesteBoundary.class)));
 
         btnLogout.setOnClickListener(v -> performLogout());
-
         btnAbbandona.setOnClickListener(v -> mostraSezioneConferma(true));
-
         btnSi.setOnClickListener(v -> eseguiAbbandonoNucleo());
-
         btnNo.setOnClickListener(v -> mostraSezioneConferma(false));
     }
 
@@ -125,7 +120,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         btnSi.setEnabled(false);
         btnNo.setEnabled(false);
 
-        gestioneNucleoControl.abbandonaNucleo(new GestioneNucleoFamiliareControl.ControlCallback() {
+        gestioneNucleoControl.abbandonaNucleo(new GenericCallback() {
             @Override
             public void onSuccess(String message) {
                 Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_LONG).show();

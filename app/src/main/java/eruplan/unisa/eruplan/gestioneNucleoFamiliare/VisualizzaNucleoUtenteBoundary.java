@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import eruplan.unisa.eruplan.R;
+import eruplan.unisa.eruplan.callback.NucleoCallback;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 
 public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
@@ -51,7 +52,7 @@ public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
 
     private void caricaDatiNucleo() {
         loadingProgressBar.setVisibility(View.VISIBLE);
-        gestioneNucleoFamiliareControl.getNucleo(new GestioneNucleoFamiliareControl.NucleoControlCallback() {
+        gestioneNucleoFamiliareControl.getNucleo(new NucleoCallback() {
             @Override
             public void onNucleoLoaded(NucleoEntity nucleo) {
                 loadingProgressBar.setVisibility(View.GONE);
@@ -70,7 +71,7 @@ public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 loadingProgressBar.setVisibility(View.GONE);
-                Toast.makeText(VisualizzaNucleoUtenteBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(VisualizzaNucleoUtenteBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
             }
         });
     }
