@@ -53,10 +53,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:text="Via/Piazza" />
 
             <TextView
                 android:id="@+id/viaPiazzaTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -67,10 +69,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="Comune" />
 
             <TextView
                 android:id="@+id/comuneTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -81,10 +85,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="Regione" />
 
             <TextView
                 android:id="@+id/regioneTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -95,10 +101,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="Paese" />
 
             <TextView
                 android:id="@+id/paeseTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -109,10 +117,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="Civico" />
 
             <TextView
                 android:id="@+id/civicoTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -123,10 +133,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="CAP" />
 
             <TextView
                 android:id="@+id/capTextView"
+                android:background="@drawable/bg_rounded_light_gray"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
