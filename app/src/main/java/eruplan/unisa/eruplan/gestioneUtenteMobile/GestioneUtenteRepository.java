@@ -10,17 +10,18 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
+import eruplan.unisa.eruplan.BuildConfig;
+import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.utility.VolleySingleton;
 
 /**
  * Gestisce la persistenza e la comunicazione con il server per le operazioni relative all'utente.
- * È l'unico strato che conosce gli endpoint del server e come costruire le richieste JSON.
  */
 public class GestioneUtenteRepository {
 
-    private static final String LOGIN_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/login";
-    private static final String SIGNUP_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/registra";
-    private static final String LOGOUT_URL = "https://eruplanserver.azurewebsites.net/gestoreUtentiMobile/logout";
+    private static final String LOGIN_URL = BuildConfig.BASE_URL + "/gestoreUtentiMobile/login";
+    private static final String SIGNUP_URL = BuildConfig.BASE_URL + "/gestoreUtentiMobile/registra";
+    private static final String LOGOUT_URL = BuildConfig.BASE_URL + "/gestoreUtentiMobile/logout";
     private final Context context;
 
     public interface RepositoryCallback {
@@ -32,25 +33,18 @@ public class GestioneUtenteRepository {
         this.context = context;
     }
 
-    /**
-     * Crea il JSON ed esegue la chiamata di rete per il login.
-     * Usa StringRequest per gestire la risposta di successo con corpo vuoto dal backend.
-     */
     public void login(String codiceFiscale, String password, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
             requestBody.put("codiceFiscale", codiceFiscale);
             requestBody.put("password", password);
         } catch (JSONException e) {
-            callback.onError("Errore interno nella creazione della richiesta.");
+            callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, LOGIN_URL,
-                response -> {
-                    // Per il login, una risposta 2xx è un successo, anche con corpo vuoto.
-                    callback.onSuccess("Login effettuato con successo.");
-                },
+                response -> callback.onSuccess(context.getString(R.string.repo_login_success)),
                 error -> {
                     String errorMessage = parseError(error);
                     callback.onError(errorMessage);
@@ -70,18 +64,13 @@ public class GestioneUtenteRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 
-    /**
-     * Esegue la chiamata di rete per il logout e pulisce i cookie locali.
-     */
     public void logout(final RepositoryCallback callback) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, LOGOUT_URL,
                 response -> {
-                    // Il server ha confermato il logout, ora puliamo i cookie locali.
                     VolleySingleton.logout();
-                    callback.onSuccess("Logout effettuato con successo.");
+                    callback.onSuccess(context.getString(R.string.repo_logout_success));
                 },
                 error -> {
-                    // Anche in caso di errore dal server, potrebbe essere utile pulire i cookie locali
                     VolleySingleton.logout();
                     String errorMessage = parseError(error);
                     callback.onError(errorMessage);
@@ -90,9 +79,6 @@ public class GestioneUtenteRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 
-    /**
-     * Crea il JSON ed esegue la chiamata di rete per la registrazione.
-     */
     public void registra(String nome, String cognome, String cf, String data, String sesso, String password, final RepositoryCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
@@ -103,7 +89,7 @@ public class GestioneUtenteRepository {
             requestBody.put("sesso", sesso);
             requestBody.put("password", password);
         } catch (JSONException e) {
-            callback.onError("Errore interno nella creazione della richiesta di registrazione.");
+            callback.onError(context.getString(R.string.repo_signup_request_error));
             return;
         }
 
@@ -111,14 +97,14 @@ public class GestioneUtenteRepository {
                 response -> {
                     try {
                         boolean success = response.optBoolean("success", true);
-                        String message = response.optString("message", "Registrazione avvenuta con successo.");
+                        String message = response.optString("message", context.getString(R.string.repo_signup_success_default));
                         if (success) {
                             callback.onSuccess(message);
                         } else {
                             callback.onError(message);
                         }
                     } catch (Exception e) {
-                        callback.onError("Risposta del server non valida.");
+                        callback.onError(context.getString(R.string.repo_invalid_server_response));
                     }
                 },
                 error -> {
@@ -129,9 +115,6 @@ public class GestioneUtenteRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    /**
-     * Estrae un messaggio di errore significativo dalla risposta del server.
-     */
     private String parseError(com.android.volley.VolleyError error) {
         NetworkResponse response = error.networkResponse;
         if (response != null && response.data != null) {
@@ -144,13 +127,12 @@ public class GestioneUtenteRepository {
                     return data.getString("error");
                 }
             } catch (Exception e) {
-                // Ignora l'errore di parsing
+                // Ignora l'errore di parsing, verrà usato un messaggio generico
             }
         }
-        String genericError = "Errore di comunicazione con il server.";
         if (response != null) {
-            genericError += " (Codice: " + response.statusCode + ")";
+            return context.getString(R.string.repo_server_communication_error_with_code, response.statusCode);
         }
-        return genericError;
+        return context.getString(R.string.repo_server_communication_error);
     }
 }

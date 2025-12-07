@@ -7,53 +7,44 @@ import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 
 /**
  * Gestisce le interazioni tra la UI (Boundary) e la logica di business (Service).
- * Inoltra le richieste dalla UI al Service e restituisce i risultati alla UI tramite callback.
  */
 public class GestioneUtenteControl {
 
     private final GestioneUtenteService service;
-    private final ControlCallback callback;
     private final Context context;
 
-    // Interfaccia per la comunicazione verso la Boundary
-    public interface ControlCallback {
-        void onOperazioneSuccess(String message);
-        void onOperazioneError(String message);
+    // Interfacce per la comunicazione verso le Boundary, specifiche per operazione
+    public interface LoginCallback {
+        void onLoginSuccess(String message);
+        void onLoginError(String message);
         void onLoginRedirect();
+    }
+
+    public interface SignupCallback {
+        void onSignupSuccess(String message);
+        void onSignupError(String message);
         void onSignupRedirect();
     }
 
-    /**
-     * Implementazione vuota di {@link ControlCallback}.
-     * Permette alle classi di estenderla e implementare solo i metodi necessari,
-     * evitando di dover fornire implementazioni vuote per i metodi non utilizzati.
-     */
-    public static class ControlCallbackAdapter implements ControlCallback {
-        @Override
-        public void onOperazioneSuccess(String message) {}
-        @Override
-        public void onOperazioneError(String message) {}
-        @Override
-        public void onLoginRedirect() {}
-        @Override
-        public void onSignupRedirect() {}
+    public interface OperationCallback {
+        void onSuccess(String message);
+        void onError(String message);
     }
 
-
-    public GestioneUtenteControl(Context context, ControlCallback callback) {
+    public GestioneUtenteControl(Context context) {
         this.service = new GestioneUtenteService(context);
-        this.callback = callback;
         this.context = context;
     }
 
     /**
-     * Inoltra la richiesta di login al Service.
+     * Inoltra la richiesta di login al Service e gestisce la risposta.
      */
-    public void login(String codiceFiscale, String password) {
+    public void login(String codiceFiscale, String password, final LoginCallback callback) {
         service.login(codiceFiscale, password, new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onOperazioneSuccess(message);
+                callback.onLoginSuccess(message);
+                // La logica di navigazione rimane qui per centralizzare i cambi di activity
                 Intent intent = new Intent(context, CosaVuoiFareBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
@@ -62,19 +53,20 @@ public class GestioneUtenteControl {
 
             @Override
             public void onError(String message) {
-                callback.onOperazioneError(message);
+                callback.onLoginError(message);
             }
         });
     }
 
     /**
-     * Inoltra la richiesta di registrazione al Service.
+     * Inoltra la richiesta di registrazione al Service e gestisce la risposta.
      */
-    public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass) {
+    public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass, final SignupCallback callback) {
         service.registra(nome, cognome, cf, data, sesso, password, confirmPass, new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onOperazioneSuccess(message);
+                callback.onSignupSuccess(message);
+                // La logica di navigazione rimane qui
                 Intent intent = new Intent(context, LoginBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
@@ -83,7 +75,7 @@ public class GestioneUtenteControl {
 
             @Override
             public void onError(String message) {
-                callback.onOperazioneError(message);
+                callback.onSignupError(message);
             }
         });
     }
@@ -91,16 +83,16 @@ public class GestioneUtenteControl {
     /**
      * Inoltra la richiesta di logout al Service.
      */
-    public void logout() {
+    public void logout(final OperationCallback callback) {
         service.logout(new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onOperazioneSuccess(message);
+                callback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                callback.onOperazioneError(message);
+                callback.onError(message);
             }
         });
     }

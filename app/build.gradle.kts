@@ -7,8 +7,11 @@ plugins {
 
 android {
     namespace = "eruplan.unisa.eruplan"
-    compileSdk {
-        version = release(36)
+    compileSdk = 36
+
+    // Abilita la generazione della classe BuildConfig
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -28,6 +31,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Definisci l'URL di produzione
+            buildConfigField("String", "BASE_URL", "\"https://eruplanserver.azurewebsites.net\"")
+        }
+        debug {
+            // Definisci l'URL di debug (attualmente uguale a quello di produzione)
+            buildConfigField("String", "BASE_URL", "\"https://eruplanserver.azurewebsites.net\"")
         }
     }
     compileOptions {

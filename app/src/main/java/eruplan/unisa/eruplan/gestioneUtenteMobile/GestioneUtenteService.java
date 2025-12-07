@@ -1,6 +1,8 @@
 package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
+
+import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.utility.Validator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeParseException;
 public class GestioneUtenteService {
 
     private final GestioneUtenteRepository repository;
+    private final Context context;
 
     public interface ServiceCallback {
         void onSuccess(String message);
@@ -21,6 +24,7 @@ public class GestioneUtenteService {
 
     public GestioneUtenteService(Context context) {
         this.repository = new GestioneUtenteRepository(context);
+        this.context = context;
     }
 
     /**
@@ -28,24 +32,23 @@ public class GestioneUtenteService {
      */
     public void login(String codiceFiscale, String password, final ServiceCallback callback) {
         if (codiceFiscale == null || codiceFiscale.trim().isEmpty()) {
-            callback.onError("Il codice fiscale è obbligatorio.");
+            callback.onError(context.getString(R.string.validation_cf_mandatory));
             return;
         }
         if (!Validator.isCodiceFiscaleValid(codiceFiscale)) {
-            callback.onError("Formato codice fiscale non valido.");
+            callback.onError(context.getString(R.string.validation_cf_format));
             return;
         }
 
         if (password == null || password.isEmpty()) {
-            callback.onError("La password è obbligatoria.");
+            callback.onError(context.getString(R.string.validation_password_mandatory));
             return;
         }
         if (!Validator.isPasswordValid(password)) {
-            callback.onError("Password non valida. La password deve contenere almeno 8 caratteri, di cui una lettera maiuscola, una minuscola e un numero.");
+            callback.onError(context.getString(R.string.validation_password_format));
             return;
         }
 
-        // Normalizziamo il CF in maiuscolo per evitare problemi di case-sensitivity
         String cfUpper = codiceFiscale.toUpperCase();
 
         repository.login(cfUpper, password, new GestioneUtenteRepository.RepositoryCallback() {
@@ -78,40 +81,39 @@ public class GestioneUtenteService {
         });
     }
 
-
     /**
      * Esegue la validazione e avvia il processo di registrazione.
      */
     public void registra(String nome, String cognome, String cf, String data, String sesso, String password, String confirmPass, final ServiceCallback callback) {
         if (nome == null || nome.trim().isEmpty()) {
-            callback.onError("Il nome è obbligatorio.");
+            callback.onError(context.getString(R.string.validation_name_mandatory));
             return;
         }
         if (!Validator.isNomeValid(nome)) {
-            callback.onError("Formato nome non valido.");
+            callback.onError(context.getString(R.string.validation_name_format));
             return;
         }
 
         if (cognome == null || cognome.trim().isEmpty()) {
-            callback.onError("Il cognome è obbligatorio.");
+            callback.onError(context.getString(R.string.validation_lastname_mandatory));
             return;
         }
         if (!Validator.isCognomeValid(cognome)) {
-            callback.onError("Formato cognome non valido.");
+            callback.onError(context.getString(R.string.validation_lastname_format));
             return;
         }
 
         if (cf == null || cf.trim().isEmpty()) {
-            callback.onError("Il codice fiscale è obbligatorio.");
+            callback.onError(context.getString(R.string.validation_cf_mandatory));
             return;
         }
         if (!Validator.isCodiceFiscaleValid(cf)) {
-            callback.onError("Formato codice fiscale non valido.");
+            callback.onError(context.getString(R.string.validation_cf_format));
             return;
         }
 
         if (data == null || data.trim().isEmpty()) {
-            callback.onError("La data di nascita è obbligatoria.");
+            callback.onError(context.getString(R.string.validation_birthdate_mandatory));
             return;
         }
         LocalDate localDate;
@@ -119,34 +121,33 @@ public class GestioneUtenteService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             localDate = LocalDate.parse(data, formatter);
         } catch (DateTimeParseException e) {
-            callback.onError("Formato data non valido. Usa dd-MM-yyyy.");
+            callback.onError(context.getString(R.string.validation_date_format));
             return;
         }
 
         if (!Validator.isDataNascitaValid(localDate)) {
-            callback.onError("Data di nascita non valida (deve essere nel passato).");
+            callback.onError(context.getString(R.string.validation_birthdate_past));
             return;
         }
 
         if (sesso == null || sesso.isEmpty() || !Validator.isSessoValid(sesso)) {
-            callback.onError("È obbligatorio specificare il sesso.");
+            callback.onError(context.getString(R.string.validation_gender_mandatory));
             return;
         }
 
         if (password == null || password.isEmpty()) {
-            callback.onError("La password è obbligatoria.");
+            callback.onError(context.getString(R.string.validation_password_mandatory));
             return;
         }
         if (!Validator.isPasswordValid(password)) {
-            callback.onError("La password deve contenere almeno 8 caratteri, di cui una lettera maiuscola, una minuscola e un numero.");
+            callback.onError(context.getString(R.string.validation_password_format));
             return;
         }
         if (!password.equals(confirmPass)) {
-            callback.onError("Le password non coincidono.");
+            callback.onError(context.getString(R.string.password_mismatch_error));
             return;
         }
 
-        // Normalizziamo il CF in maiuscolo
         String cfUpper = cf.toUpperCase();
 
         repository.registra(nome, cognome, cfUpper, data, sesso, password, new GestioneUtenteRepository.RepositoryCallback() {

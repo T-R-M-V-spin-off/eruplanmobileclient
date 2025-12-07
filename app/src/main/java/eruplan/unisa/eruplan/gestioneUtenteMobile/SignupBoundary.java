@@ -2,6 +2,7 @@ package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -16,7 +17,7 @@ import java.util.Calendar;
 
 import eruplan.unisa.eruplan.R;
 
-public class SignupBoundary extends AppCompatActivity implements GestioneUtenteControl.ControlCallback {
+public class SignupBoundary extends AppCompatActivity implements GestioneUtenteControl.SignupCallback {
 
     private EditText etNome, etCognome, etCodiceFiscale, etDataNascita;
     private RadioGroup etSesso;
@@ -31,8 +32,7 @@ public class SignupBoundary extends AppCompatActivity implements GestioneUtenteC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        // Inizializza il Control passando il callback
-        gestioneUtenteControl = new GestioneUtenteControl(this, this);
+        gestioneUtenteControl = new GestioneUtenteControl(this);
 
         initViews();
 
@@ -69,6 +69,10 @@ public class SignupBoundary extends AppCompatActivity implements GestioneUtenteC
     }
 
     private void attemptRegistration() {
+        if (!validateInput()) {
+            return;
+        }
+
         String nome = etNome.getText().toString().trim();
         String cognome = etCognome.getText().toString().trim();
         String cf = etCodiceFiscale.getText().toString().trim();
@@ -77,37 +81,66 @@ public class SignupBoundary extends AppCompatActivity implements GestioneUtenteC
         String confirmPass = etConfirmPassword.getText().toString().trim();
 
         int selectedSessoId = etSesso.getCheckedRadioButtonId();
-        String sesso = "";
-        if (selectedSessoId == R.id.radioMaschio) {
-            sesso = "M";
-        } else if (selectedSessoId == R.id.radioFemmina) {
-            sesso = "F";
-        }
+        String sesso = (selectedSessoId == R.id.radioMaschio) ? "M" : "F";
 
         progressBar.setVisibility(View.VISIBLE);
         btnSignUp.setEnabled(false);
 
-        // Chiama il Control per avviare il processo di registrazione
-        gestioneUtenteControl.registra(nome, cognome, cf, data, sesso, password, confirmPass);
+        gestioneUtenteControl.registra(nome, cognome, cf, data, sesso, password, confirmPass, this);
+    }
+
+    private boolean validateInput() {
+        if (TextUtils.isEmpty(etNome.getText())) {
+            etNome.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(etCognome.getText())) {
+            etCognome.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(etCodiceFiscale.getText())) {
+            etCodiceFiscale.setError(getString(R.string.empty_cf_error));
+            return false;
+        }
+        if (etCodiceFiscale.getText().length() != 16) {
+            etCodiceFiscale.setError(getString(R.string.invalid_cf_length_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(etDataNascita.getText())) {
+            etDataNascita.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (etSesso.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(this, R.string.gender_not_selected_error, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(etPassword.getText())) {
+            etPassword.setError(getString(R.string.empty_password_error));
+            return false;
+        }
+        if (!etPassword.getText().toString().equals(etConfirmPassword.getText().toString())) {
+            etConfirmPassword.setError(getString(R.string.password_mismatch_error));
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void onOperazioneSuccess(String message) {
-        progressBar.setVisibility(View.GONE);
-        btnSignUp.setEnabled(true);
-        Toast.makeText(SignupBoundary.this, message, Toast.LENGTH_SHORT).show();
+    public void onSignupSuccess(String message) {
+        runOnUiThread(() -> {
+            progressBar.setVisibility(View.GONE);
+            btnSignUp.setEnabled(true);
+            Toast.makeText(SignupBoundary.this, R.string.signup_success, Toast.LENGTH_LONG).show();
+        });
     }
 
     @Override
-    public void onOperazioneError(String message) {
-        progressBar.setVisibility(View.GONE);
-        btnSignUp.setEnabled(true);
-        Toast.makeText(SignupBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onLoginRedirect() {
-        // Non implementato in questa boundary
+    public void onSignupError(String message) {
+        runOnUiThread(() -> {
+            progressBar.setVisibility(View.GONE);
+            btnSignUp.setEnabled(true);
+            Toast.makeText(SignupBoundary.this, getString(R.string.signup_error, message), Toast.LENGTH_LONG).show();
+        });
     }
 
     @Override
