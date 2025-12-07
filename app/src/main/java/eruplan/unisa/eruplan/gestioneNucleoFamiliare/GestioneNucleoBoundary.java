@@ -30,40 +30,21 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
     private LinearLayout layoutConfermaAzioni;
     private Flow buttonFlow;
 
-    // Controller per la gestione del nucleo
+    // Controller
     private GestioneNucleoFamiliareControl gestioneNucleoControl;
     private GestioneUtenteControl gestioneUtenteControl;
 
-    // TAG per i log delle notifiche
     private static final String TAG_FCM = "FCM_DEBUG";
-    // Topic per le notifiche di emergenza
     private static final String TOPIC_EMERGENZA = "emergenza";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Carica il layout del menu GNF
         setContentView(R.layout.activity_gnf);
 
         // 1. Inizializzazione dei Control
         gestioneNucleoControl = new GestioneNucleoFamiliareControl(getApplicationContext());
-        gestioneUtenteControl = new GestioneUtenteControl(this, new GestioneUtenteControl.ControlCallbackAdapter() {
-            @Override
-            public void onOperazioneSuccess(String message) {
-                Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(GestioneNucleoBoundary.this, LoginBoundary.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-
-            @Override
-            public void onOperazioneError(String message) {
-                Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
-            }
-        }); // Correzione: Inizializzazione del control
-
+        gestioneUtenteControl = new GestioneUtenteControl(this);
 
         // Inizializzazione Views
         MaterialButton btnLogout = findViewById(R.id.btnLogout);
@@ -80,51 +61,44 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         layoutConfermaAzioni = findViewById(R.id.layoutConfermaAzioni);
         buttonFlow = findViewById(R.id.button_flow);
 
-        // Iscrizione al topic per le notifiche di emergenza.
         subscribeToNotificationTopic();
 
-        // Listener per il pulsante "I membri del tuo Nucleo"
         btnMembri.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaMembri());
-
-        // Listener per il pulsante "I tuoi Luoghi Sicuri"
         btnLuoghi.setOnClickListener(v -> gestioneNucleoControl.apriListaAppoggio());
 
         //Listneer per il pulsante "Il tuo Piano di Emergenza"
         btnGestioneEmergenza.setOnClickListener(v -> gestioneNucleoControl.mostraGestioneEmergenza());
 
         btnResidenza.setOnClickListener(v -> gestioneNucleoControl.mostraVisualizzaNucleo());
-
-        // Listener per il pulsante "I tuoi Inviti"
         btnInviti.setOnClickListener(v -> gestioneNucleoControl.mostraListaRichieste());
 
-        // Listener per il pulsante "Logout"
-        btnLogout.setOnClickListener(v -> gestioneUtenteControl.logout());
+        btnLogout.setOnClickListener(v -> performLogout());
 
-        // Listener per il pulsante "Abbandona Nucleo"
-        btnAbbandona.setOnClickListener(v -> {
-            // Mostra la sezione di conferma
-            mostraSezioneConferma(true);
+        btnAbbandona.setOnClickListener(v -> mostraSezioneConferma(true));
 
-        });
+        btnSi.setOnClickListener(v -> eseguiAbbandonoNucleo());
 
-        // Listener per il pulsante "Sì" (nella sezione di conferma)
-        btnSi.setOnClickListener(v -> {
-            // Logica per eseguire l'abbandono del nucleo
-            eseguiAbbandonoNucleo();
-        });
-
-
-        // Listener per il pulsante "No" (nella sezione di conferma)
-        btnNo.setOnClickListener(v -> {
-            // Nasconde la sezione di conferma
-            mostraSezioneConferma(false);
-        });
-
+        btnNo.setOnClickListener(v -> mostraSezioneConferma(false));
     }
 
-    /**
-     * Iscrive il dispositivo al topic "emergenza" di Firebase Cloud Messaging.
-     */
+    private void performLogout() {
+        gestioneUtenteControl.logout(new GestioneUtenteControl.OperationCallback() {
+            @Override
+            public void onSuccess(String message) {
+                Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GestioneNucleoBoundary.this, LoginBoundary.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void subscribeToNotificationTopic() {
         FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_EMERGENZA)
                 .addOnCompleteListener(task -> {
@@ -138,10 +112,6 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Mostra o nasconde la sezione di conferma per l'abbandono del nucleo.
-     * @param mostra true per mostrare, false per nascondere.
-     */
     private void mostraSezioneConferma(boolean mostra) {
         int visibility = mostra ? View.VISIBLE : View.GONE;
         int gridVisibility = mostra ? View.GONE : View.VISIBLE;
@@ -151,26 +121,19 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         buttonFlow.setVisibility(gridVisibility);
     }
 
-    /**
-     * Chiama il control per eseguire l'operazione di abbandono del nucleo
-     * e gestisce la risposta.
-     */
     private void eseguiAbbandonoNucleo() {
-        // Disabilita i bottoni per prevenire click multipli durante la richiesta
         btnSi.setEnabled(false);
         btnNo.setEnabled(false);
 
         gestioneNucleoControl.abbandonaNucleo(new GestioneNucleoFamiliareControl.ControlCallback() {
             @Override
-            public void onSuccess(String message) { // Correzione: nome metodo
-                // Successo: mostra un messaggio e naviga alla schermata di avvio
+            public void onSuccess(String message) {
                 Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
-                gestioneUtenteControl.logout();
+                performLogout(); // Esegui il logout dopo aver abbandonato il nucleo
             }
 
             @Override
-            public void onError(String message) { // Correzione: nome metodo
-                // Errore: nascondi la sezione di conferma, mostra un errore e riabilita i bottoni
+            public void onError(String message) {
                 mostraSezioneConferma(false);
                 Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
                 btnSi.setEnabled(true);
