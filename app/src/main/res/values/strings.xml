@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Eruplan</string>
+    <string name="label_nome">Nome: %1$s</string>
+    <string name="label_cognome">Cognome: %1$s</string>
+    <string name="label_cf">CF: %1$s</string>
+    <string name="hint_nome">Nome</string>
+    <string name="hint_cognome">Cognome</string>
+    <string name="hint_codice_fiscale">Codice Fiscale</string>
+    <string name="hint_data_nascita">Data di Nascita (gg/mm/aaaa)</string>
+    <string name="label_sesso">Sesso</string>
+    <string name="radio_maschio">Maschio</string>
+    <string name="radio_femmina">Femmina</string>
+    <string name="checkbox_assistenza">Necessita di assistenza</string>
+    <string name="checkbox_minorenne">Minorenne</string>
+    <string name="button_aggiungi_membro">Aggiungi Membro</string>
+    <string name="welcome_message">Benvenuto in Eruplan</string>
+    <string name="create_family_button">Crea un nuovo nucleo familiare</string>
+    <string name="view_invitations_button">Vedi inviti ricevuti</string>
+    <string name="no_members_found">Nessun membro trovato nel nucleo.</string>
+    <string name="members_loading_error">Errore caricamento membri: %1$s</string>
+    <string name="member_remove_error">Errore eliminazione: %1$s</string>
+    <string name="invitation_sent_success">Invito inviato con successo!</string>
+    <string name="generic_error">Errore: %1$s</string>
 </resources>

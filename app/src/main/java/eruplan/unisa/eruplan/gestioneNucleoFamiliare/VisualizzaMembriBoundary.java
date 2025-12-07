@@ -76,7 +76,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
     private void showPopupMenu(View anchor) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, null);
+        View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, (ViewGroup) rvMembri, false);
 
         final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
 
@@ -89,7 +89,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
         popupView.findViewById(R.id.btn_rimuovi_membro_menu).setOnClickListener(v -> {
             membroAdapter.setShowDeleteIcon(true);
-            membroAdapter.notifyDataSetChanged();
+            membroAdapter.notifyItemRangeChanged(0, membriList.size());
             popupWindow.dismiss();
         });
 
@@ -110,13 +110,13 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                 membroAdapter.notifyDataSetChanged();
 
                 if (membriList.isEmpty()) {
-                    Toast.makeText(VisualizzaMembriBoundary.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VisualizzaMembriBoundary.this, R.string.no_members_found, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(VisualizzaMembriBoundary.this, "Errore caricamento membri: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(VisualizzaMembriBoundary.this, getString(R.string.members_loading_error, message), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -133,7 +133,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(VisualizzaMembriBoundary.this, "Errore eliminazione: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(VisualizzaMembriBoundary.this, getString(R.string.member_remove_error, message), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -166,9 +166,9 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                         @Override
                         public void onUtenteTrovato(MembroEntity m) {
                             layoutRisultato.setVisibility(View.VISIBLE);
-                            tvNome.setText("Nome: " + m.getNome());
-                            tvCognome.setText("Cognome: " + m.getCognome());
-                            tvCF.setText("CF: " + m.getCodiceFiscale());
+                            tvNome.setText(getString(R.string.label_nome, m.getNome()));
+                            tvCognome.setText(getString(R.string.label_cognome, m.getCognome()));
+                            tvCF.setText(getString(R.string.label_cf, m.getCodiceFiscale()));
                             etCF.setEnabled(false);
                         }
 
@@ -190,12 +190,12 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                 @Override
                 public void onSuccess(String message) {
                     dialog.dismiss();
-                    Toast.makeText(VisualizzaMembriBoundary.this, "Invito inviato con successo!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(VisualizzaMembriBoundary.this, R.string.invitation_sent_success, Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onError(String message) {
-                    Toast.makeText(VisualizzaMembriBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(VisualizzaMembriBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
                 }
             });
         });

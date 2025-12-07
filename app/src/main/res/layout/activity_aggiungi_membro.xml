@@ -29,7 +29,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Nome"
+            android:hint="@string/hint_nome"
             android:textColorHint="@color/black"
             app:cursorColor="@color/black"
             app:boxBackgroundColor="@color/light_gray"
@@ -59,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Cognome"
+            android:hint="@string/hint_cognome"
             android:textColorHint="@color/black"
             app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
@@ -88,7 +88,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Codice Fiscale"
+            android:hint="@string/hint_codice_fiscale"
             android:textColorHint="@color/black"
             app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
@@ -118,7 +118,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Data di Nascita (gg/mm/aaaa)"
+            android:hint="@string/hint_data_nascita"
             android:textColorHint="@color/black"
             app:cursorColor="@color/black"
             app:hintTextColor="@color/black"
@@ -146,7 +146,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Sesso"
+            android:text="@string/label_sesso"
             android:textColor="@color/black"
             android:textAppearance="?attr/textAppearanceBody1"
             app:layout_constraintStart_toStartOf="parent"
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 app:buttonTint="@color/red"
-                android:text="Maschio" />
+                android:text="@string/radio_maschio" />
 
             <RadioButton
                 android:id="@+id/radioFemmina"
@@ -176,7 +176,7 @@
                 android:textColor="@color/black"
                 app:buttonTint="@color/red"
                 android:layout_marginStart="16dp"
-                android:text="Femmina" />
+                android:text="@string/radio_femmina" />
         </RadioGroup>
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -184,7 +184,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Necessita di assistenza"
+            android:text="@string/checkbox_assistenza"
             android:textColor="@color/black"
             app:buttonTint="@color/red"
             app:buttonIconTint="@color/white"
@@ -195,7 +195,7 @@
             android:id="@+id/minorenneCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Minorenne"
+            android:text="@string/checkbox_minorenne"
             android:textColor="@color/black"
             app:buttonTint="@color/red"
             app:buttonIconTint="@color/white"
@@ -210,7 +210,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Aggiungi Membro"
+            android:text="@string/button_aggiungi_membro"
             android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@id/minorenneCheckBox"
             app:layout_constraintEnd_toEndOf="parent"
