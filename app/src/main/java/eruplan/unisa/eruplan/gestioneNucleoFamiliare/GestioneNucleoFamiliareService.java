@@ -1,13 +1,17 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import eruplan.unisa.eruplan.entity.AppoggioEntity;
 import eruplan.unisa.eruplan.entity.MembroEntity;
 import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.entity.RichiestaEntity;
+import eruplan.unisa.eruplan.utility.Validator;
 
 
 /**
@@ -15,35 +19,31 @@ import eruplan.unisa.eruplan.entity.RichiestaEntity;
  */
 public class GestioneNucleoFamiliareService {
 
-    // CORREZIONE: Pattern aggiornato per usare i trattini (dd-MM-yyyy) per coerenza.
-    private static final Pattern DATE_PATTERN = Pattern.compile(
-        "^((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\\d{2}))S");
-
     private GestioneNucleoFamiliareRepository repository;
 
     public interface ServiceCallback {
-        void onSalvataggioSuccess(String message);
-        void onSalvataggioError(String message);
+        void onSuccess(String message);
+        void onError(String message);
     }
 
     public interface NucleoServiceCallback {
         void onNucleoLoaded(NucleoEntity nucleo);
-        void onServiceError(String message);
+        void onError(String message);
     }
 
     public interface AppoggiServiceCallback {
         void onAppoggiLoaded(List<AppoggioEntity> appoggi);
-        void onServiceError(String message);
+        void onError(String message);
     }
 
     public interface MembriServiceCallback {
         void onMembriLoaded(List<MembroEntity> membri);
-        void onServiceError(String message);
+        void onError(String message);
     }
 
     public interface RichiesteServiceCallback {
         void onRichiesteLoaded(List<RichiestaEntity> richieste);
-        void onServiceError(String message);
+        void onError(String message);
     }
 
     public GestioneNucleoFamiliareService(Context context) {
@@ -59,7 +59,7 @@ public class GestioneNucleoFamiliareService {
 
             @Override
             public void onError(String message) {
-                callback.onServiceError(message);
+                callback.onError(message);
             }
         });
     }
@@ -73,7 +73,7 @@ public class GestioneNucleoFamiliareService {
 
             @Override
             public void onError(String message) {
-                callback.onServiceError(message);
+                callback.onError(message);
             }
         });
     }
@@ -87,7 +87,7 @@ public class GestioneNucleoFamiliareService {
 
             @Override
             public void onError(String message) {
-                callback.onServiceError(message);
+                callback.onError(message);
             }
         });
     }
@@ -101,7 +101,7 @@ public class GestioneNucleoFamiliareService {
 
             @Override
             public void onError(String message) {
-                callback.onServiceError(message);
+                callback.onError(message);
             }
         });
     }
@@ -110,12 +110,12 @@ public class GestioneNucleoFamiliareService {
         repository.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onSalvataggioSuccess(message);
+                callback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                callback.onSalvataggioError(message);
+                callback.onError(message);
             }
         });
     }
@@ -124,12 +124,12 @@ public class GestioneNucleoFamiliareService {
         repository.rimuoviMembro(codiceFiscale, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onSalvataggioSuccess(message);
+                callback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                callback.onSalvataggioError(message);
+                callback.onError(message);
             }
         });
     }
@@ -146,28 +146,40 @@ public class GestioneNucleoFamiliareService {
     }
 
     public void creaMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ServiceCallback serviceCallback) throws IllegalArgumentException {
-        final String nomeTrimmed = validateAndTrim(nome, 2, 30, "Il nome non è valido.");
-        final String cognomeTrimmed = validateAndTrim(cognome, 2, 30, "Il cognome non è valido.");
-        final String cfTrimmed = validateAndTrim(codiceFiscale, 16, 16, "Il codice fiscale deve essere di 16 caratteri.");
-
-        if (dataDiNascita == null || !DATE_PATTERN.matcher(dataDiNascita).matches()) {
-            throw new IllegalArgumentException("La data di nascita non è valida (formato richiesto: dd-mm-aaaa).");
+        if (!Validator.isNomeValid(nome)) {
+            throw new IllegalArgumentException("Il nome non è valido.");
         }
-        if (sesso == null || (!sesso.equals("M") && !sesso.equals("F"))) {
+        if (!Validator.isCognomeValid(cognome)) {
+            throw new IllegalArgumentException("Il cognome non è valido.");
+        }
+        if (!Validator.isCodiceFiscaleValid(codiceFiscale)) {
+            throw new IllegalArgumentException("Il codice fiscale deve essere di 16 caratteri.");
+        }
+        if (!Validator.isSessoValid(sesso)) {
             throw new IllegalArgumentException("Il sesso non è valido.");
         }
 
-        MembroEntity nuovoMembroEntity = new MembroEntity(nomeTrimmed, cognomeTrimmed, cfTrimmed, dataDiNascita, sesso, assistenza, minorenne);
+        try {
+            LocalDate data = LocalDate.parse(dataDiNascita, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            if (!Validator.isDataNascitaValid(data)) {
+                throw new IllegalArgumentException("La data di nascita non è valida.");
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("La data di nascita non è valida (formato richiesto: dd-mm-aaaa).");
+        }
+
+
+        MembroEntity nuovoMembroEntity = new MembroEntity(nome, cognome, codiceFiscale, dataDiNascita, sesso, assistenza, minorenne);
 
         repository.salvaMembro(nuovoMembroEntity, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                serviceCallback.onSalvataggioSuccess(message);
+                serviceCallback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                serviceCallback.onSalvataggioError(message);
+                serviceCallback.onError(message);
             }
         });
     }
@@ -189,12 +201,12 @@ public class GestioneNucleoFamiliareService {
         repository.salvaNucleo(nuovoNucleoEntity, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                serviceCallback.onSalvataggioSuccess(message);
+                serviceCallback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                serviceCallback.onSalvataggioError(message);
+                serviceCallback.onError(message);
             }
         });
     }
@@ -203,12 +215,12 @@ public class GestioneNucleoFamiliareService {
         repository.abbandonaNucleo(new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                serviceCallback.onSalvataggioSuccess(message);
+                serviceCallback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                serviceCallback.onSalvataggioError(message);
+                serviceCallback.onError(message);
             }
         });
     }
@@ -227,12 +239,12 @@ public class GestioneNucleoFamiliareService {
         repository.salvaAppoggio(nuovoAppoggio, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                serviceCallback.onSalvataggioSuccess(message);
+                serviceCallback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                serviceCallback.onSalvataggioError(message);
+                serviceCallback.onError(message);
             }
         });
     }
@@ -250,12 +262,12 @@ public class GestioneNucleoFamiliareService {
         repository.modificaResidenza(nucleoModificato, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                serviceCallback.onSalvataggioSuccess(message);
+                serviceCallback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                serviceCallback.onSalvataggioError(message);
+                serviceCallback.onError(message);
             }
         });
     }
@@ -270,27 +282,20 @@ public class GestioneNucleoFamiliareService {
      * 2. Se valido, chiama il repository per cercare nel server.
      */
     public void cercaUtentePerInvito(String codiceFiscale, final GestioneNucleoFamiliareRepository.UtenteCallback callback) {
-        try {
-            // STEP 1: Validazione locale
-            // Se il CF non è di 16 caratteri, validateAndTrim lancia un'eccezione e blocca tutto subito.
-            String cfTrimmed = validateAndTrim(codiceFiscale, 16, 16, "Il Codice Fiscale deve essere di 16 caratteri esatti.");
-
-            // STEP 2: Se siamo qui, il CF è formalmente valido. Chiamiamo il server.
-            repository.cercaUtenteByCF(cfTrimmed, callback);
-
-        } catch (IllegalArgumentException e) {
-            // Se la validazione fallisce, restituiamo subito l'errore senza chiamare il server
-            callback.onError(e.getMessage());
+        if (!Validator.isCodiceFiscaleValid(codiceFiscale)) {
+            callback.onError("Il Codice Fiscale deve essere di 16 caratteri esatti.");
+            return;
         }
+        repository.cercaUtenteByCF(codiceFiscale, callback);
+
     }
 
     /**
      * Logica per l'invio dell'invito.
      */
     public void inviaInvito(String codiceFiscale, final ServiceCallback callback) {
-        // Controllo di sicurezza base
-        if (codiceFiscale == null || codiceFiscale.length() != 16) {
-            callback.onSalvataggioError("Codice fiscale non valido per l'invio.");
+        if (!Validator.isCodiceFiscaleValid(codiceFiscale)) {
+            callback.onError("Codice fiscale non valido per l'invio.");
             return;
         }
 
@@ -299,12 +304,12 @@ public class GestioneNucleoFamiliareService {
             @Override
             public void onSuccess(String message) {
                 // Traduciamo il callback del repository in quello del service
-                callback.onSalvataggioSuccess(message);
+                callback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                callback.onSalvataggioError(message);
+                callback.onError(message);
             }
         });
     }
@@ -320,7 +325,7 @@ public class GestioneNucleoFamiliareService {
     public void accettaRichiesta(long idRichiesta, final ServiceCallback callback) {
         // Validazione minima: l'ID deve essere positivo
         if (idRichiesta <= 0) {
-            callback.onSalvataggioError("ID richiesta non valido.");
+            callback.onError("ID richiesta non valido.");
             return;
         }
 
@@ -328,12 +333,12 @@ public class GestioneNucleoFamiliareService {
         repository.accettaRichiestaApi(idRichiesta, new GestioneNucleoFamiliareRepository.RepositoryCallback() {
             @Override
             public void onSuccess(String message) {
-                callback.onSalvataggioSuccess(message);
+                callback.onSuccess(message);
             }
 
             @Override
             public void onError(String message) {
-                callback.onSalvataggioError(message);
+                callback.onError(message);
             }
         });
     }

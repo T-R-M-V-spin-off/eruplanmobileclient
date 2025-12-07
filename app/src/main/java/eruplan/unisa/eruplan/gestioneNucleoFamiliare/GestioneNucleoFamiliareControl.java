@@ -17,28 +17,28 @@ public class GestioneNucleoFamiliareControl {
     private final Context context;
 
     public interface ControlCallback {
-        void onInserimentoSuccesso(String message);
-        void onInserimentoErrore(String message);
+        void onSuccess(String message);
+        void onError(String message);
     }
 
     public interface NucleoControlCallback {
         void onNucleoLoaded(NucleoEntity nucleo);
-        void onControlError(String message);
+        void onError(String message);
     }
 
     public interface AppoggiControlCallback {
         void onAppoggiLoaded(List<AppoggioEntity> appoggi);
-        void onControlError(String message);
+        void onError(String message);
     }
 
     public interface MembriControlCallback {
         void onMembriLoaded(List<MembroEntity> membri);
-        void onControlError(String message);
+        void onError(String message);
     }
 
     public interface RichiesteControlCallback {
         void onRichiesteLoaded(List<RichiestaEntity> richieste);
-        void onControlError(String message);
+        void onError(String message);
     }
 
     public GestioneNucleoFamiliareControl(Context context) {
@@ -48,7 +48,7 @@ public class GestioneNucleoFamiliareControl {
 
     public void getNucleo(final NucleoControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onControlError("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.getNucleo(new GestioneNucleoFamiliareService.NucleoServiceCallback() {
@@ -58,15 +58,15 @@ public class GestioneNucleoFamiliareControl {
             }
 
             @Override
-            public void onServiceError(String message) {
-                callback.onControlError(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
 
     public void getRichieste(final RichiesteControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onControlError("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.getRichieste(new GestioneNucleoFamiliareService.RichiesteServiceCallback() {
@@ -76,15 +76,15 @@ public class GestioneNucleoFamiliareControl {
             }
 
             @Override
-            public void onServiceError(String message) {
-                callback.onControlError(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
 
     public void getMembri(final MembriControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onControlError("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.getMembri(new GestioneNucleoFamiliareService.MembriServiceCallback() {
@@ -94,15 +94,15 @@ public class GestioneNucleoFamiliareControl {
             }
 
             @Override
-            public void onServiceError(String message) {
-                callback.onControlError(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
 
     public void getAppoggi(final AppoggiControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onControlError("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.getAppoggi(new GestioneNucleoFamiliareService.AppoggiServiceCallback() {
@@ -112,44 +112,44 @@ public class GestioneNucleoFamiliareControl {
             }
 
             @Override
-            public void onServiceError(String message) {
-                callback.onControlError(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
 
     public void eliminaAppoggio(long appoggioId, final ControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onInserimentoErrore("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.eliminaAppoggio(appoggioId, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
-            public void onSalvataggioSuccess(String message) {
-                callback.onInserimentoSuccesso(message);
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
             }
 
             @Override
-            public void onSalvataggioError(String message) {
-                callback.onInserimentoErrore(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
 
     public void rimuoviMembro(String codiceFiscale, final ControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onInserimentoErrore("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.rimuoviMembro(codiceFiscale, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
-            public void onSalvataggioSuccess(String message) {
-                callback.onInserimentoSuccesso(message);
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
             }
 
             @Override
-            public void onSalvataggioError(String message) {
-                callback.onInserimentoErrore(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
@@ -196,80 +196,96 @@ public class GestioneNucleoFamiliareControl {
         context.startActivity(intent);
     }
 
-    public void inserisciMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ControlCallback controlCallback) throws IllegalArgumentException {
+    public void inserisciMembro(String nome, String cognome, String codiceFiscale, String dataDiNascita, String sesso, boolean assistenza, boolean minorenne, final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            controlCallback.onInserimentoErrore("Utente non autenticato.");
+            controlCallback.onError("Utente non autenticato.");
             return;
         }
-        service.creaMembro(nome, cognome, codiceFiscale, dataDiNascita, sesso, assistenza, minorenne, new GestioneNucleoFamiliareService.ServiceCallback() {
-            @Override
-            public void onSalvataggioSuccess(String message) {
-                controlCallback.onInserimentoSuccesso(message);
-            }
+        try {
+            service.creaMembro(nome, cognome, codiceFiscale, dataDiNascita, sesso, assistenza, minorenne, new GestioneNucleoFamiliareService.ServiceCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    controlCallback.onSuccess(message);
+                }
 
-            @Override
-            public void onSalvataggioError(String message) {
-                controlCallback.onInserimentoErrore(message);
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    controlCallback.onError(message);
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            controlCallback.onError(e.getMessage());
+        }
     }
 
     /**
      * Avvia il processo di creazione di un nuovo nucleo familiare.
      */
-    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, boolean hasVeicolo, int postiVeicolo, final ControlCallback controlCallback) throws IllegalArgumentException {
+    public void creaNucleo(String viaPiazza, String comune, String regione, String paese, String civico, String cap, boolean hasVeicolo, int postiVeicolo, final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            controlCallback.onInserimentoErrore("Utente non autenticato.");
+            controlCallback.onError("Utente non autenticato.");
             return;
         }
-        service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap,hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareService.ServiceCallback() {
-            @Override
-            public void onSalvataggioSuccess(String message) {
-                controlCallback.onInserimentoSuccesso(message);
-            }
+        try {
+            service.creaNucleo(viaPiazza, comune, regione, paese, civico, cap,hasVeicolo, postiVeicolo, new GestioneNucleoFamiliareService.ServiceCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    controlCallback.onSuccess(message);
+                }
 
-            @Override
-            public void onSalvataggioError(String message) {
-                controlCallback.onInserimentoErrore(message);
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    controlCallback.onError(message);
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            controlCallback.onError(e.getMessage());
+        }
     }
 
 
     public void creaAppoggio(String viaPiazza, String civico, String comune, String cap, String provincia, String regione, String paese, final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            controlCallback.onInserimentoErrore("Utente non autenticato.");
+            controlCallback.onError("Utente non autenticato.");
             return;
         }
-        service.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GestioneNucleoFamiliareService.ServiceCallback() {
-            @Override
-            public void onSalvataggioSuccess(String message) {
-                controlCallback.onInserimentoSuccesso(message);
-            }
+        try {
+            service.creaAppoggio(viaPiazza, civico, comune, cap, provincia, regione, paese, new GestioneNucleoFamiliareService.ServiceCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    controlCallback.onSuccess(message);
+                }
 
-            @Override
-            public void onSalvataggioError(String message) {
-                controlCallback.onInserimentoErrore(message);
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    controlCallback.onError(message);
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            controlCallback.onError(e.getMessage());
+        }
     }
 
     public void modificaResidenza(String viaPiazza, String comune, String regione, String paese, String civico, String cap, final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            controlCallback.onInserimentoErrore("Utente non autenticato.");
+            controlCallback.onError("Utente non autenticato.");
             return;
         }
-        service.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
-            @Override
-            public void onSalvataggioSuccess(String message) {
-                controlCallback.onInserimentoSuccesso(message);
-            }
+        try {
+            service.modificaResidenza(viaPiazza, comune, regione, paese, civico, cap, new GestioneNucleoFamiliareService.ServiceCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    controlCallback.onSuccess(message);
+                }
 
-            @Override
-            public void onSalvataggioError(String message) {
-                controlCallback.onInserimentoErrore(message);
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    controlCallback.onError(message);
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            controlCallback.onError(e.getMessage());
+        }
     }
 
     /**
@@ -278,20 +294,20 @@ public class GestioneNucleoFamiliareControl {
      */
     public void abbandonaNucleo(final ControlCallback controlCallback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            controlCallback.onInserimentoErrore("Utente non autenticato.");
+            controlCallback.onError("Utente non autenticato.");
             return;
         }
         service.abbandonaNucleo(new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
-            public void onSalvataggioSuccess(String message) {
+            public void onSuccess(String message) {
                 // Traduciamo il successo del service in un successo per l'Activity
-                controlCallback.onInserimentoSuccesso(message);
+                controlCallback.onSuccess(message);
             }
 
             @Override
-            public void onSalvataggioError(String message) {
+            public void onError(String message) {
                 // Traduciamo l'errore del service in un errore per l'Activity
-                controlCallback.onInserimentoErrore(message);
+                controlCallback.onError(message);
             }
         });
     }
@@ -306,7 +322,7 @@ public class GestioneNucleoFamiliareControl {
      */
     public interface RicercaCallback {
         void onUtenteTrovato(MembroEntity membroEntity);
-        void onErrore(String messaggio);
+        void onError(String messaggio);
     }
 
     /**
@@ -315,7 +331,7 @@ public class GestioneNucleoFamiliareControl {
      */
     public void cercaMembroPerInvito(String cf, final RicercaCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onErrore("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.cercaUtentePerInvito(cf, new GestioneNucleoFamiliareRepository.UtenteCallback() {
@@ -328,7 +344,7 @@ public class GestioneNucleoFamiliareControl {
             @Override
             public void onError(String message) {
                 // Qualcosa è andato storto (non trovato o errore server)
-                callback.onErrore(message);
+                callback.onError(message);
             }
         });
     }
@@ -338,18 +354,18 @@ public class GestioneNucleoFamiliareControl {
      */
     public void finalizzaInvito(String cf, final ControlCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
-            callback.onInserimentoErrore("Utente non autenticato.");
+            callback.onError("Utente non autenticato.");
             return;
         }
         service.inviaInvito(cf, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
-            public void onSalvataggioSuccess(String message) {
-                callback.onInserimentoSuccesso(message);
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
             }
 
             @Override
-            public void onSalvataggioError(String message) {
-                callback.onInserimentoErrore(message);
+            public void onError(String message) {
+                callback.onError(message);
             }
         });
     }
@@ -378,12 +394,12 @@ public class GestioneNucleoFamiliareControl {
         }
         service.accettaRichiesta(idRichiesta, new GestioneNucleoFamiliareService.ServiceCallback() {
             @Override
-            public void onSalvataggioSuccess(String message) {
+            public void onSuccess(String message) {
                 callback.onSuccess(message);
             }
 
             @Override
-            public void onSalvataggioError(String message) {
+            public void onError(String message) {
                 callback.onError(message);
             }
         });
