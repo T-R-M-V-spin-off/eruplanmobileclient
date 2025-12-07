@@ -78,6 +78,10 @@
             android:name=".gestioneNucleoFamiliare.ListaAppoggioBoundary"
             android:exported="true"/>
 
+        <activity
+            android:name=".gestioneEmergenza.GestioneEmergenzaBoundary"
+            android:exported="true"/>
+
         <service
             android:name=".utility.EruplanMessagingService"
             android:exported="false">
