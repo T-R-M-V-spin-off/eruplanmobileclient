@@ -71,6 +71,10 @@
             android:exported="true"/>
 
         <activity
+            android:name=".gestioneNucleoFamiliare.VisualizzaNucleoUtenteBoundary"
+            android:exported="true"/>
+
+        <activity
             android:name=".gestioneNucleoFamiliare.ListaAppoggioBoundary"
             android:exported="true"/>
 

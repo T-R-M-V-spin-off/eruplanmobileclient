@@ -47,6 +47,9 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
         // Inizializzazione View
         rvMembri = findViewById(R.id.rv_membri);
         btnBack = findViewById(R.id.btn_back);
+        //
+        //Solo se sei admin visualizzi questa view
+        //
         btnMenu = findViewById(R.id.btn_menu);
 
         // Configurazione RecyclerView

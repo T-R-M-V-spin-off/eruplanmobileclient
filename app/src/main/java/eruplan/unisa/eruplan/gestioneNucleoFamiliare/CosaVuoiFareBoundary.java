@@ -30,7 +30,7 @@ public class CosaVuoiFareBoundary extends AppCompatActivity {
         btnCreaNucleo = findViewById(R.id.btnCreaNucleo);
 
         // Collega il bottone degli inviti (decommentare quando viene aggiunto all'XML)
-        // btnInvitiRicevuti = findViewById(R.id.btnInvitiRicevuti);
+        btnInvitiRicevuti = findViewById(R.id.btnInvitiRicevuti);
 
         // Imposta il listener per il click
         btnCreaNucleo.setOnClickListener(new View.OnClickListener() {

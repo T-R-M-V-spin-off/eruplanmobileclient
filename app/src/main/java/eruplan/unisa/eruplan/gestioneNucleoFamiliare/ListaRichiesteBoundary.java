@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +33,9 @@ public class ListaRichiesteBoundary extends AppCompatActivity implements Richies
     private RichiestaEntity richiestaSelezionata = null;
 
     // Riferimenti ai 3 bottoni
-    private Button btnConferma;
-    private Button btnIndietro;
-    private Button btnTornaMenu;
+    private MaterialButton btnConferma;
+    private MaterialButton btnIndietro;
+    private MaterialButton btnTornaMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +45,8 @@ public class ListaRichiesteBoundary extends AppCompatActivity implements Richies
         setContentView(R.layout.activity_lista_richieste);
 
         // Recupero i bottoni (conferma e indietro vanno aggiunti all'xml)
-        // btnConferma = findViewById(R.id.btn_conferma);
-        // btnIndietro = findViewById(R.id.btn_indietro);
+         btnConferma = findViewById(R.id.btn_conferma);
+         btnIndietro = findViewById(R.id.btn_indietro);
         btnTornaMenu = findViewById(R.id.btn_torna_menu);
 
         // Controllo se questa pagina è stata aperta in modalità "Accettazione" o "Sola Lettura"
