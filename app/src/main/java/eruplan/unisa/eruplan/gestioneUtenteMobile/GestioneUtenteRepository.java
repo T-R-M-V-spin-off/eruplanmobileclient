@@ -71,16 +71,18 @@ public class GestioneUtenteRepository {
     }
 
     /**
-     * Esegue la chiamata di rete per il logout.
-     * Usa StringRequest per gestire la risposta di successo con corpo vuoto dal backend.
+     * Esegue la chiamata di rete per il logout e pulisce i cookie locali.
      */
     public void logout(final RepositoryCallback callback) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, LOGOUT_URL,
                 response -> {
-                    // Una risposta 2xx è un successo.
+                    // Il server ha confermato il logout, ora puliamo i cookie locali.
+                    VolleySingleton.logout();
                     callback.onSuccess("Logout effettuato con successo.");
                 },
                 error -> {
+                    // Anche in caso di errore dal server, potrebbe essere utile pulire i cookie locali
+                    VolleySingleton.logout();
                     String errorMessage = parseError(error);
                     callback.onError(errorMessage);
                 }
@@ -136,20 +138,17 @@ public class GestioneUtenteRepository {
             try {
                 String responseBody = new String(response.data, StandardCharsets.UTF_8);
                 JSONObject data = new JSONObject(responseBody);
-                // Il backend Spring di default usa 'message' per l'errore inviato con sendError
                 if (data.has("message")) {
                     return data.getString("message");
                 } else if (data.has("error")) {
                     return data.getString("error");
                 }
             } catch (Exception e) {
-                // Ignora l'errore di parsing e restituisce un errore generico
+                // Ignora l'errore di parsing
             }
         }
-        // Fallback su un messaggio di errore generico
         String genericError = "Errore di comunicazione con il server.";
         if (response != null) {
-            // Aggiunge il codice di stato se disponibile per aiutare nel debug
             genericError += " (Codice: " + response.statusCode + ")";
         }
         return genericError;
