@@ -1,6 +1,7 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -71,8 +72,10 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
         // Listener Pulsanti
         btnBack.setOnClickListener(v -> {
-            // Torna al menu GNF
-            finish(); // Chiude semplicemente questa activity tornando a quella precedente nello stack
+            // Torna al menu Gestione_Nucleo_Boundary
+            Intent intent = new Intent(VisualizzaMembriBoundary.this, GestioneNucleoBoundary.class);
+            startActivity(intent);
+            finish();// Chiude semplicemente questa activity tornando a quella precedente nello stack
         });
 
         // Il tasto menu (se presente nel layout)

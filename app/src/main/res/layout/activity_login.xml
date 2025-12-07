@@ -66,12 +66,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_codice_fiscale" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_rounded_red"
+        android:backgroundTint="@color/red"
         android:textColor="@color/white"
         android:text="Login"
         app:cornerRadius="20dp"

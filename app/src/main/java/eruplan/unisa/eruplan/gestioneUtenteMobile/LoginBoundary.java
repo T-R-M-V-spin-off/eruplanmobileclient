@@ -19,7 +19,7 @@ import eruplan.unisa.eruplan.R;
 public class LoginBoundary extends AppCompatActivity implements GestioneUtenteControl.ControlCallback {
 
     private EditText codiceFiscaleEditText, passwordEditText;
-    private MaterialButton loginButton, goToSignupButton;
+    private MaterialButton loginButton;
     private ProgressBar loadingProgressBar;
 
     private GestioneUtenteControl gestioneUtenteControl;
@@ -36,17 +36,14 @@ public class LoginBoundary extends AppCompatActivity implements GestioneUtenteCo
 
         loginButton.setOnClickListener(v -> attemptLogin());
 
-        goToSignupButton.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginBoundary.this, SignupBoundary.class);
-            startActivity(intent);
-        });
+
+
     }
 
     private void initViews() {
         codiceFiscaleEditText = findViewById(R.id.et_codice_fiscale);
         passwordEditText = findViewById(R.id.et_password);
         loginButton = findViewById(R.id.login);
-        goToSignupButton = findViewById(R.id.btn_go_to_signup);
         loadingProgressBar = findViewById(R.id.progressBar);
     }
 
@@ -57,7 +54,6 @@ public class LoginBoundary extends AppCompatActivity implements GestioneUtenteCo
         // Prepara l'UI per l'attesa
         loadingProgressBar.setVisibility(View.VISIBLE);
         loginButton.setEnabled(false);
-        goToSignupButton.setEnabled(false);
 
         // Chiama il Control per avviare il processo di login
         gestioneUtenteControl.login(codiceFiscale, password);
@@ -68,7 +64,7 @@ public class LoginBoundary extends AppCompatActivity implements GestioneUtenteCo
         // Operazione riuscita
         loadingProgressBar.setVisibility(View.GONE);
         loginButton.setEnabled(true);
-        goToSignupButton.setEnabled(true);
+
 
         Toast.makeText(LoginBoundary.this, message, Toast.LENGTH_SHORT).show();
     }
@@ -78,7 +74,7 @@ public class LoginBoundary extends AppCompatActivity implements GestioneUtenteCo
         // Gestisce l'errore (validazione o rete)
         loadingProgressBar.setVisibility(View.GONE);
         loginButton.setEnabled(true);
-        goToSignupButton.setEnabled(true);
+
         Toast.makeText(LoginBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
     }
 
