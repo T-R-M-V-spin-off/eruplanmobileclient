@@ -319,10 +319,6 @@ public class GestioneNucleoFamiliareControl {
         });
     }
 
-    // =================================================================================
-    //  NUOVI METODI E INTERFACCE PER L'INVITO (REQUISITO UC-GNF.01)
-    // =================================================================================
-
     /**
      * Interfaccia Callback specifica per la ricerca.
      * Serve per dire all'Activity: "Ho finito di cercare, ecco il Membro trovato (o l'errore)".
@@ -336,7 +332,7 @@ public class GestioneNucleoFamiliareControl {
      * Metodo chiamato dal bottone "Cerca" nel Dialog.
      * Fa da ponte tra Activity e Service.
      */
-    public void cercaMembroPerInvito(String cf, final RicercaCallback callback) {
+    public void cercaUtentePerInvito(String cf, final RicercaCallback callback) {
         if (!VolleySingleton.isUserLoggedIn()) {
             callback.onError("Utente non autenticato.");
             return;
@@ -377,9 +373,6 @@ public class GestioneNucleoFamiliareControl {
         });
     }
 
-    // =================================================================================
-    //  METODI PER ACCETTARE RICHIESTA (REQUISITO SC-GNF.02)
-    // =================================================================================
 
     /**
      * Interfaccia di callback specifica per l'operazione di accettazione.
