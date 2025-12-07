@@ -15,11 +15,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
+import eruplan.unisa.eruplan.gestioneUtenteMobile.GestioneUtenteControl;
 
 import eruplan.unisa.eruplan.R;
-import eruplan.unisa.eruplan.gestioneUtenteMobile.StartupBoundary;
+
 
 public class GestioneNucleoBoundary extends AppCompatActivity {
 
@@ -32,6 +31,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
 
     // Controller per la gestione del nucleo
     private GestioneNucleoFamiliareControl gestioneNucleoControl;
+    private GestioneUtenteControl gestioneUtenteControl;
 
     // TAG per i log delle notifiche
     private static final String TAG_FCM = "FCM_DEBUG";
@@ -81,7 +81,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
         });
 
         // Listener per il pulsante "Logout"
-        btnLogout.setOnClickListener(v -> gestioneNucleoControl.performLogout());
+        btnLogout.setOnClickListener(v -> gestioneUtenteControl.logout());
 
         // Listener per il pulsante "Abbandona Nucleo"
         btnAbbandona.setOnClickListener(v -> {
@@ -148,7 +148,7 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
             public void onInserimentoSuccesso(String message) {
                 // Successo: mostra un messaggio e naviga alla schermata di avvio
                 Toast.makeText(GestioneNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
-                gestioneNucleoControl.performLogout();
+                gestioneUtenteControl.logout();
             }
 
             @Override
