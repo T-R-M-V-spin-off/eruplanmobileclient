@@ -1,7 +1,6 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,57 +34,43 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     private ImageButton btnMenu;
     private GestioneNucleoFamiliareControl control;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualizza_membri);
 
-        // Inizializza il control
         control = new GestioneNucleoFamiliareControl(this);
 
-        // Inizializzazione View
+        initViews();
+        setupRecyclerView();
+        setupListeners();
+
+        caricaMembri();
+    }
+
+    private void initViews() {
         rvMembri = findViewById(R.id.rv_membri);
         btnBack = findViewById(R.id.btn_back);
-        //
-        //Solo se sei admin visualizzi questa view
-        //
         btnMenu = findViewById(R.id.btn_menu);
+    }
 
-        // Configurazione RecyclerView
+    private void setupRecyclerView() {
         rvMembri.setLayoutManager(new LinearLayoutManager(this));
-
-        // Inizializza lista vuota e adapter
         membriList = new ArrayList<>();
         membroAdapter = new MembroAdapter(membriList);
-        
-        // Impostiamo il listener per l'eliminazione
         membroAdapter.setOnItemDeleteListener(position -> {
             MembroEntity membroDaRimuovere = membriList.get(position);
             rimuoviMembro(membroDaRimuovere, position);
         });
-        
-        // Di default, l'icona di cancellazione è nascosta
         membroAdapter.setShowDeleteIcon(false);
-        
         rvMembri.setAdapter(membroAdapter);
+    }
 
-        // Caricamento dati reali dal backend
-        caricaMembri();
+    private void setupListeners() {
+        btnBack.setOnClickListener(v -> control.tornaAllaGestioneNucleo());
 
-        // Listener Pulsanti
-        btnBack.setOnClickListener(v -> {
-            // Torna al menu Gestione_Nucleo_Boundary
-            Intent intent = new Intent(VisualizzaMembriBoundary.this, GestioneNucleoBoundary.class);
-            startActivity(intent);
-            finish();// Chiude semplicemente questa activity tornando a quella precedente nello stack
-        });
-
-        // Il tasto menu (se presente nel layout)
         if (btnMenu != null) {
-            btnMenu.setOnClickListener(v -> {
-                showPopupMenu(v);
-            });
+            btnMenu.setOnClickListener(this::showPopupMenu);
         }
     }
 
@@ -93,35 +78,24 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_opzioni_nucleo, null);
 
-        int width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        int height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true;
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
 
         popupWindow.showAsDropDown(anchor);
 
-        Button btnAggiungi = popupView.findViewById(R.id.btn_aggiungi_membro_menu);
-        btnAggiungi.setOnClickListener(v -> {
+        popupView.findViewById(R.id.btn_aggiungi_membro_menu).setOnClickListener(v -> {
             control.mostraAggiungiMembro();
             popupWindow.dismiss();
         });
 
-        Button btnRimuovi = popupView.findViewById(R.id.btn_rimuovi_membro_menu);
-        btnRimuovi.setOnClickListener(v -> {
-            // Mostra le icone di cancellazione per permettere la rimozione
+        popupView.findViewById(R.id.btn_rimuovi_membro_menu).setOnClickListener(v -> {
             membroAdapter.setShowDeleteIcon(true);
             membroAdapter.notifyDataSetChanged();
             popupWindow.dismiss();
         });
 
-        Button btnInvita = popupView.findViewById(R.id.btn_invita_membro_menu);
-        btnInvita.setOnClickListener(v -> {
-
-            // Aggiungi qui la logica per invitare un membro, se necessaria
-
+        popupView.findViewById(R.id.btn_invita_membro_menu).setOnClickListener(v -> {
             apriDialogInvito();
             popupWindow.dismiss();
-
         });
     }
 
@@ -134,14 +108,14 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                     membriList.addAll(membri);
                 }
                 membroAdapter.notifyDataSetChanged();
-                
+
                 if (membriList.isEmpty()) {
                     Toast.makeText(VisualizzaMembriBoundary.this, "Nessun membro trovato nel nucleo.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onControlError(String message) {
+            public void onError(String message) {
                 Toast.makeText(VisualizzaMembriBoundary.this, "Errore caricamento membri: " + message, Toast.LENGTH_LONG).show();
             }
         });
@@ -150,16 +124,15 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
     private void rimuoviMembro(MembroEntity membro, int position) {
         control.rimuoviMembro(membro.getCodiceFiscale(), new GestioneNucleoFamiliareControl.ControlCallback() {
             @Override
-            public void onInserimentoSuccesso(String message) {
+            public void onSuccess(String message) {
                 Toast.makeText(VisualizzaMembriBoundary.this, message, Toast.LENGTH_SHORT).show();
-                // Rimuoviamo dalla lista locale e aggiorniamo la UI
                 membriList.remove(position);
                 membroAdapter.notifyItemRemoved(position);
                 membroAdapter.notifyItemRangeChanged(position, membriList.size());
             }
 
             @Override
-            public void onInserimentoErrore(String message) {
+            public void onError(String message) {
                 Toast.makeText(VisualizzaMembriBoundary.this, "Errore eliminazione: " + message, Toast.LENGTH_LONG).show();
             }
         });
@@ -167,10 +140,9 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
     private void apriDialogInvito() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_invita_membro, null);
-
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_invita_membro, null);
         builder.setView(dialogView);
+
         final AlertDialog dialog = builder.create();
 
         final EditText etCF = dialogView.findViewById(R.id.et_codice_fiscale_ricerca);
@@ -179,8 +151,6 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
         final TextView tvCognome = dialogView.findViewById(R.id.tv_cognome_trovato);
         final TextView tvCF = dialogView.findViewById(R.id.tv_cf_trovato);
         Button btnInvita = dialogView.findViewById(R.id.btn_conferma_invito);
-
-        final GestioneNucleoFamiliareControl controller = new GestioneNucleoFamiliareControl(this);
 
         etCF.addTextChangedListener(new TextWatcher() {
             @Override
@@ -192,7 +162,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 16) {
-                    controller.cercaMembroPerInvito(s.toString(), new GestioneNucleoFamiliareControl.RicercaCallback() {
+                    control.cercaUtentePerInvito(s.toString(), new GestioneNucleoFamiliareControl.RicercaCallback() {
                         @Override
                         public void onUtenteTrovato(MembroEntity m) {
                             layoutRisultato.setVisibility(View.VISIBLE);
@@ -203,7 +173,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onErrore(String msg) {
+                        public void onError(String msg) {
                             layoutRisultato.setVisibility(View.GONE);
                             Toast.makeText(VisualizzaMembriBoundary.this, msg, Toast.LENGTH_SHORT).show();
                         }
@@ -216,15 +186,15 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
         btnInvita.setOnClickListener(v -> {
             String cfDaInvitare = etCF.getText().toString();
-            controller.finalizzaInvito(cfDaInvitare, new GestioneNucleoFamiliareControl.ControlCallback() {
+            control.finalizzaInvito(cfDaInvitare, new GestioneNucleoFamiliareControl.ControlCallback() {
                 @Override
-                public void onInserimentoSuccesso(String message) {
+                public void onSuccess(String message) {
                     dialog.dismiss();
                     Toast.makeText(VisualizzaMembriBoundary.this, "Invito inviato con successo!", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
-                public void onInserimentoErrore(String message) {
+                public void onError(String message) {
                     Toast.makeText(VisualizzaMembriBoundary.this, "Errore: " + message, Toast.LENGTH_LONG).show();
                 }
             });
@@ -232,5 +202,4 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
 
         dialog.show();
     }
-
 }
