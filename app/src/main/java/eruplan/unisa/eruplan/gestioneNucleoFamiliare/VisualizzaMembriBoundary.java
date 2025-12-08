@@ -179,7 +179,7 @@ public class VisualizzaMembriBoundary extends AppCompatActivity {
                         @Override
                         public void onError(String msg) {
                             layoutRisultato.setVisibility(View.GONE);
-                            Toast.makeText(VisualizzaMembriBoundary.this, msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(VisualizzaMembriBoundary.this, getString(R.string.generic_error, msg), Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {

@@ -97,11 +97,11 @@ public class GestioneNucleoBoundary extends AppCompatActivity {
     private void subscribeToNotificationTopic() {
         FirebaseMessaging.getInstance().subscribeToTopic(TOPIC_EMERGENZA)
                 .addOnCompleteListener(task -> {
-                    String msg = "Iscrizione al Topic '" + TOPIC_EMERGENZA + "' riuscita.";
                     if (!task.isSuccessful()) {
-                        msg = "ERRORE: Iscrizione al Topic fallita.";
+                        String msg = getString(R.string.fcm_subscription_error);
                         Log.e(TAG_FCM, msg, task.getException());
                     } else {
+                        String msg = getString(R.string.fcm_subscription_success, TOPIC_EMERGENZA);
                         Log.d(TAG_FCM, msg);
                     }
                 });

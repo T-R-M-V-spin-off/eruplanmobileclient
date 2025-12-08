@@ -91,4 +91,9 @@
     <string name="checkbox_has_veicolo">Possiedi un veicolo?</string>
     <string name="hint_posti_veicolo">Numero posti veicolo</string>
     <string name="button_crea_nucleo">Crea Nucleo</string>
+    <string name="error_empty_vehicle_seats">Per favore, inserisci il numero di posti.</string>
+    <string name="error_invalid_vehicle_seats">Il numero di posti non è valido.</string>
+    <string name="fcm_subscription_success">Iscrizione al Topic \'%1$s\' riuscita.</string>
+    <string name="fcm_subscription_error">ERRORE: Iscrizione al Topic fallita.</string>
+    <string name="no_nucleus_found">Nessun nucleo trovato.</string>
 </resources>

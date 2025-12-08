@@ -93,7 +93,7 @@ public class ListaRichiesteBoundary extends AppCompatActivity implements Richies
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ListaRichiesteBoundary.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListaRichiesteBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_SHORT).show();
             }
         });
     }

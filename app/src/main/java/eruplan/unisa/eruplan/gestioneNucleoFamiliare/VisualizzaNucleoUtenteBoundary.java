@@ -1,6 +1,5 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -30,11 +29,8 @@ public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
 
         initViews();
 
-        btnChiudi.setOnClickListener(v -> {
-            Intent intent = new Intent(VisualizzaNucleoUtenteBoundary.this, GestioneNucleoBoundary.class);
-            startActivity(intent);
-            finish();
-        });
+        // Semplificato: finish() torna all'activity precedente, rendendo il componente più riutilizzabile.
+        btnChiudi.setOnClickListener(v -> finish());
 
         caricaDatiNucleo();
     }
@@ -64,7 +60,7 @@ public class VisualizzaNucleoUtenteBoundary extends AppCompatActivity {
                     civicoTextView.setText(nucleo.getCivico());
                     capTextView.setText(nucleo.getCap());
                 } else {
-                    Toast.makeText(VisualizzaNucleoUtenteBoundary.this, "Nessun nucleo trovato.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(VisualizzaNucleoUtenteBoundary.this, R.string.no_nucleus_found, Toast.LENGTH_LONG).show();
                 }
             }
 

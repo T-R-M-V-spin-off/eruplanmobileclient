@@ -1,8 +1,8 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,7 +23,6 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
 
     private EditText nomeEditText, cognomeEditText, codiceFiscaleEditText, dataNascitaEditText;
     private RadioGroup sessoRadioGroup;
-    private RadioButton radioMaschio, radioFemmina;
     private CheckBox assistenzaCheckBox, minorenneCheckBox;
     private Button submitButton;
     private ProgressBar loadingProgressBar;
@@ -48,8 +47,6 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
         codiceFiscaleEditText = findViewById(R.id.codiceFiscaleEditText);
         dataNascitaEditText = findViewById(R.id.dataNascitaEditText);
         sessoRadioGroup = findViewById(R.id.sessoRadioGroup);
-        radioMaschio = findViewById(R.id.radioMaschio);
-        radioFemmina = findViewById(R.id.radioFemmina);
         assistenzaCheckBox = findViewById(R.id.assistenzaCheckBox);
         minorenneCheckBox = findViewById(R.id.minorenneCheckBox);
         submitButton = findViewById(R.id.submitButton);
@@ -76,19 +73,46 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    private boolean validateInput() {
+        if (TextUtils.isEmpty(nomeEditText.getText())) {
+            nomeEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(cognomeEditText.getText())) {
+            cognomeEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(codiceFiscaleEditText.getText())) {
+            codiceFiscaleEditText.setError(getString(R.string.empty_cf_error));
+            return false;
+        }
+        if (codiceFiscaleEditText.getText().length() != 16) {
+            codiceFiscaleEditText.setError(getString(R.string.invalid_cf_length_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(dataNascitaEditText.getText())) {
+            dataNascitaEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (sessoRadioGroup.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(this, R.string.gender_not_selected_error, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
     private void aggiungiMembro() {
+        if (!validateInput()) {
+            return;
+        }
+
         String nome = nomeEditText.getText().toString().trim();
         String cognome = cognomeEditText.getText().toString().trim();
         String codiceFiscale = codiceFiscaleEditText.getText().toString().trim();
         String dataNascita = dataNascitaEditText.getText().toString().trim();
 
-        int selectedSessoId = sessoRadioGroup.getCheckedRadioButtonId();
-        String sesso = "";
-        if (selectedSessoId == radioMaschio.getId()) {
-            sesso = "M";
-        } else if (selectedSessoId == radioFemmina.getId()) {
-            sesso = "F";
-        }
+        RadioButton selectedRadioButton = findViewById(sessoRadioGroup.getCheckedRadioButtonId());
+        String sesso = selectedRadioButton.getText().toString().startsWith("M") ? "M" : "F";
 
         boolean assistenza = assistenzaCheckBox.isChecked();
         boolean minorenne = minorenneCheckBox.isChecked();
@@ -97,26 +121,24 @@ public class AggiungiMembroBoundary extends AppCompatActivity {
         submitButton.setEnabled(false);
 
         gestioneNucleoFamiliareControl.inserisciMembro(
-            nome, cognome, codiceFiscale, dataNascita, sesso, assistenza, minorenne,
-            new GenericCallback() {
-                @Override
-                public void onSuccess(String message) {
-                    loadingProgressBar.setVisibility(View.GONE);
-                    submitButton.setEnabled(true);
-                    Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
+                nome, cognome, codiceFiscale, dataNascita, sesso, assistenza, minorenne,
+                new GenericCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        loadingProgressBar.setVisibility(View.GONE);
+                        submitButton.setEnabled(true);
+                        Toast.makeText(AggiungiMembroBoundary.this, message, Toast.LENGTH_LONG).show();
+                        // Ritorna alla schermata precedente
+                        finish();
+                    }
 
-                    Intent intent = new Intent(AggiungiMembroBoundary.this, VisualizzaNucleoBoundary.class);
-                    startActivity(intent);
-                    finish();
+                    @Override
+                    public void onError(String message) {
+                        loadingProgressBar.setVisibility(View.GONE);
+                        submitButton.setEnabled(true);
+                        Toast.makeText(AggiungiMembroBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
+                    }
                 }
-
-                @Override
-                public void onError(String message) {
-                    loadingProgressBar.setVisibility(View.GONE);
-                    submitButton.setEnabled(true);
-                    Toast.makeText(AggiungiMembroBoundary.this, getString(R.string.generic_error, message), Toast.LENGTH_LONG).show();
-                }
-            }
         );
     }
 }

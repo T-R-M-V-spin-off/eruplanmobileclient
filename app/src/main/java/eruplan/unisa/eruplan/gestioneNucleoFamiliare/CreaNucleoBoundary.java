@@ -1,6 +1,7 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -51,7 +52,43 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         postiVeicoloEditText = findViewById(R.id.postiVeicoloEditText);
     }
 
+    private boolean validateInput() {
+        if (TextUtils.isEmpty(viaPiazzaEditText.getText())) {
+            viaPiazzaEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(comuneEditText.getText())) {
+            comuneEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(regioneEditText.getText())) {
+            regioneEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(paeseEditText.getText())) {
+            paeseEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(civicoEditText.getText())) {
+            civicoEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (TextUtils.isEmpty(capEditText.getText())) {
+            capEditText.setError(getString(R.string.empty_field_error));
+            return false;
+        }
+        if (hasVeicoloCheckBox.isChecked() && TextUtils.isEmpty(postiVeicoloEditText.getText())) {
+            postiVeicoloEditText.setError(getString(R.string.error_empty_vehicle_seats));
+            return false;
+        }
+        return true;
+    }
+
     private void submitNucleo() {
+        if (!validateInput()) {
+            return;
+        }
+
         String viaPiazza = viaPiazzaEditText.getText().toString().trim();
         String comune = comuneEditText.getText().toString().trim();
         String regione = regioneEditText.getText().toString().trim();
@@ -62,15 +99,10 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         int postiVeicolo = 0;
 
         if (hasVeicolo) {
-            String postiStr = postiVeicoloEditText.getText().toString().trim();
-            if (postiStr.isEmpty()) {
-                Toast.makeText(this, "Per favore, inserisci il numero di posti.", Toast.LENGTH_SHORT).show();
-                return;
-            }
             try {
-                postiVeicolo = Integer.parseInt(postiStr);
+                postiVeicolo = Integer.parseInt(postiVeicoloEditText.getText().toString().trim());
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Il numero di posti non è valido.", Toast.LENGTH_SHORT).show();
+                postiVeicoloEditText.setError(getString(R.string.error_invalid_vehicle_seats));
                 return;
             }
         }

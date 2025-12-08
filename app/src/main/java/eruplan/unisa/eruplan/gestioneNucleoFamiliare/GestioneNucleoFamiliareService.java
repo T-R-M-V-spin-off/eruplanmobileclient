@@ -43,9 +43,7 @@ public class GestioneNucleoFamiliareService {
     public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {repository.eliminaAppoggio(appoggioId, callback);}
     public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {repository.rimuoviMembro(codiceFiscale, callback);}
 
-    public void abbandonaNucleo(final GenericCallback callback) {
-        repository.abbandonaNucleo(callback);
-    }
+    public void abbandonaNucleo(final GenericCallback callback)  {repository.abbandonaNucleo(callback);}
 
     public void creaMembro(String nome, String cognome, String cf, String data, String sesso, boolean assistenza, boolean minorenne, final GenericCallback callback) {
         if (!Validator.isNomeValid(nome)) { callback.onError(context.getString(R.string.validation_invalid_name)); return; }
