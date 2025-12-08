@@ -31,26 +31,17 @@ public class GestioneNucleoFamiliareService {
     public void getNucleo(final NucleoCallback callback) {
         repository.getNucleo(callback);
     }
-
-    public void getRichieste(final RichiesteCallback callback) {
-        repository.getRichieste(callback);
-    }
-
+    public void getRichieste(final RichiesteCallback callback) {repository.getRichieste(callback);}
     public void getMembri(final MembriCallback callback) {
         repository.getMembri(callback);
     }
-
     public void getAppoggi(final AppoggiCallback callback) {
         repository.getAppoggi(callback);
     }
 
-    public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {
-        repository.eliminaAppoggio(appoggioId, callback);
-    }
 
-    public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {
-        repository.rimuoviMembro(codiceFiscale, callback);
-    }
+    public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {repository.eliminaAppoggio(appoggioId, callback);}
+    public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {repository.rimuoviMembro(codiceFiscale, callback);}
 
     public void abbandonaNucleo(final GenericCallback callback) {
         repository.abbandonaNucleo(callback);

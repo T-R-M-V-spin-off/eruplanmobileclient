@@ -1,19 +1,16 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-
+import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
 import eruplan.unisa.eruplan.BuildConfig;
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.callback.AppoggiCallback;
@@ -30,19 +27,22 @@ import eruplan.unisa.eruplan.utility.VolleySingleton;
 
 public class GestioneNucleoFamiliareRepository {
 
-    // Endpoints
-    private static final String SOTTOSISTEMA_NUCLEO_URL = BuildConfig.BASE_URL + "/sottosistema";
-    private static final String NUCLEO_URL = BuildConfig.BASE_URL + "/nucleo";
+    private static final String BASE_GNF_URL = BuildConfig.BASE_URL + "/gestoreNucleo";
 
-    private static final String MEMBERS_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/membri";
-    private static final String NUCLEI_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/nuclei";
-    private static final String RESIDENZA_ENDPOINT = NUCLEI_ENDPOINT + "/residenza";
-    private static final String ABBANDONA_ENDPOINT = NUCLEI_ENDPOINT + "/abbandona";
-    private static final String APPOGGI_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/appoggi";
-    private static final String INVITI_ENDPOINT = NUCLEO_URL + "/inviti";
-    private static final String ACCETTA_INVITO_ENDPOINT = INVITI_ENDPOINT + "/accetta";
-    private static final String CERCA_UTENTE_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/utenti/cerca";
-    private static final String INVITA_UTENTE_ENDPOINT = SOTTOSISTEMA_NUCLEO_URL + "/inviti/nuovo";
+    // Endpoints allineati al GNFControl del server
+    private static final String INVITA_ENDPOINT = BASE_GNF_URL + "/invita";
+    private static final String ACCETTA_ENDPOINT = BASE_GNF_URL + "/accetta";
+    private static final String AGGIUNGI_MEMBRO_ENDPOINT = BASE_GNF_URL + "/aggiungiMembro";
+    private static final String ABBANDONA_ENDPOINT = BASE_GNF_URL + "/abbandona";
+    private static final String RICHIESTE_ENDPOINT = BASE_GNF_URL + "/richieste";
+    private static final String APPOGGI_ENDPOINT = BASE_GNF_URL + "/appoggi";
+    private static final String AGGIUNGI_APPOGGIO_ENDPOINT = APPOGGI_ENDPOINT + "/aggiungi";
+    private static final String RIMUOVI_APPOGGIO_ENDPOINT = APPOGGI_ENDPOINT + "/rimuovi";
+
+    // Endpoint non presenti nel controller fornito: verranno gestiti con un errore temporaneo.
+    private static final String MEMBRI_ENDPOINT = BASE_GNF_URL + "/membri"; // Ipotetico
+    private static final String RESIDENZA_ENDPOINT = BASE_GNF_URL + "/residenza"; // Ipotetico
+    private static final String CERCA_UTENTE_ENDPOINT = BuildConfig.BASE_URL + "/gestoreUtentiMobile/utenti/cerca";
 
     private final Context context;
 
@@ -54,15 +54,9 @@ public class GestioneNucleoFamiliareRepository {
         NetworkResponse response = error.networkResponse;
         if (response != null && response.data != null) {
             try {
-                String responseBody = new String(response.data, StandardCharsets.UTF_8);
-                JSONObject data = new JSONObject(responseBody);
-                if (data.has("message")) {
-                    return data.getString("message");
-                } else if (data.has("error")) {
-                    return data.getString("error");
-                }
+                return new String(response.data, StandardCharsets.UTF_8);
             } catch (Exception e) {
-                // Ignora, usa messaggio generico
+                // Ignora
             }
         }
         if (response != null) {
@@ -71,34 +65,57 @@ public class GestioneNucleoFamiliareRepository {
         return context.getString(R.string.repo_server_communication_error);
     }
 
-    public void getNucleo(final NucleoCallback callback) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, RESIDENZA_ENDPOINT, null,
-                response -> {
-                    try {
-                        NucleoEntity nucleo = new NucleoEntity();
-                        nucleo.setViaPiazza(response.getString("viaPiazza"));
-                        nucleo.setComune(response.getString("comune"));
-                        nucleo.setRegione(response.getString("regione"));
-                        nucleo.setPaese(response.getString("paese"));
-                        nucleo.setCivico(response.getString("civico"));
-                        nucleo.setCap(response.getString("cap"));
-                        callback.onNucleoLoaded(nucleo);
-                    } catch (JSONException e) {
-                        callback.onError(context.getString(R.string.repo_parsing_error));
-                    }
-                },
-                error -> callback.onError(parseError(error)));
+    // RF-GNF.01: Invita utente
+    public void inviaRichiestaInvito(String codiceFiscaleDestinatario, final GenericCallback callback) {
+        String url = INVITA_ENDPOINT + "?cfInvitato=" + codiceFiscaleDestinatario;
+        StringRequest request = new StringRequest(Request.Method.POST, url, callback::onSuccess, error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
+    // RF-GNF.02: Accetta invito
+    public void accettaRichiestaApi(long idRichiesta, final GenericCallback callback) {
+        String url = ACCETTA_ENDPOINT + "/" + idRichiesta;
+        StringRequest request = new StringRequest(Request.Method.POST, url, callback::onSuccess, error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    // RF-GNF.03: Aggiungi Membro Manuale
+    public void salvaMembro(MembroEntity membro, final GenericCallback callback) {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("nome", membro.getNome());
+            body.put("cognome", membro.getCognome());
+            body.put("codiceFiscale", membro.getCodiceFiscale());
+            body.put("dataDiNascita", membro.getDataDiNascita());
+            body.put("sesso", membro.getSesso());
+        } catch (JSONException e) {
+            callback.onError(context.getString(R.string.repo_internal_request_error));
+            return;
+        }
+        StringRequest request = new StringRequest(Request.Method.POST, AGGIUNGI_MEMBRO_ENDPOINT, callback::onSuccess, error -> callback.onError(parseError(error))) {
+            @Override
+            public byte[] getBody() { return body.toString().getBytes(StandardCharsets.UTF_8); }
+            @Override
+            public String getBodyContentType() { return "application/json; charset=utf-8"; }
+        };
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    // RF-GNF.04: Abbandona Nucleo
+    public void abbandonaNucleo(final GenericCallback callback) {
+        StringRequest request = new StringRequest(Request.Method.POST, ABBANDONA_ENDPOINT, callback::onSuccess, error -> callback.onError(parseError(error)));
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    // RF-GNF.06: Visualizza lista richieste
     public void getRichieste(final RichiesteCallback callback) {
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, INVITI_ENDPOINT, null,
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, RICHIESTE_ENDPOINT, null,
                 response -> {
                     try {
                         List<RichiestaEntity> richieste = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             JSONObject obj = response.getJSONObject(i);
-                            richieste.add(new RichiestaEntity(obj.getLong("id"), obj.getString("nomeMittente"), obj.getString("dataOra")));
+                            richieste.add(new RichiestaEntity(obj.optLong("id"), obj.optString("nomeMittente"), obj.optString("dataOra")));
                         }
                         callback.onRichiesteLoaded(richieste);
                     } catch (JSONException e) {
@@ -109,155 +126,7 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    public void getMembri(final MembriCallback callback) {
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBERS_ENDPOINT, null,
-                response -> {
-                    try {
-                        List<MembroEntity> membri = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject obj = response.getJSONObject(i);
-                            MembroEntity m = new MembroEntity();
-                            m.setNome(obj.optString("nome"));
-                            m.setCognome(obj.optString("cognome"));
-                            m.setCodiceFiscale(obj.optString("codiceFiscale"));
-                            m.setDataDiNascita(obj.optString("dataDiNascita"));
-                            m.setSesso(obj.optString("sesso"));
-                            m.setAssistenza(obj.optBoolean("assistenza"));
-                            m.setMinorenne(obj.optBoolean("minorenne"));
-                            membri.add(m);
-                        }
-                        callback.onMembriLoaded(membri);
-                    } catch (JSONException e) {
-                        callback.onError(context.getString(R.string.repo_parsing_error));
-                    }
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void getAppoggi(final AppoggiCallback callback) {
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, APPOGGI_ENDPOINT, null,
-                response -> {
-                    try {
-                        List<AppoggioEntity> appoggi = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject json = response.getJSONObject(i);
-                            AppoggioEntity appoggio = new AppoggioEntity(
-                                    json.getString("viaPiazza"), json.getString("civico"), json.getString("comune"),
-                                    json.getString("cap"), json.getString("provincia"), json.getString("regione"),
-                                    json.getString("paese")
-                            );
-                            appoggio.setId(json.getLong("id"));
-                            appoggi.add(appoggio);
-                        }
-                        callback.onAppoggiLoaded(appoggi);
-                    } catch (JSONException e) {
-                        callback.onError(context.getString(R.string.repo_parsing_error));
-                    }
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {
-        String url = APPOGGI_ENDPOINT + "/" + appoggioId;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_delete_success_default));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {
-        String url = MEMBERS_ENDPOINT + "/" + codiceFiscale;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_remove_member_success_default));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void salvaMembro(MembroEntity membro, final GenericCallback callback) {
-        JSONObject body = new JSONObject();
-        try {
-            body.put("nome", membro.getNome());
-            body.put("cognome", membro.getCognome());
-            body.put("codiceFiscale", membro.getCodiceFiscale());
-            body.put("dataDiNascita", membro.getDataDiNascita());
-            body.put("sesso", membro.getSesso());
-            body.put("assistenza", membro.isAssistenza());
-            body.put("minorenne", membro.isMinorenne());
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, MEMBERS_ENDPOINT, body,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void salvaNucleo(NucleoEntity nucleo, final GenericCallback callback) {
-        JSONObject body = new JSONObject();
-        try {
-            body.put("viaPiazza", nucleo.getViaPiazza());
-            body.put("comune", nucleo.getComune());
-            body.put("regione", nucleo.getRegione());
-            body.put("paese", nucleo.getPaese());
-            body.put("civico", nucleo.getCivico());
-            body.put("cap", nucleo.getCap());
-            body.put("hasVeicolo", nucleo.hasVeicolo());
-            body.put("postiVeicolo", nucleo.getPostiVeicolo());
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, NUCLEI_ENDPOINT, body,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_create_nucleus_success_default));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void modificaResidenza(NucleoEntity nucleo, final GenericCallback callback) {
-        JSONObject body = new JSONObject();
-        try {
-            body.put("viaPiazza", nucleo.getViaPiazza());
-            body.put("comune", nucleo.getComune());
-            body.put("regione", nucleo.getRegione());
-            body.put("paese", nucleo.getPaese());
-            body.put("civico", nucleo.getCivico());
-            body.put("cap", nucleo.getCap());
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, RESIDENZA_ENDPOINT, body,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
-                    if (success) callback.onSuccess(msg); else callback.onError(msg);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
+    // RF-GNF.09: Aggiungi Appoggio
     public void salvaAppoggio(AppoggioEntity appoggio, final GenericCallback callback) {
         JSONObject body = new JSONObject();
         try {
@@ -272,29 +141,47 @@ public class GestioneNucleoFamiliareRepository {
             callback.onError(context.getString(R.string.repo_internal_request_error));
             return;
         }
+        StringRequest request = new StringRequest(Request.Method.POST, AGGIUNGI_APPOGGIO_ENDPOINT, callback::onSuccess, error -> callback.onError(parseError(error))) {
+            @Override
+            public byte[] getBody() { return body.toString().getBytes(StandardCharsets.UTF_8); }
+            @Override
+            public String getBodyContentType() { return "application/json; charset=utf-8"; }
+        };
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, APPOGGI_ENDPOINT, body,
+    // Mostra luoghi sicuri
+    public void getAppoggi(final AppoggiCallback callback) {
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, APPOGGI_ENDPOINT, null,
                 response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_create_support_success_default));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
+                    try {
+                        List<AppoggioEntity> appoggi = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject json = response.getJSONObject(i);
+                            AppoggioEntity appoggioEntity = new AppoggioEntity(json.getString("viaPiazza"), json.getString("civico"), json.getString("comune"), json.getString("cap"), json.getString("provincia"), json.getString("regione"), json.getString("paese"));
+                            appoggioEntity.setId(json.getLong("id"));
+                            appoggi.add(appoggioEntity);
+                        }
+                        callback.onAppoggiLoaded(appoggi);
+                    } catch (JSONException e) {
+                        callback.onError(context.getString(R.string.repo_parsing_error));
+                    }
                 },
                 error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-    public void abbandonaNucleo(final GenericCallback callback) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ABBANDONA_ENDPOINT, null,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String message = response.optString("message", context.getString(R.string.repo_leave_nucleus_success_default));
-                    if (success) callback.onSuccess(message); else callback.onError(message);
-                },
-                error -> callback.onError(parseError(error)));
+    // RF-GNF.10: Rimuovi Appoggio
+    public void eliminaAppoggio(long appoggioId, final GenericCallback callback) {
+        String url = RIMUOVI_APPOGGIO_ENDPOINT + "/" + appoggioId;
+        StringRequest request = new StringRequest(Request.Method.DELETE, url, callback::onSuccess, error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
+
+    // --- Metodi con Endpoint non disponibili nel controller GNF --- //
 
     public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {
+        // Questa logica appartiene al gestoreUtenteMobile e la lasciamo invariata
         JSONObject body = new JSONObject();
         try {
             body.put("codiceFiscale", codiceFiscale);
@@ -306,8 +193,7 @@ public class GestioneNucleoFamiliareRepository {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, CERCA_UTENTE_ENDPOINT, body,
                 response -> {
                     try {
-                        boolean success = response.getBoolean("success");
-                        if (success) {
+                        if (response.getBoolean("success")) {
                             JSONObject data = response.getJSONObject("data");
                             MembroEntity m = new MembroEntity();
                             m.setNome(data.optString("nome"));
@@ -324,42 +210,29 @@ public class GestioneNucleoFamiliareRepository {
                 error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
-
-    public void inviaRichiestaInvito(String codiceFiscaleDestinatario, final GenericCallback callback) {
-        JSONObject body = new JSONObject();
-        try {
-            body.put("codiceFiscaleDestinatario", codiceFiscaleDestinatario);
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, INVITA_UTENTE_ENDPOINT, body,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
-                    if (success) callback.onSuccess(msg); else callback.onError(msg);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    
+    public void getMembri(final MembriCallback callback) {
+        // TODO: Endpoint non specificato nel controller, usare un URL ipotetico
+        callback.onError("Endpoint non implementato sul server per getMembri");
     }
 
-    public void accettaRichiestaApi(long idRichiesta, final GenericCallback callback) {
-        JSONObject body = new JSONObject();
-        try {
-            body.put("idRichiesta", idRichiesta);
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
+    public void getNucleo(final NucleoCallback callback) {
+        // TODO: Endpoint non specificato nel controller, usare un URL ipotetico
+        callback.onError("Endpoint non implementato sul server per getNucleo");
+    }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ACCETTA_INVITO_ENDPOINT, body,
-                response -> {
-                    boolean success = response.optBoolean("success");
-                    String msg = response.optString("message", context.getString(R.string.repo_generic_operation_completed));
-                    if (success) callback.onSuccess(msg); else callback.onError(msg);
-                },
-                error -> callback.onError(parseError(error)));
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    public void rimuoviMembro(String codiceFiscale, final GenericCallback callback) {
+        // TODO: Endpoint non specificato nel controller
+        callback.onError("Endpoint non implementato sul server per rimuoviMembro");
+    }
+
+    public void salvaNucleo(NucleoEntity nucleo, final GenericCallback callback) {
+        // TODO: Endpoint non specificato nel controller
+        callback.onError("Endpoint non implementato sul server per salvaNucleo");
+    }
+
+    public void modificaResidenza(NucleoEntity nucleo, final GenericCallback callback) {
+        // TODO: Endpoint non specificato nel controller
+        callback.onError("Endpoint non implementato sul server per modificaResidenza");
     }
 }
