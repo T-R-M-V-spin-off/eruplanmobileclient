@@ -61,4 +61,7 @@ dependencies {
 
     // Aggiunta libreria per le chiamate di rete
     implementation("com.android.volley:volley:1.2.1")
+
+    // WorkManager
+    implementation("androidx.work:work-runtime:2.9.0")
 }
