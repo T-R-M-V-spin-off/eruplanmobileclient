@@ -67,11 +67,11 @@ public class GestioneUtenteRepository {
     public void logout(final RepositoryCallback callback) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, LOGOUT_URL,
                 response -> {
-                    VolleySingleton.logout();
+                    VolleySingleton.getInstance(context).logout();
                     callback.onSuccess(context.getString(R.string.repo_logout_success));
                 },
                 error -> {
-                    VolleySingleton.logout();
+                    VolleySingleton.getInstance(context).logout();
                     String errorMessage = parseError(error);
                     callback.onError(errorMessage);
                 }
