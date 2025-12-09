@@ -270,6 +270,19 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
+    public void checkNucleoExists(final GenericCallback callback) {
+        StringRequest request = new StringRequest(Request.Method.GET, BASE_GNF_URL,
+                response -> {
+                    // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
+                    callback.onSuccess("Nucleo trovato.");
+                },
+                error -> {
+                    // Un errore (es. 404) indica che il nucleo non esiste.
+                    callback.onError(parseError(error));
+                });
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
     // --- Metodi con Endpoint non disponibili nel controller GNF --- //
 
     public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {

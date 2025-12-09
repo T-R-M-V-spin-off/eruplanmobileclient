@@ -31,6 +31,11 @@ public class GestioneNucleoFamiliareService {
     public void getNucleo(final NucleoCallback callback) {
         repository.getNucleo(callback);
     }
+
+    public void checkNucleoExists(final GenericCallback callback) {
+        repository.checkNucleoExists(callback);
+    }
+
     public void getRichieste(final RichiesteCallback callback) {repository.getRichieste(callback);}
     public void getMembri(final MembriCallback callback) {
         repository.getMembri(callback);

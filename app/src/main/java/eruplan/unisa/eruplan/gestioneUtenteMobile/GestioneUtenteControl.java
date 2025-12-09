@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoBoundary; // NOTA: Assumo che la tua activity principale si chiami HomeActivity
-import eruplan.unisa.eruplan.callback.NucleoCallback;
-import eruplan.unisa.eruplan.entity.NucleoEntity;
+import eruplan.unisa.eruplan.callback.GenericCallback;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoFamiliareService;
 
@@ -67,9 +66,9 @@ public class GestioneUtenteControl {
      * @param loginCallback il callback per notificare il reindirizzamento alla boundary.
      */
     private void checkNucleoAndRedirect(final LoginCallback loginCallback) {
-        gnfService.getNucleo(new NucleoCallback() {
+        gnfService.checkNucleoExists(new GenericCallback() {
             @Override
-            public void onNucleoLoaded(NucleoEntity nucleo) {
+            public void onSuccess(String message) {
                 // L'utente ha un nucleo. Vai alla Home.
                 Intent intent = new Intent(context, GestioneNucleoBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
