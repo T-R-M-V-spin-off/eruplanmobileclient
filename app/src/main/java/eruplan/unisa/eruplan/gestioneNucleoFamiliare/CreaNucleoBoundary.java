@@ -1,5 +1,6 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -120,7 +121,10 @@ public class CreaNucleoBoundary extends AppCompatActivity {
                 loadingProgressBarNucleo.setVisibility(View.GONE);
                 btnSubmitNucleo.setEnabled(true);
                 Toast.makeText(CreaNucleoBoundary.this, message, Toast.LENGTH_LONG).show();
-                finish();
+                Intent intent = new Intent(CreaNucleoBoundary.this, GestioneNucleoBoundary.class);
+                intent.putExtra("IS_ACTIONABLE", true);
+                startActivity(intent);
+
             }
 
             @Override
