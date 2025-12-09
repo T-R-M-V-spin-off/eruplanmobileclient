@@ -74,11 +74,11 @@ public class GestioneNucleoFamiliareRepository {
     }
 
     public void checkNucleoExists(final GenericCallback callback) {
-        // Usiamo l'endpoint per ottenere i membri. Se la richiesta ha successo (risposta 2xx),
-        // il server risponderà con un array JSON (anche vuoto), confermando che il nucleo esiste.
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBRI_ENDPOINT, null,
+        // Usiamo uno StringRequest perché è più semplice per verificare solo l'esistenza.
+        // Se la richiesta ha successo (risposta 2xx), il nucleo esiste.
+        StringRequest request = new StringRequest(Request.Method.GET, MEMBRI_ENDPOINT,
                 response -> {
-                    // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
+                    // Una risposta di successo, indipendentemente dal contenuto, indica che il nucleo esiste.
                     callback.onSuccess("Nucleo trovato.");
                 },
                 error -> {
@@ -251,9 +251,7 @@ public class GestioneNucleoFamiliareRepository {
                 return body.toString().getBytes(StandardCharsets.UTF_8);
             }
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
+            public String getBodyContentType() { return "application/json; charset=utf-8"; }
         };
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
@@ -275,14 +273,10 @@ public class GestioneNucleoFamiliareRepository {
 
         StringRequest request = new StringRequest(Request.Method.POST, MODIFICA_RESIDENZA_ENDPOINT, callback::onSuccess, error -> callback.onError(parseError(error))) {
             @Override
-            public byte[] getBody() {
-                return body.toString().getBytes(StandardCharsets.UTF_8);
-            }
+            public byte[] getBody() { return body.toString().getBytes(StandardCharsets.UTF_8); }
 
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
+            public String getBodyContentType() { return "application/json; charset=utf-8"; }
         };
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }

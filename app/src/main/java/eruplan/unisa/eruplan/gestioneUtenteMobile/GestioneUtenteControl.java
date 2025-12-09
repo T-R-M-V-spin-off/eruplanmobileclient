@@ -2,6 +2,7 @@ package eruplan.unisa.eruplan.gestioneUtenteMobile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import eruplan.unisa.eruplan.callback.GenericCallback;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
@@ -16,6 +17,7 @@ public class GestioneUtenteControl {
     private final GestioneUtenteService service;
     private final GestioneNucleoFamiliareService gnfService;
     private final Context context;
+    private static final String TAG = "CheckNucleoDebug";
 
     // Interfacce per la comunicazione verso le Boundary, specifiche per operazione
     public interface LoginCallback {
@@ -70,6 +72,7 @@ public class GestioneUtenteControl {
             @Override
             public void onSuccess(String message) {
                 // L'utente ha un nucleo. Vai alla visualizzazione del nucleo.
+                Log.d(TAG, "Controllo nucleo superato: " + message);
                 Intent intent = new Intent(context, VisualizzaNucleoBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
@@ -78,7 +81,8 @@ public class GestioneUtenteControl {
 
             @Override
             public void onError(String message) {
-                // L'utente non ha un nucleo. Vai alla pagina di scelta.
+                // L'utente non ha un nucleo. Qui registriamo l'errore esatto.
+                Log.e(TAG, "Controllo nucleo fallito. Errore ricevuto: " + message);
                 Intent intent = new Intent(context, CosaVuoiFareBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
