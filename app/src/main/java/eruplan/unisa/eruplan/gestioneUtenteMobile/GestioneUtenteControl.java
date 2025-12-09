@@ -3,10 +3,10 @@ package eruplan.unisa.eruplan.gestioneUtenteMobile;
 import android.content.Context;
 import android.content.Intent;
 
-import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoBoundary; // NOTA: Assumo che la tua activity principale si chiami HomeActivity
 import eruplan.unisa.eruplan.callback.GenericCallback;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoFamiliareService;
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.VisualizzaNucleoBoundary;
 
 /**
  * Gestisce le interazioni tra la UI (Boundary) e la logica di business (Service).
@@ -69,8 +69,8 @@ public class GestioneUtenteControl {
         gnfService.checkNucleoExists(new GenericCallback() {
             @Override
             public void onSuccess(String message) {
-                // L'utente ha un nucleo. Vai alla Home.
-                Intent intent = new Intent(context, GestioneNucleoBoundary.class);
+                // L'utente ha un nucleo. Vai alla visualizzazione del nucleo.
+                Intent intent = new Intent(context, VisualizzaNucleoBoundary.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
                 loginCallback.onLoginRedirect();

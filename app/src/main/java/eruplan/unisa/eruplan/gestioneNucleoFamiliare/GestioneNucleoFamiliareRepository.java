@@ -271,13 +271,15 @@ public class GestioneNucleoFamiliareRepository {
     }
 
     public void checkNucleoExists(final GenericCallback callback) {
-        StringRequest request = new StringRequest(Request.Method.GET, MEMBRI_ENDPOINT,
+        // Usiamo l'endpoint per ottenere i membri. Se la richiesta ha successo (risposta 2xx),
+        // il server risponderà con un array JSON (anche vuoto), confermando che il nucleo esiste.
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBRI_ENDPOINT, null,
                 response -> {
                     // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
                     callback.onSuccess("Nucleo trovato.");
                 },
                 error -> {
-                    // Un errore (es. 404) indica che il nucleo non esiste.
+                    // Un errore (es. 400, 401, 404) viene interpretato come "nucleo non esistente".
                     callback.onError(parseError(error));
                 });
         VolleySingleton.getInstance(context).addToRequestQueue(request);
