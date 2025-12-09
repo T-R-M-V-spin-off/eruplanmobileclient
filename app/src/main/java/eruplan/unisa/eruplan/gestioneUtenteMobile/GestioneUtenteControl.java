@@ -3,7 +3,11 @@ package eruplan.unisa.eruplan.gestioneUtenteMobile;
 import android.content.Context;
 import android.content.Intent;
 
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoBoundary; // NOTA: Assumo che la tua activity principale si chiami HomeActivity
+import eruplan.unisa.eruplan.callback.NucleoCallback;
+import eruplan.unisa.eruplan.entity.NucleoEntity;
 import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
+import eruplan.unisa.eruplan.gestioneNucleoFamiliare.GestioneNucleoFamiliareService;
 
 /**
  * Gestisce le interazioni tra la UI (Boundary) e la logica di business (Service).
@@ -11,6 +15,7 @@ import eruplan.unisa.eruplan.gestioneNucleoFamiliare.CosaVuoiFareBoundary;
 public class GestioneUtenteControl {
 
     private final GestioneUtenteService service;
+    private final GestioneNucleoFamiliareService gnfService;
     private final Context context;
 
     // Interfacce per la comunicazione verso le Boundary, specifiche per operazione
@@ -33,27 +38,52 @@ public class GestioneUtenteControl {
 
     public GestioneUtenteControl(Context context) {
         this.service = new GestioneUtenteService(context);
+        this.gnfService = new GestioneNucleoFamiliareService(context);
         this.context = context;
     }
 
     /**
-     * Inoltra la richiesta di login al Service e gestisce la risposta.
+     * Inoltra la richiesta di login al Service e, in caso di successo,
+     * controlla l'esistenza di un nucleo per decidere il reindirizzamento.
      */
     public void login(String codiceFiscale, String password, final LoginCallback callback) {
         service.login(codiceFiscale, password, new GestioneUtenteService.ServiceCallback() {
             @Override
             public void onSuccess(String message) {
                 callback.onLoginSuccess(message);
-                // La logica di navigazione rimane qui per centralizzare i cambi di activity
-                Intent intent = new Intent(context, CosaVuoiFareBoundary.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(intent);
-                callback.onLoginRedirect();
+                // Dopo il login, controlla se l'utente ha un nucleo e reindirizza
+                checkNucleoAndRedirect(callback);
             }
 
             @Override
             public void onError(String message) {
                 callback.onLoginError(message);
+            }
+        });
+    }
+
+    /**
+     * Controlla se l'utente ha un nucleo familiare e reindirizza all'activity appropriata.
+     * @param loginCallback il callback per notificare il reindirizzamento alla boundary.
+     */
+    private void checkNucleoAndRedirect(final LoginCallback loginCallback) {
+        gnfService.getNucleo(new NucleoCallback() {
+            @Override
+            public void onNucleoLoaded(NucleoEntity nucleo) {
+                // L'utente ha un nucleo. Vai alla Home.
+                Intent intent = new Intent(context, GestioneNucleoBoundary.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+                loginCallback.onLoginRedirect();
+            }
+
+            @Override
+            public void onError(String message) {
+                // L'utente non ha un nucleo. Vai alla pagina di scelta.
+                Intent intent = new Intent(context, CosaVuoiFareBoundary.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+                loginCallback.onLoginRedirect();
             }
         });
     }
