@@ -1,16 +1,20 @@
 package eruplan.unisa.eruplan.gestioneNucleoFamiliare;
 
 import android.content.Context;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
 import eruplan.unisa.eruplan.BuildConfig;
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.callback.AppoggiCallback;
@@ -67,6 +71,21 @@ public class GestioneNucleoFamiliareRepository {
             return context.getString(R.string.repo_server_communication_error_with_code, response.statusCode);
         }
         return context.getString(R.string.repo_server_communication_error);
+    }
+
+    public void checkNucleoExists(final GenericCallback callback) {
+        // Usiamo l'endpoint per ottenere i membri. Se la richiesta ha successo (risposta 2xx),
+        // il server risponderà con un array JSON (anche vuoto), confermando che il nucleo esiste.
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBRI_ENDPOINT, null,
+                response -> {
+                    // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
+                    callback.onSuccess("Nucleo trovato.");
+                },
+                error -> {
+                    // Un errore (es. 400, 401, 404) viene interpretato come "nucleo non esistente".
+                    callback.onError(parseError(error));
+                });
+        VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
     // RF-GNF.01: Invita utente
@@ -254,9 +273,7 @@ public class GestioneNucleoFamiliareRepository {
             return;
         }
 
-        StringRequest request = new StringRequest(Request.Method.POST, MODIFICA_RESIDENZA_ENDPOINT,
-                callback::onSuccess,
-                error -> callback.onError(parseError(error))) {
+        StringRequest request = new StringRequest(Request.Method.POST, MODIFICA_RESIDENZA_ENDPOINT, callback::onSuccess, error -> callback.onError(parseError(error))) {
             @Override
             public byte[] getBody() {
                 return body.toString().getBytes(StandardCharsets.UTF_8);
@@ -267,54 +284,6 @@ public class GestioneNucleoFamiliareRepository {
                 return "application/json; charset=utf-8";
             }
         };
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    public void checkNucleoExists(final GenericCallback callback) {
-        // Usiamo l'endpoint per ottenere i membri. Se la richiesta ha successo (risposta 2xx),
-        // il server risponderà con un array JSON (anche vuoto), confermando che il nucleo esiste.
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, MEMBRI_ENDPOINT, null,
-                response -> {
-                    // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
-                    callback.onSuccess("Nucleo trovato.");
-                },
-                error -> {
-                    // Un errore (es. 400, 401, 404) viene interpretato come "nucleo non esistente".
-                    callback.onError(parseError(error));
-                });
-        VolleySingleton.getInstance(context).addToRequestQueue(request);
-    }
-
-    // --- Metodi con Endpoint non disponibili nel controller GNF --- //
-
-    public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {
-        // Questa logica appartiene al gestoreUtenteMobile e la lasciamo invariata
-        JSONObject body = new JSONObject();
-        try {
-            body.put("codiceFiscale", codiceFiscale);
-        } catch (JSONException e) {
-            callback.onError(context.getString(R.string.repo_internal_request_error));
-            return;
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, CERCA_UTENTE_ENDPOINT, body,
-                response -> {
-                    try {
-                        if (response.getBoolean("success")) {
-                            JSONObject data = response.getJSONObject("data");
-                            MembroEntity m = new MembroEntity();
-                            m.setNome(data.optString("nome"));
-                            m.setCognome(data.optString("cognome"));
-                            m.setCodiceFiscale(data.optString("codiceFiscale"));
-                            callback.onSuccess(m);
-                        } else {
-                            callback.onError(response.optString("message", context.getString(R.string.repo_user_not_found)));
-                        }
-                    } catch (JSONException e) {
-                        callback.onError(context.getString(R.string.repo_parsing_error));
-                    }
-                },
-                error -> callback.onError(parseError(error)));
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
@@ -372,5 +341,7 @@ public class GestioneNucleoFamiliareRepository {
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }
 
-
+    public void cercaUtenteByCF(String codiceFiscale, final UtenteCallback callback) {
+        callback.onError("Endpoint di ricerca non implementato correttamente.");
+    }
 }
