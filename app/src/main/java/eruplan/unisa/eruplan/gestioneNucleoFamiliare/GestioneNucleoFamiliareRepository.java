@@ -271,7 +271,7 @@ public class GestioneNucleoFamiliareRepository {
     }
 
     public void checkNucleoExists(final GenericCallback callback) {
-        StringRequest request = new StringRequest(Request.Method.GET, BASE_GNF_URL,
+        StringRequest request = new StringRequest(Request.Method.GET, MEMBRI_ENDPOINT,
                 response -> {
                     // Se riceviamo una risposta di successo (2xx), significa che il nucleo esiste.
                     callback.onSuccess("Nucleo trovato.");
