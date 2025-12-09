@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import eruplan.unisa.eruplan.R;
 import eruplan.unisa.eruplan.callback.GenericCallback;
 
@@ -20,6 +22,7 @@ public class CreaNucleoBoundary extends AppCompatActivity {
     private Button btnSubmitNucleo;
     private ProgressBar loadingProgressBarNucleo;
     private CheckBox hasVeicoloCheckBox;
+    private TextInputLayout postiVeicoloInputLayout;
 
     private GestioneNucleoFamiliareControl gestioneNucleoFamiliareControl;
 
@@ -33,7 +36,7 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         initViews();
 
         hasVeicoloCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            postiVeicoloEditText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            postiVeicoloInputLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
         btnSubmitNucleo.setOnClickListener(v -> submitNucleo());
@@ -50,6 +53,7 @@ public class CreaNucleoBoundary extends AppCompatActivity {
         loadingProgressBarNucleo = findViewById(R.id.loadingProgressBarNucleo);
         hasVeicoloCheckBox = findViewById(R.id.hasVeicoloCheckBox);
         postiVeicoloEditText = findViewById(R.id.postiVeicoloEditText);
+        postiVeicoloInputLayout = findViewById(R.id.postiVeicoloInputLayout);
     }
 
     private boolean validateInput() {
