@@ -1,4 +1,5 @@
 package eruplan.unisa.eruplan.utility;
+
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
@@ -23,8 +24,15 @@ public class Validator {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
     private static final String NOME_PERSONA_REGEX = "^[a-zA-Z\\s]{2,30}$";
     private static final Pattern NOME_PERSONA_PATTERN = Pattern.compile(NOME_PERSONA_REGEX);
+
+    // Pattern legacy: accetta 0-9 e lettere (utile per validazione generale esistente)
     private static final String CODICE_FISCALE_REGEX = "^[A-Za-z0-9]{16}$";
     private static final Pattern CODICE_FISCALE_PATTERN = Pattern.compile(CODICE_FISCALE_REGEX);
+
+    // Nuovo pattern per TD-M-20: 16 caratteri, solo A-Za-z e cifre 1-9 (ZERO ESCLUSO)
+    private static final String CODICE_FISCALE_CHARS_REGEX = "^[A-Za-z1-9]{16}$";
+    private static final Pattern CODICE_FISCALE_CHARS_PATTERN = Pattern.compile(CODICE_FISCALE_CHARS_REGEX);
+
     private static final String COGNOME_PERSONA_REGEX="^[a-zA-Z\\s]{2,30}$";
     private static final Pattern COGNOME_PERSONA_PATTERN = Pattern.compile(COGNOME_PERSONA_REGEX);
 
@@ -36,9 +44,33 @@ public class Validator {
         return NOME_PERSONA_PATTERN.matcher(nome).matches();
     }
 
+    /**
+     * Validazione "completa" legacy (mantengo per retrocompatibilità)
+     */
     public static boolean isCodiceFiscaleValid(String cf) {
         if (cf == null || cf.compareTo("") == 0) return false;
         return CODICE_FISCALE_PATTERN.matcher(cf).matches();
+    }
+
+    /**
+     * Verifica la sola lunghezza (TD: LC)
+     * @param cf codice fiscale
+     * @return true se cf.length() == 16
+     */
+    public static boolean isCodiceFiscaleLengthValid(String cf) {
+        return cf != null && cf.length() == 16;
+    }
+
+    /**
+     * Verifica i soli caratteri ammessi secondo TD (A-Za-z e cifre 1-9, ZERO escluso)
+     * IMPORTANTE: questo metodo assume CF già lungo 16 (la chiamata dei test / controller
+     * dovrebbe prima controllare la lunghezza).
+     * @param cf codice fiscale
+     * @return true se cf contiene solo caratteri ammessi (no '0') e lunghezza 16
+     */
+    public static boolean isCodiceFiscaleCharactersValid(String cf) {
+        if (cf == null) return false;
+        return CODICE_FISCALE_CHARS_PATTERN.matcher(cf).matches();
     }
 
     public static boolean isSessoValid(String sesso) {
@@ -60,7 +92,7 @@ public class Validator {
     }
 
     /**
-     * Verifica se il nome del piano di evacuazione Ã¨ valido.
+     * Verifica se il nome del piano di evacuazione è valido.
      *
      * @param nomePiano Il nome da verificare
      * @return true se valido, false altrimenti
