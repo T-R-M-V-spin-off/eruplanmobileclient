@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 1. PERMESSO OBBLIGATORIO PER ANDROID 13+ (API 33+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
-    <!-- Opzionale ma consigliato, anche se spesso è implicito -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".utility.EruplanApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,8 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Eruplan">
 
+        <!-- StartupActivity è il Launcher: deve essere exported="true" -->
         <activity
-            android:name=".MainActivity"
+            android:name=".gestioneUtenteMobile.StartupBoundary"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +25,66 @@
             </intent-filter>
         </activity>
 
-        <!-- 2. DICHIARAZIONE DEL SERVIZIO FIREBASE (FONDAMENTALE) -->
-        <!-- Senza questo, onMessageReceived e onNewToken non partiranno MAI -->
+        <!-- Le altre activity sono interne: exported="false" per sicurezza -->
+        <activity
+            android:name=".gestioneUtenteMobile.LoginBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.GestioneNucleoBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneUtenteMobile.SignupBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.AggiungiMembroBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.CreaNucleoBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.CosaVuoiFareBoundary"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.InserisciAppoggioBoundary"
+            android:exported="true"/>
+
+        <activity android:name=".gestioneNucleoFamiliare.ListaRichiesteBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.VisualizzaMembriBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.VisualizzaNucleoBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.VisualizzaNucleoUtenteBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneNucleoFamiliare.ListaAppoggioBoundary"
+            android:exported="true"/>
+
+        <activity
+            android:name=".gestioneEmergenza.GestioneEmergenzaBoundary"
+            android:exported="true"/>
+
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".utility.EruplanMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -7,8 +7,11 @@ plugins {
 
 android {
     namespace = "eruplan.unisa.eruplan"
-    compileSdk {
-        version = release(36)
+    compileSdk = 36
+
+    // Abilita la generazione della classe BuildConfig
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -28,6 +31,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Definisci l'URL di produzione
+            buildConfigField("String", "BASE_URL", "\"https://eruplanserver.azurewebsites.net\"")
+        }
+        debug {
+            // Definisci l'URL di debug (attualmente uguale a quello di produzione)
+            buildConfigField("String", "BASE_URL", "\"https://eruplanserver.azurewebsites.net\"")
         }
     }
     compileOptions {
@@ -45,8 +54,14 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // Firebase
+    // Firebase (mantenuto per altri servizi come le notifiche)
     implementation(libs.firebase.messaging)
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
     implementation("com.google.firebase:firebase-analytics")
+
+    // Aggiunta libreria per le chiamate di rete
+    implementation("com.android.volley:volley:1.2.1")
+
+    // WorkManager
+    implementation("androidx.work:work-runtime:2.9.0")
 }
